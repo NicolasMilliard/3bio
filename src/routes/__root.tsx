@@ -1,4 +1,4 @@
-import { TooltipProvider } from '@/components/ui';
+import { Toaster, TooltipProvider } from '@/components/ui';
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
@@ -12,6 +12,7 @@ const RootLayout = () => (
         <main className="mx-auto w-full max-w-6xl">
           <Outlet />
         </main>
+        <Toaster />
       </div>
     </TooltipProvider>
     <TanStackRouterDevtools />

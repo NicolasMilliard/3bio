@@ -11,6 +11,7 @@ export * from './label';
 export * from './popover';
 export * from './select';
 export * from './separator';
+export * from './sonner';
 export * from './spinner';
 export * from './SpinnerScreen';
 export * from './textarea';
