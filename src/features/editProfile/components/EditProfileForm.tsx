@@ -32,7 +32,7 @@ export type SocialLink = z.infer<typeof socialLinkSchema>;
 
 const formSchema = z.object({
   avatar: z.union([z.instanceof(File), z.url(), z.literal('')]).optional(),
-  name: z.string(),
+  name: z.string().min(1, 'Name is required'),
   bio: z.string().optional(),
   socialLinks: z.array(socialLinkSchema),
 });
@@ -115,8 +115,6 @@ export const EditProfileForm = ({ profile }: { profile: LensProfile }) => {
         picture: avatarUri || undefined,
         ...(allAttributes.length > 0 && { attributes: allAttributes }),
       });
-
-      console.log(JSON.stringify(data, null, 2));
 
       const { uri: metadataUri } = await storageClient.uploadAsJson(data, {
         acl,

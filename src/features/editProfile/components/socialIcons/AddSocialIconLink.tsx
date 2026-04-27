@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
-import { SOCIAL_PLATFORMS, type SocialValue } from '../../constants';
+import { ALL_SOCIAL_PLATFORMS, type SocialValue } from '../../constants';
 import type { SocialLink } from '../EditProfileForm';
 
 import {
@@ -17,6 +17,7 @@ export const AddSocialIconLink = () => {
   const [open, setOpen] = useState(false);
   const [pendingType, setPendingType] = useState<SocialValue | null>(null);
   const [pendingUrl, setPendingUrl] = useState('');
+  const [urlError, setUrlError] = useState<string | null>(null);
 
   const { control } = useFormContext<{ socialLinks: SocialLink[] }>();
   const { fields, update } = useFieldArray({ control, name: 'socialLinks' });
@@ -28,6 +29,18 @@ export const AddSocialIconLink = () => {
 
   const handleConfirm = () => {
     if (!pendingType || !pendingUrl.trim()) return;
+
+    const platform = ALL_SOCIAL_PLATFORMS.find((p) => p.value === pendingType);
+    const isValid = platform?.validateUrl(pendingUrl.trim()) ?? false;
+
+    if (!isValid) {
+      setUrlError(
+        `Please enter a valid ${platform?.label} URL (e.g. ${platform?.placeholder})`,
+      );
+      return;
+    }
+
+    setUrlError(null);
     const idx = fields.findIndex((f) => f.type === pendingType);
     if (idx !== -1) update(idx, { type: pendingType, url: pendingUrl.trim() });
     setPendingType(null);
@@ -38,6 +51,7 @@ export const AddSocialIconLink = () => {
   const handleCancel = () => {
     setPendingType(null);
     setPendingUrl('');
+    setUrlError(null);
   };
 
   return (
@@ -56,7 +70,7 @@ export const AddSocialIconLink = () => {
       <PopoverContent className="w-72 p-0" align="start" sideOffset={4}>
         {pendingType ? (
           (() => {
-            const platform = SOCIAL_PLATFORMS.find(
+            const platform = ALL_SOCIAL_PLATFORMS.find(
               (p) => p.value === pendingType,
             );
             return (
@@ -70,6 +84,9 @@ export const AddSocialIconLink = () => {
                   autoFocus
                   onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
                 />
+                {urlError && (
+                  <p className="text-destructive text-xs">{urlError}</p>
+                )}
                 <div className="flex gap-2">
                   <Button
                     type="button"

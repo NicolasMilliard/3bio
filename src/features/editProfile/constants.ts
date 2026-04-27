@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react';
+
 import {
   BlueskyIcon,
   DiscordIcon,
@@ -12,8 +14,6 @@ import {
   TwitterIcon,
   YouTubeIcon,
 } from '@/components/icons';
-
-import type { ComponentType } from 'react';
 
 export type SocialValue =
   | 'discord'
@@ -34,7 +34,7 @@ export type SocialPlatform = {
   label: string;
   Icon: ComponentType<{ className?: string }>;
   placeholder: string;
-  urlPrefix: string;
+  validateUrl: (url: string) => boolean;
 };
 
 export const POPULAR_SOCIAL_PLATFORMS: SocialPlatform[] = [
@@ -43,28 +43,30 @@ export const POPULAR_SOCIAL_PLATFORMS: SocialPlatform[] = [
     label: 'Instagram',
     Icon: InstagramIcon,
     placeholder: 'https://instagram.com/yourhandle',
-    urlPrefix: 'https://instagram.com/',
+    validateUrl: (url: string) => url.startsWith('https://instagram.com/'),
   },
   {
     value: 'tiktok',
     label: 'TikTok',
     Icon: TikTokIcon,
     placeholder: 'https://tiktok.com/@yourhandle',
-    urlPrefix: 'https://tiktok.com/@',
+    validateUrl: (url: string) => url.startsWith('https://tiktok.com/'),
   },
   {
     value: 'twitter',
     label: 'Twitter / X',
     Icon: TwitterIcon,
     placeholder: 'https://x.com/yourhandle',
-    urlPrefix: 'https://x.com/',
+    validateUrl: (url: string) =>
+      url.startsWith('https://x.com/') ||
+      url.startsWith('https://twitter.com/'),
   },
   {
     value: 'facebook',
     label: 'Facebook',
     Icon: FacebookIcon,
     placeholder: 'https://facebook.com/yourpage',
-    urlPrefix: 'https://facebook.com/',
+    validateUrl: (url: string) => url.startsWith('https://facebook.com/'),
   },
 ];
 
@@ -74,56 +76,58 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     label: 'Bluesky',
     Icon: BlueskyIcon,
     placeholder: 'https://bsky.app/profile/yourhandle',
-    urlPrefix: 'https://bsky.app/profile/',
+    validateUrl: (url: string) => url.startsWith('https://bsky.app/profile/'),
   },
   {
     value: 'discord',
     label: 'Discord',
     Icon: DiscordIcon,
     placeholder: 'https://discord.gg/yourserver',
-    urlPrefix: 'https://discord.gg/',
+    validateUrl: (url: string) =>
+      url.startsWith('https://discord.gg/') ||
+      url.startsWith('https://discord.com/'),
   },
   {
     value: 'farcaster',
     label: 'Farcaster',
     Icon: FarcasterIcon,
     placeholder: 'https://farcaster.xyz/yourhandle',
-    urlPrefix: 'https://farcaster.xyz/',
+    validateUrl: (url: string) => url.startsWith('https://farcaster.xyz/'),
   },
   {
     value: 'github',
     label: 'GitHub',
     Icon: GithubIcon,
     placeholder: 'https://github.com/yourhandle',
-    urlPrefix: 'https://github.com/',
+    validateUrl: (url: string) => url.startsWith('https://github.com/'),
   },
   {
     value: 'mastodon',
     label: 'Mastodon',
     Icon: MastodonIcon,
     placeholder: 'https://mastodon.social/@yourhandle',
-    urlPrefix: 'https://mastodon.social/@',
+    validateUrl: (url: string) => url.startsWith('https://mastodon.social/@'),
   },
   {
     value: 'threads',
     label: 'Threads',
     Icon: ThreadsIcon,
     placeholder: 'https://threads.net/@yourhandle',
-    urlPrefix: 'https://threads.net/@',
+    validateUrl: (url: string) => url.startsWith('https://threads.net/@'),
   },
   {
     value: 'twitch',
     label: 'Twitch',
     Icon: TwitchIcon,
     placeholder: 'https://twitch.tv/yourhandle',
-    urlPrefix: 'https://twitch.tv/',
+    validateUrl: (url: string) => url.startsWith('https://twitch.tv/'),
   },
   {
     value: 'youtube',
     label: 'YouTube',
     Icon: YouTubeIcon,
     placeholder: 'https://youtube.com/@yourchannel',
-    urlPrefix: 'https://youtube.com/@',
+    validateUrl: (url: string) => url.startsWith('https://youtube.com/@'),
   },
 ];
 
