@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui';
 import { AuthButton } from '@/features/auth/components';
-import { BarChart3, Image, Link2, Palette, Settings } from 'lucide-react';
+import { BarChart3, Image, Link, Link2, Palette, Settings } from 'lucide-react';
 
 const sections = [
   {
@@ -10,6 +10,10 @@ const sections = [
   {
     label: 'CTA Links',
     icon: Link2,
+  },
+  {
+    label: 'Website Link',
+    icon: Link,
   },
   {
     label: 'Statistics',

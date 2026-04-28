@@ -2,7 +2,7 @@ import { AppHeader } from '@/components/layout';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 const AppLayout = () => (
-  <div className="flex min-h-dvh flex-col bg-white">
+  <div className="flex min-h-dvh flex-col">
     <AppHeader />
 
     <main className="mx-auto flex w-full flex-1 flex-col">

@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 
 export const NotFoundScreen = ({ handleLens }: { handleLens?: string }) => {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4">
+    <div className="flex min-h-dvh flex-1 flex-col items-center justify-center gap-4">
       <h1 className="text-3xl">Profile not found.</h1>
       {handleLens && (
         <p>
