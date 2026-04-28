@@ -9,20 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as PageIdRouteRouteImport } from './routes/$pageId/route'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as EditIndexRouteImport } from './routes/edit/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as PageIdIndexRouteImport } from './routes/$pageId/index'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PageIdRouteRoute = PageIdRouteRouteImport.update({
   id: '/$pageId',
   path: '/$pageId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditIndexRoute = EditIndexRouteImport.update({
@@ -30,67 +30,79 @@ const EditIndexRoute = EditIndexRouteImport.update({
   path: '/edit/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRouteImport,
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
 } as any)
 const PageIdIndexRoute = PageIdIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PageIdRouteRoute,
 } as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/$pageId': typeof PageIdRouteRouteWithChildren
+  '/': typeof AppIndexRoute
+  '/dashboard': typeof AppDashboardRoute
   '/$pageId/': typeof PageIdIndexRoute
-  '/dashboard/': typeof DashboardIndexRoute
   '/edit/': typeof EditIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/dashboard': typeof AppDashboardRoute
   '/$pageId': typeof PageIdIndexRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/': typeof AppIndexRoute
   '/edit': typeof EditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/$pageId': typeof PageIdRouteRouteWithChildren
+  '/_app': typeof AppRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRoute
   '/$pageId/': typeof PageIdIndexRoute
-  '/dashboard/': typeof DashboardIndexRoute
+  '/_app/': typeof AppIndexRoute
   '/edit/': typeof EditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$pageId' | '/$pageId/' | '/dashboard/' | '/edit/'
+  fullPaths: '/$pageId' | '/' | '/dashboard' | '/$pageId/' | '/edit/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$pageId' | '/dashboard' | '/edit'
-  id: '__root__' | '/' | '/$pageId' | '/$pageId/' | '/dashboard/' | '/edit/'
+  to: '/dashboard' | '/$pageId' | '/' | '/edit'
+  id:
+    | '__root__'
+    | '/$pageId'
+    | '/_app'
+    | '/_app/dashboard'
+    | '/$pageId/'
+    | '/_app/'
+    | '/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   PageIdRouteRoute: typeof PageIdRouteRouteWithChildren
-  DashboardIndexRoute: typeof DashboardIndexRoute
+  AppRoute: typeof AppRouteWithChildren
   EditIndexRoute: typeof EditIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$pageId': {
       id: '/$pageId'
       path: '/$pageId'
       fullPath: '/$pageId'
       preLoaderRoute: typeof PageIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/edit/': {
@@ -100,12 +112,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/$pageId/': {
       id: '/$pageId/'
@@ -113,6 +125,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$pageId/'
       preLoaderRoute: typeof PageIdIndexRouteImport
       parentRoute: typeof PageIdRouteRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
@@ -129,10 +148,21 @@ const PageIdRouteRouteWithChildren = PageIdRouteRoute._addFileChildren(
   PageIdRouteRouteChildren,
 )
 
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   PageIdRouteRoute: PageIdRouteRouteWithChildren,
-  DashboardIndexRoute: DashboardIndexRoute,
+  AppRoute: AppRouteWithChildren,
   EditIndexRoute: EditIndexRoute,
 }
 export const routeTree = rootRouteImport

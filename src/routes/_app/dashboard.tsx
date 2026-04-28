@@ -5,14 +5,14 @@ import { AuthGuard } from '@/features/auth/components';
 import { DashboardCard } from '@/features/dashboard/components';
 import { Link } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/dashboard/')({
-  component: RouteComponent,
+export const Route = createFileRoute('/_app/dashboard')({
+  component: DashboardPage,
 });
 
-function RouteComponent() {
+function DashboardPage() {
   return (
     <AuthGuard>
-      <div className="mt-20 flex flex-col gap-8 px-4">
+      <div className="mx-auto mt-20 flex w-full max-w-6xl flex-col gap-8 px-4">
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <section className="grid gap-4 md:grid-cols-2">
           <DashboardCard
