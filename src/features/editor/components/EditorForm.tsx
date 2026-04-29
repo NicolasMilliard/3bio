@@ -1,4 +1,4 @@
-import { type LensProfile, toMetadataAttribute } from '@/helpers';
+import { getHostname, type LensProfile, toMetadataAttribute } from '@/helpers';
 import { chains } from '@lens-chain/sdk/viem';
 import { lensAccountOnly, StorageClient } from '@lens-chain/storage-client';
 import { uri } from '@lens-protocol/client';
@@ -69,7 +69,9 @@ export const EditorForm = ({
       toast.loading('Uploading metadata...', { id: toastId });
 
       // 2. Handle attributes
-      const linkAttributes:
+
+      // Social links
+      const socialLinkAttributes:
         | Array<{
             type: MetadataAttributeType.STRING;
             key: string;
@@ -82,11 +84,28 @@ export const EditorForm = ({
           key: `socialLinks.${l.type}`,
           value: l.url.trim(),
         }));
+
+      // Links
+      const linkAttributes:
+        | Array<{
+            type: MetadataAttributeType.STRING;
+            key: string;
+            value: string;
+          }>
+        | undefined = values.links?.map((l) => ({
+        type: MetadataAttributeType.STRING,
+        key: `links.${getHostname(l)}`,
+        value: l,
+      }));
+
+      // Other attributes
       const nonManagedAttributes = (profile.attributes ?? [])
         .filter((a) => !a.key.startsWith('socialLinks.'))
         .map(toMetadataAttribute);
+
       const allAttributes = [
         ...nonManagedAttributes,
+        ...(socialLinkAttributes ?? []),
         ...(linkAttributes ?? []),
       ];
 
