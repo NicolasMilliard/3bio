@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { ALL_SOCIAL_PLATFORMS, type SocialValue } from '../../constants';
-import type { SocialLink } from '../../schemas/profile.schema';
+import type { SocialLink } from '../../schemas/profileForm.schema';
 
 import {
   Button,

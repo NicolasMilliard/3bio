@@ -3,7 +3,7 @@ import {
   type SocialType,
 } from '@/features/profile/model/social.config';
 import { useFormContext, useWatch } from 'react-hook-form';
-import type { SocialLink } from '../../schemas/profile.schema';
+import type { SocialLink } from '../../schemas/profileForm.schema';
 
 import { EditSocialIconLink } from './EditSocialIconLink';
 

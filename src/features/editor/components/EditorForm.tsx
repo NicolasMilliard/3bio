@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import {
   profileFormSchema,
   type ProfileFormValues,
-} from '../schemas/profile.schema';
+} from '../schemas/profileForm.schema';
 
 const storageClient = StorageClient.create();
 

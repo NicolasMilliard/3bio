@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import type { ProfileFormValues } from '../schemas/profile.schema';
+import type { ProfileFormValues } from '../schemas/profileForm.schema';
 
 import { Button } from '@/components/ui';
 import { Image } from 'lucide-react';
