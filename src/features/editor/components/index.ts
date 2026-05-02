@@ -1,4 +1,6 @@
 export * from './BannerInput';
+export * from './BrandingSection';
+export * from './BrandingToggle';
 export * from './CoverPictureSection';
 export * from './EditorForm';
 export * from './IdentitySection';

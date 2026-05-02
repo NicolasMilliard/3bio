@@ -23,6 +23,7 @@ export const metadataFormSchema = z.object({
   socialLinks: z.array(socialLinkSchema).optional(),
   links: z.array(z.url()).optional(),
   displayStatistics: z.boolean().optional(),
+  displayBranding: z.boolean().optional(),
 });
 
 export type MetadataFormValues = z.infer<typeof metadataFormSchema>;

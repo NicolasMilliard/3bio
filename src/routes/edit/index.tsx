@@ -9,6 +9,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { SpinnerScreen } from '@/components/ui';
 import { AuthGuard } from '@/features/auth/components';
 import {
+  BrandingSection,
   CoverPictureSection,
   EditorForm,
   IdentitySection,
@@ -17,7 +18,7 @@ import {
   SocialIconsSection,
   StatisticsSection,
 } from '@/features/editor/components';
-import { Branding, NotFoundScreen } from '@/features/profile/components';
+import { NotFoundScreen } from '@/features/profile/components';
 
 export const Route = createFileRoute('/edit/')({
   component: EditorPage,
@@ -68,7 +69,7 @@ function EditorPage() {
                   following={following}
                   posts={posts}
                 />
-                <Branding />
+                <BrandingSection />
               </section>
             </div>
           </main>
