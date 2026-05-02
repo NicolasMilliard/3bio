@@ -64,8 +64,6 @@ export const EditorForm = ({
       return;
     }
 
-    console.log('Submit form', values);
-
     const toastId = toast.loading('Uploading avatar...');
 
     try {
@@ -107,8 +105,8 @@ export const EditorForm = ({
         avatar: avatarUri,
         name: values.name,
         bio: values.bio,
-        socialLinks: socialLinkAttributes,
-        links: linkAttributes,
+        socialLinks: socialLinkAttributes ?? [],
+        links: linkAttributes ?? [],
       };
 
       const nextInBioMetadata = {
@@ -117,15 +115,7 @@ export const EditorForm = ({
       };
 
       // 3. Create and upload metadata
-      // TODO: Test
       const data = formatMetadataBeforeUpload(account, nextInBioMetadata);
-      // const data = createMetadata({
-      //   name: values.name || inBioProfile.name || undefined,
-      //   bio: values.bio || inBioProfile.bio || undefined,
-      //   picture: avatarUri || undefined,
-      //   coverPicture: coverPictureUri || undefined,
-      //   ...(allAttributes.length > 0 && { attributes: allAttributes }),
-      // });
 
       const { uri: metadataUri } = await storageClient.uploadAsJson(data, {
         acl,
@@ -151,6 +141,7 @@ export const EditorForm = ({
         description: 'Your changes are now live.',
       });
     } catch (error) {
+      console.error(error);
       const message =
         error instanceof Error ? error.message : 'Something went wrong';
 

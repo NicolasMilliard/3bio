@@ -7,26 +7,29 @@ import { EditSocialIconLink } from './EditSocialIconLink';
 export const EditableSocialIcons = () => {
   const { control } = useFormContext<{ socialLinks: SocialLink[] }>();
   const socialLinks = useWatch({ control, name: 'socialLinks' });
-  const activeLinks = socialLinks.filter((l) => l.url !== '');
 
-  if (activeLinks.length === 0) return null;
+  if (!socialLinks.length) return null;
+
+  const items = socialLinks.flatMap((link) => {
+    if (!link.url) return [];
+
+    const platform = SOCIAL_MAP[link.platform as PlatformName];
+
+    return [
+      <EditSocialIconLink
+        key={link.platform}
+        icon={<platform.Icon className="size-6" />}
+        label={platform.label}
+        type={link.platform}
+      />,
+    ];
+  });
+
+  if (items.length === 0) return null;
 
   return (
     <div className="flex max-w-prose flex-wrap items-center justify-center gap-3">
-      {activeLinks.map((link) => {
-        const platform = SOCIAL_MAP[link.platform as PlatformName];
-
-        if (!platform) return null;
-
-        return (
-          <EditSocialIconLink
-            key={link.platform}
-            icon={<platform.Icon className="size-6" />}
-            label={platform.label}
-            type={link.platform}
-          />
-        );
-      })}
+      {items}
     </div>
   );
 };

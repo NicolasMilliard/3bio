@@ -25,7 +25,7 @@ export const AddSocialIconLink = () => {
   const socialLinks = useWatch({ control, name: 'socialLinks' });
 
   const activePlatformTypes = new Set(
-    socialLinks.filter((l) => l.url !== '').map((l) => l.platform),
+    socialLinks.filter((l) => l.url !== undefined).map((l) => l.platform),
   );
 
   const handleConfirm = () => {
@@ -67,7 +67,7 @@ export const AddSocialIconLink = () => {
       }}
     >
       <PopoverTrigger asChild>
-        <Button variant="outline">
+        <Button type="button" variant="outline">
           <Plus size={16} />
         </Button>
       </PopoverTrigger>

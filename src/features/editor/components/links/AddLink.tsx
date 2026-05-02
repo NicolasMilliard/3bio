@@ -17,7 +17,7 @@ type FormValues = {
   _pendingLink: string;
 };
 
-export const AddLink = ({ links }: { links: string[] }) => {
+export const AddLink = ({ links }: { links?: string[] }) => {
   const [open, onOpenChange] = useState(false);
   const {
     register,
@@ -30,7 +30,7 @@ export const AddLink = ({ links }: { links: string[] }) => {
   } = useFormContext<FormValues>();
 
   const addLink = (newLink: string) => {
-    setValue('links', [...links, newLink], {
+    setValue('links', [...(links ?? []), newLink], {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -76,7 +76,7 @@ export const AddLink = ({ links }: { links: string[] }) => {
             {errors._pendingLink.message}
           </p>
         )}
-        <Button role="button" onClick={handleConfirm}>
+        <Button type="button" onClick={handleConfirm}>
           Add
         </Button>
       </PopoverContent>

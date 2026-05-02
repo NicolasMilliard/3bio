@@ -39,10 +39,6 @@ export const formatMetadataBeforeUpload = (
   );
 
   return createMetadata({
-    name: prevMetadata?.name ?? undefined,
-    bio: prevMetadata?.bio ?? undefined,
-    picture: prevMetadata?.picture,
-    coverPicture: prevMetadata?.coverPicture,
     attributes: nextAttributes,
   });
 };

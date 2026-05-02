@@ -46,7 +46,7 @@ export const EditSocialIconLink = ({
       <PopoverContent className="p-8">
         <Label>Edit your {label} link:</Label>
         <Input {...register(`socialLinks.${idx}.url`)} defaultValue={url} />
-        <Button role="button" variant="destructive" onClick={handleRemove}>
+        <Button type="button" variant="destructive" onClick={handleRemove}>
           Remove
         </Button>
       </PopoverContent>

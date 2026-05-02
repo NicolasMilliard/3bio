@@ -86,10 +86,10 @@ export const LinksSection = () => {
               </p>
             )}
             <div className="flex w-full flex-1 gap-2">
-              <Button variant="destructive" role="button" onClick={removeLink}>
+              <Button type="button" variant="destructive" onClick={removeLink}>
                 <Trash2 />
               </Button>
-              <Button role="button" onClick={updateLink}>
+              <Button type="button" onClick={updateLink}>
                 Update
               </Button>
             </div>
