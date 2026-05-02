@@ -11,8 +11,9 @@ export const SocialLinks = ({ socialLinks }: { socialLinks?: LensLink[] }) => {
     <div className="flex max-w-prose flex-wrap items-center justify-center gap-3">
       {socialLinks.map((socialLink) => {
         const formattedSocialLink = formatSocialLink(socialLink);
-        const platform =
-          SOCIAL_MAP[formattedSocialLink.platform as PlatformName];
+        const platform = formattedSocialLink.platform
+          ? SOCIAL_MAP[formattedSocialLink.platform as PlatformName]
+          : null;
 
         if (!platform) return null;
 

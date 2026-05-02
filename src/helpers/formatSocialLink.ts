@@ -9,9 +9,12 @@ export type SocialLink = {
 };
 
 export const formatSocialLink = (link: LensLink) => {
+  const hostname = getHostname(link.value);
+  const platform = hostname?.replace(/^www\./, '').split('.')[0];
+
   return {
     key: link.key,
-    platform: getHostname(link.value),
+    platform,
     value: link.value,
   };
 };
