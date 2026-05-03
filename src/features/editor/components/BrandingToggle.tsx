@@ -2,7 +2,7 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import type { MetadataFormValues } from '../schemas/metadataForm.schema';
 
 import { Toggle } from '@/components/ui';
-import { FileSpreadsheet } from 'lucide-react';
+import { Copyright } from 'lucide-react';
 
 export const BrandingToggle = () => {
   const { setValue, control } = useFormContext<MetadataFormValues>();
@@ -18,7 +18,7 @@ export const BrandingToggle = () => {
         setValue('displayBranding', pressed, { shouldDirty: true })
       }
     >
-      <FileSpreadsheet />
+      <Copyright />
       Branding
     </Toggle>
   );
