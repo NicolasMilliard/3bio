@@ -2,6 +2,7 @@ import { useMatchRoute } from '@tanstack/react-router';
 
 import { AuthButton } from '@/features/auth/components';
 import { Link } from '@tanstack/react-router';
+import { InBioLogo } from '../icons/InBioLogo';
 import { Button } from '../ui/button';
 
 export const AppHeader = () => {
@@ -9,21 +10,16 @@ export const AppHeader = () => {
   const isHome = !!matchRoute({ to: '/' });
 
   return (
-    <header className="w-full">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full backdrop-blur">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
         <Link to="/">
-          <div className="flex items-center gap-2 font-semibold">
-            <div className="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-md">
-              iB
-            </div>
-            <span>inBio</span>
-          </div>
+          <InBioLogo />
         </Link>
 
         <nav className="flex items-center gap-2">
           {isHome ? (
             <Button asChild>
-              <Link to="/dashboard">Open app</Link>
+              <Link to="/dashboard">Launch App</Link>
             </Button>
           ) : (
             <AuthButton />
