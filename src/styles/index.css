@@ -132,3 +132,61 @@
     filter: blur(0);
   }
 }
+
+.social-proof-rotator {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 15%,
+    black 95%,
+    transparent 100%
+  );
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 15%,
+    black 95%,
+    transparent 100%
+  );
+}
+
+.social-proof-word-list {
+  animation: socialProofWordSlide 9s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+
+@keyframes socialProofWordSlide {
+  0%,
+  12% {
+    transform: translateY(0);
+  }
+  16.666%,
+  28.666% {
+    transform: translateY(-3.5rem);
+  }
+  33.333%,
+  45.333% {
+    transform: translateY(-7rem);
+  }
+  50%,
+  62% {
+    transform: translateY(-10.5rem);
+  }
+  66.666%,
+  78.666% {
+    transform: translateY(-14rem);
+  }
+  83.333%,
+  95.333% {
+    transform: translateY(-17.5rem);
+  }
+  100% {
+    transform: translateY(-21rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-proof-word-list {
+    animation: none;
+  }
+}
