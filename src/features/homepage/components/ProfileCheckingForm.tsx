@@ -11,6 +11,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
+  Text,
 } from '@/components/ui';
 
 export const ProfileCheckingForm = () => {
@@ -54,7 +55,9 @@ export const ProfileCheckingForm = () => {
           <Button type="submit">Check my Profile</Button>
         </div>
         {errors.link?.message ? (
-          <p className="text-destructive px-3 text-sm">{errors.link.message}</p>
+          <Text className="text-destructive px-3 text-sm">
+            {errors.link.message}
+          </Text>
         ) : null}
       </form>
     </FormProvider>

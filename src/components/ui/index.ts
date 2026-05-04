@@ -13,7 +13,9 @@ export * from './select';
 export * from './separator';
 export * from './sonner';
 export * from './spinner';
-export * from './SpinnerScreen';
 export * from './textarea';
 export * from './toggle';
 export * from './tooltip';
+
+export * from './SpinnerScreen';
+export * from './Text';

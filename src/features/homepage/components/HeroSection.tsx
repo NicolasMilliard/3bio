@@ -1,3 +1,4 @@
+import { Text } from '@/components/ui';
 import { INBIO_GITHUB_URL } from '@/constants';
 import { ProfileCheckingForm } from './ProfileCheckingForm';
 
@@ -6,10 +7,13 @@ export const HeroSection = () => {
     <section className="bg-secondary relative -top-20 min-h-dvh pt-28 pb-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-16 p-4 md:flex-row">
         <div className="mx-auto flex flex-col gap-10 md:mx-0">
-          <h1 className="text-primary max-w-97 animate-[blurFadeIn_0.8s_ease-out_forwards] text-[32px] font-extrabold">
+          <Text
+            variant="h1"
+            className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_forwards]"
+          >
             Finally, your decentralized link&nbsp;in&nbsp;bio.
-          </h1>
-          <p className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0">
+          </Text>
+          <Text className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0">
             It's time to take back control of your digital identity. inBio is
             decentralized,{' '}
             <a
@@ -21,7 +25,7 @@ export const HeroSection = () => {
               open source
             </a>
             , and your profile is already live.
-          </p>
+          </Text>
           <ProfileCheckingForm />
         </div>
         {/* TODO: Add image instead of this placeholder */}
