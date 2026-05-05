@@ -1,4 +1,5 @@
 import { Text } from '@/components/ui';
+import { CarouselCreators } from './CarouselCreators';
 
 const WORDS = [
   'creator',
@@ -11,8 +12,8 @@ const WORDS = [
 
 export const SocialProofSection = () => {
   return (
-    <section className="mx-auto max-w-6xl">
-      <Text variant="h2">
+    <section className="mx-auto mb-16 max-w-6xl">
+      <Text variant="h2" className="mb-16">
         Your favorite {/* Accessible static label */}
         <span className="sr-only">{WORDS[0]}</span>
         {/* Animation hidden from screen readers */}
@@ -31,6 +32,7 @@ export const SocialProofSection = () => {
         <br />
         is already on inBio.
       </Text>
+      <CarouselCreators />
     </section>
   );
 };

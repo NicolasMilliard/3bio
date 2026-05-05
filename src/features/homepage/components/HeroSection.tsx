@@ -19,7 +19,7 @@ export const HeroSection = () => {
             <a
               href={INBIO_GITHUB_URL}
               target="_blank"
-              rel="noopener,noreferrer"
+              rel="noopener noreferrer"
               className="text-primary font-bold hover:underline"
             >
               open source

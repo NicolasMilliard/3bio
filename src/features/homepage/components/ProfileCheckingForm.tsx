@@ -13,6 +13,7 @@ import {
   InputGroupInput,
   Text,
 } from '@/components/ui';
+import { ExternalLink } from 'lucide-react';
 
 export const ProfileCheckingForm = () => {
   const methods = useForm<ProfileCheckingFormValues>({
@@ -29,7 +30,7 @@ export const ProfileCheckingForm = () => {
 
   const onSubmit = (values: ProfileCheckingFormValues) => {
     const profilePath = values.link;
-    window.open(profilePath, '_blank', 'noopener,noreferrer');
+    window.open(profilePath, '_blank', 'noopener noreferrer');
   };
 
   return (
@@ -52,7 +53,9 @@ export const ProfileCheckingForm = () => {
               {...register('link')}
             />
           </InputGroup>
-          <Button type="submit">Check my Profile</Button>
+          <Button type="submit">
+            Check my Profile <ExternalLink />
+          </Button>
         </div>
         {errors.link?.message ? (
           <Text className="text-destructive px-3 text-sm">

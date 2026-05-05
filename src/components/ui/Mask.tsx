@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 
-type Shape =
-  | 'circle'
-  | 'rounded'
-  | 'square'
-  | 'oval'
-  | { type: 'rounded-rect'; radius: number }
-  | { type: 'custom'; className: string };
+type Orientation = 'landscape' | 'portrait';
+
+export type Shape =
+  | { type: 'circle' }
+  | { type: 'oval'; orientation?: Orientation }
+  | { type: 'rect'; orientation?: Orientation }
+  | { type: 'custom'; orientation?: Orientation };
 
 type MaskProps = {
   shape?: Shape;
@@ -14,7 +14,11 @@ type MaskProps = {
   children: React.ReactNode;
 };
 
-export const Mask = ({ shape = 'rounded', className, children }: MaskProps) => {
+export const Mask = ({
+  shape = { type: 'rect' },
+  className,
+  children,
+}: MaskProps) => {
   const shapeClass = getShapeClass(shape);
 
   return (
@@ -24,27 +28,23 @@ export const Mask = ({ shape = 'rounded', className, children }: MaskProps) => {
   );
 };
 
+function getOrientationClassName(orientation?: Orientation): string {
+  const formattedOrientation = orientation ?? 'landscape';
+  return formattedOrientation === 'landscape' ? 'aspect-[4/3]' : 'aspect-[3/4]';
+}
+
 function getShapeClass(shape: Shape): string {
-  if (typeof shape === 'string') {
-    switch (shape) {
-      case 'circle':
-        return 'rounded-full aspect-square';
-      case 'square':
-        return 'aspect-square';
-      case 'oval':
-        return 'rounded-full aspect-[4/3]';
-      case 'rounded':
-        return 'rounded-2xl';
-    }
-  }
+  switch (shape.type) {
+    case 'circle':
+      return 'rounded-full aspect-square';
 
-  if (shape.type === 'rounded-rect') {
-    return `rounded-[${shape.radius}px]`;
-  }
+    case 'oval':
+      return cn('rounded-full', getOrientationClassName(shape.orientation));
 
-  if (shape.type === 'custom') {
-    return shape.className;
-  }
+    case 'rect':
+      return getOrientationClassName(shape.orientation);
 
-  return '';
+    case 'custom':
+      return getOrientationClassName(shape.orientation);
+  }
 }
