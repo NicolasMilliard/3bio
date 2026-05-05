@@ -53,18 +53,17 @@ export const CarouselCreators = () => {
     <div className="relative">
       <Carousel
         opts={{ loop: true, align: 'start', dragFree: true }}
-        plugins={[Autoplay({ delay: 2500, stopOnInteraction: true })]}
-        className="mx-auto max-w-6xl"
+        plugins={[Autoplay({ delay: 2500 })]}
+        className="mx-auto max-w-screen"
       >
-        <CarouselContent className="-ml-6 md:-ml-14">
+        <CarouselContent>
           {items.map((item) => (
             <CarouselItem
               key={item.lensHandle}
               className={cn(
-                'pl-6 md:pl-14',
                 item.width === 'wide'
-                  ? 'basis-[45%] md:basis-[35%]'
-                  : 'basis-1/2 md:basis-1/3 lg:basis-1/4',
+                  ? 'basis-[80vw] sm:basis-[55%] md:basis-[38%] lg:basis-[32%]'
+                  : 'basis-[60vw] sm:basis-[42%] md:basis-[30%] lg:basis-[23%]',
               )}
             >
               <a
@@ -98,7 +97,7 @@ export const CarouselCreators = () => {
           ))}
         </CarouselContent>
       </Carousel>
-      <div className="from-background pointer-events-none absolute top-0 right-0 h-full w-16 bg-gradient-to-l" />
+      <div className="from-background pointer-events-none absolute top-0 right-0 h-full w-16 bg-linear-to-l" />
     </div>
   );
 };

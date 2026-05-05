@@ -13,7 +13,7 @@ const WORDS = [
 export const SocialProofSection = () => {
   return (
     <section className="mx-auto mb-16 max-w-6xl">
-      <Text variant="h2" className="mb-16">
+      <Text variant="h2" className="mb-16 px-4">
         Your favorite {/* Accessible static label */}
         <span className="sr-only">{WORDS[0]}</span>
         {/* Animation hidden from screen readers */}

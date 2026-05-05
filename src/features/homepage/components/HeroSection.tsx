@@ -5,7 +5,7 @@ import { ProfileCheckingForm } from './ProfileCheckingForm';
 export const HeroSection = () => {
   return (
     <section className="bg-secondary relative -top-20 min-h-dvh pt-28 pb-8">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-16 p-4 md:flex-row">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-16 px-4 md:flex-row">
         <div className="mx-auto flex flex-col gap-10 md:mx-0">
           <Text
             variant="h1"
