@@ -2,7 +2,12 @@ import { creatorImages } from '@/assets/carousel/creators';
 import { cn } from '@/lib/utils';
 import Autoplay from 'embla-carousel-autoplay';
 
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  Image,
+} from '@/components/ui';
 
 const creators: string[] = [
   'stani',
@@ -35,16 +40,18 @@ export const CarouselCreators = () => {
                 rel="noopener noreferrer"
                 className="group relative block focus:outline-none"
               >
-                <img
+                <Image
                   src={creatorImages[creator]}
                   alt={creator}
-                  loading="lazy"
-                  decoding="async"
                   className={cn(
                     'h-96 w-full rounded-[192px] object-cover',
                     'transition-all duration-500 ease-out',
                     'group-hover:rounded-4xl',
                   )}
+                  width={247}
+                  height={384}
+                  showSkeleton={true}
+                  skeletonClassName="rounded-[192px]"
                 />
                 <div
                   className={cn(

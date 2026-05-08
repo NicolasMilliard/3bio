@@ -1,11 +1,11 @@
-import aoifeodwyer from './aoifeodwyer.jpg';
-import elliepritts from './elliepritts.png';
-import nader from './nader.jpg';
-import nilesh from './nilesh.webp';
-import paris from './paris.webp';
-import punkess from './punkess.png';
-import stani from './stani.webp';
-import zosphotos from './zosphotos.jpg';
+import aoifeodwyer from './aoifeodwyer.avif';
+import elliepritts from './elliepritts.avif';
+import nader from './nader.avif';
+import nilesh from './nilesh.avif';
+import paris from './paris.avif';
+import punkess from './punkess.avif';
+import stani from './stani.avif';
+import zosphotos from './zosphotos.avif';
 
 export const creatorImages: Record<string, string> = {
   stani,

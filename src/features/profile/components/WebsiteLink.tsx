@@ -1,6 +1,7 @@
 import { getHostname } from '@/helpers';
 import { useState } from 'react';
 
+import { Image } from '@/components/ui';
 import { ExternalLink } from 'lucide-react';
 
 type WebsiteLinkProps = {
@@ -25,9 +26,10 @@ export const WebsiteLink = ({ href, label, onClick }: WebsiteLinkProps) => {
   const content = (
     <>
       {imgSrc ? (
-        <img
+        <Image
           src={imgSrc}
           alt={label}
+          referrerPolicy="no-referrer"
           className="h-5 w-5 shrink-0 rounded-sm object-cover"
           onError={() => {
             if (imgSrc !== googleFallback) {
