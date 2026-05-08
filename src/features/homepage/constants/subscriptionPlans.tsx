@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui';
+
 export type SubscriptionPlan = {
   variant: 'free' | 'premium';
   price: {
@@ -34,7 +36,14 @@ export const SUBSCRIPTION_PLANS: Array<SubscriptionPlan> = [
       value: '$3/mo',
       subtitle: 'Billed monthly',
       previousValue: '$5/mo',
-      additionalContent: <div>test</div>,
+      additionalContent: (
+        <Badge
+          variant="outline"
+          className="text-primary bg-accent/15 border-2 p-4"
+        >
+          Launch offer!
+        </Badge>
+      ),
     },
     features: {
       title: 'Everything in Free, plus:',
