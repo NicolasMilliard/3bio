@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import {
+  AnalyticsSection,
   HeroSection,
   SocialProofSection,
 } from '@/features/homepage/components';
@@ -14,6 +15,7 @@ function HomePage() {
     <>
       <HeroSection />
       <SocialProofSection />
+      <AnalyticsSection />
     </>
   );
 }
