@@ -1,5 +1,7 @@
-import { Text } from '@/components/ui';
+import { heroImages } from '@/assets/hero';
 import { INBIO_GITHUB_URL } from '@/constants';
+
+import { Image, Text } from '@/components/ui';
 import { ProfileCheckingForm } from './ProfileCheckingForm';
 
 export const HeroSection = () => {
@@ -28,9 +30,13 @@ export const HeroSection = () => {
           </Text>
           <ProfileCheckingForm />
         </div>
-        {/* TODO: Add image instead of this placeholder */}
-        {/* <Image ... loading="eager" fetchPriority="high" aria-hidden="true" /> */}
-        <div className="bg-accent mx-auto h-172.5 w-80 animate-[blurFadeIn_0.8s_ease-out_0.45s_forwards] opacity-0 md:mx-0"></div>
+        <Image
+          src={heroImages.homepageHero}
+          loading="eager"
+          fetchPriority="high"
+          aria-hidden="true"
+          className="animate-[blurFadeIn_0.8s_ease-out_0.45s_forwards] rounded-4xl opacity-0"
+        />
       </div>
     </section>
   );
