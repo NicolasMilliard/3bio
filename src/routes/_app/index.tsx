@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
   AnalyticsSection,
   HeroSection,
+  PricingSection,
   SocialProofSection,
 } from '@/features/homepage/components';
 
@@ -15,7 +16,10 @@ function HomePage() {
     <>
       <HeroSection />
       <SocialProofSection />
-      <AnalyticsSection />
+      <div>
+        <AnalyticsSection />
+        <PricingSection />
+      </div>
     </>
   );
 }
