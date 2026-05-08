@@ -22,7 +22,7 @@ export const AppHeader = () => {
 
       <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
         <Link to="/">
-          <InBioLogo />
+          <InBioLogo isAtTop />
         </Link>
 
         <nav className="flex items-center gap-2">
