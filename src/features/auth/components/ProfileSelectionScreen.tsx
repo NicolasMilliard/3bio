@@ -1,9 +1,11 @@
+import { getInBioProfile } from '@/helpers';
+import type { InBioProfile } from '@/schemas/inBioMetadata.schema';
 import { useAccountsAvailable } from '@lens-protocol/react';
 import { useConnection } from 'wagmi';
 import { useLensLogin } from '../hooks/useLensLogin';
+import { ProfileCard } from './ProfileCard';
 
-import { Avatar, AvatarFallback, AvatarImage, Card } from '@/components/ui';
-import { cn } from '@/lib/utils';
+import { Text } from '@/components/ui';
 
 export const ProfileSelectionScreen = () => {
   const connection = useConnection();
@@ -13,61 +15,48 @@ export const ProfileSelectionScreen = () => {
   const loginWithLens = useLensLogin();
 
   return (
-    <section className="mt-20 flex flex-col items-center gap-8 px-4 text-center">
+    <section className="mt-30 flex flex-col items-center gap-8 px-4 text-center">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Choose your profile
-        </h1>
-        <p className="text-muted-foreground max-w-md">
+        <Text variant="h1">Choose your profile</Text>
+        <Text className="max-w-97">
           Select the profile you want to use. You can switch later from your
           dashboard.
-        </p>
+        </Text>
       </div>
 
-      <div className="grid w-full max-w-xl gap-4">
-        {!accounts?.items.length && (
-          <div className="border-border/60 bg-muted/40 text-muted-foreground rounded-lg border p-4 text-sm">
-            No profiles found for this wallet.
-          </div>
-        )}
+      {!accounts?.items.length && (
+        <Text className="text-destructive">
+          No profiles found for this wallet.
+        </Text>
+      )}
 
+      <div className="grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {accounts?.items.map((item) => {
-          const name = item.account.metadata?.name ?? 'Unnamed';
-          const avatar =
-            item.account.metadata?.picture ?? name[0]?.toUpperCase();
+          const inBioProfile: InBioProfile | undefined = getInBioProfile(
+            item.account.metadata?.attributes,
+          );
+          const name =
+            inBioProfile?.name ?? item.account.username?.localName ?? 'Unnamed';
+          const avatar = inBioProfile?.avatar ?? item.account.metadata?.picture;
+          const coverPicture =
+            inBioProfile?.coverPicture ?? item.account.metadata?.coverPicture;
+          const avatarFallback =
+            item.account.username?.localName?.[0]?.toUpperCase() ??
+            name[0]?.toUpperCase() ??
+            'U';
 
           return (
-            <Card
+            <ProfileCard
               key={item.account.address}
-              onClick={() => {
+              address={item.account.address}
+              avatar={avatar}
+              avatarFallback={avatarFallback}
+              coverPicture={coverPicture}
+              name={name}
+              onSelect={() => {
                 loginWithLens(item);
               }}
-              className={cn(
-                // layout
-                'border-border bg-background cursor-pointer flex-row items-center gap-8 border p-6 shadow-none backdrop-blur-md',
-
-                // animation
-                'transition-all duration-300',
-                'hover:border-primary/30 hover:shadow-primary/5 hover:-translate-y-1 hover:shadow-md',
-              )}
-            >
-              <Avatar size="xl">
-                <AvatarImage src={avatar} alt={name} />
-                <AvatarFallback>
-                  {name ? name[0].toUpperCase() : 'U'}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex flex-col text-left">
-                <span className="font-medium">{name}</span>
-                <span className="text-muted-foreground text-xs">
-                  {item.account.address.slice(0, 6)}...
-                  {item.account.address.slice(-4)}
-                </span>
-              </div>
-
-              <div className="ml-auto">Select →</div>
-            </Card>
+            />
           );
         })}
       </div>
