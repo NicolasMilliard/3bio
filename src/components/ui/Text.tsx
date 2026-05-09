@@ -7,7 +7,7 @@ const textVariants = cva('', {
     variant: {
       h1: 'text-primary text-[32px] font-extrabold',
       h2: 'text-primary text-[32px] font-extrabold',
-      h3: '',
+      h3: 'text-primary text-2xl font-bold',
       body: '',
     },
   },
