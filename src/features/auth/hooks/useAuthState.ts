@@ -41,7 +41,7 @@ export const useAuthState = () => {
   };
 
   const switchProfile = async (profileAddress: string) => {
-    const profile = profiles.find((p) => (p.address = profileAddress));
+    const profile = profiles.find((p) => p.address === profileAddress);
 
     if (!profile || profile.isActive) return;
 
