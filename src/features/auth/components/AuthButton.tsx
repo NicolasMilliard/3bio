@@ -4,6 +4,7 @@ import {
   useAuthenticatedUser,
   useLogout,
 } from '@lens-protocol/react';
+import { useNavigate } from '@tanstack/react-router';
 import { useConnect, useConnection, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { useLensLogin } from '../hooks/useLensLogin';
@@ -19,6 +20,8 @@ import {
 } from '@/components/ui';
 
 export const AuthButton = () => {
+  const navigate = useNavigate();
+
   const connect = useConnect();
   const connection = useConnection();
   const disconnect = useDisconnect();
@@ -42,6 +45,7 @@ export const AuthButton = () => {
       console.warn('[AuthButton] Lens logout skipped:', error);
     } finally {
       await disconnect.mutateAsync();
+      navigate({ to: '/dashboard' });
     }
   };
 
