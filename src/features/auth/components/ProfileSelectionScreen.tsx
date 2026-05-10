@@ -5,11 +5,11 @@ import { useConnection } from 'wagmi';
 import { useLensLogin } from '../hooks/useLensLogin';
 import { ProfileCard } from './ProfileCard';
 
-import { Text } from '@/components/ui';
+import { Spinner, Text } from '@/components/ui';
 
 export const ProfileSelectionScreen = () => {
   const connection = useConnection();
-  const { data: accounts } = useAccountsAvailable({
+  const { data: accounts, loading } = useAccountsAvailable({
     managedBy: connection.address,
   });
   const loginWithLens = useLensLogin();
@@ -24,7 +24,14 @@ export const ProfileSelectionScreen = () => {
         </Text>
       </div>
 
-      {!accounts?.items.length && (
+      {loading && (
+        <section className="mt-30 flex items-center justify-center gap-4">
+          <Spinner />
+          <Text>Loading your profiles...</Text>
+        </section>
+      )}
+
+      {!loading && !accounts?.items.length && (
         <Text className="text-destructive">
           No profiles found for this wallet.
         </Text>
