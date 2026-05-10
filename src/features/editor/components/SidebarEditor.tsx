@@ -1,7 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { AuthButton } from '@/features/auth/components';
-import { Palette, Settings } from 'lucide-react';
-import { BannerInput, BrandingToggle, StatisticsToggle } from './index';
+import { Button, Text } from '@/components/ui';
+import { Link } from '@tanstack/react-router';
+import { ArrowLeft, Palette, Settings } from 'lucide-react';
+import { BannerInput, StatisticsToggle } from './index';
+import { BrandingSwitch } from './sidebar/BrandingSwitch';
 
 const sections = [
   {
@@ -12,22 +13,25 @@ const sections = [
 
 export const SidebarEditor = () => {
   return (
-    <aside className="sticky top-0 z-10 flex h-dvh w-72 flex-col border-l bg-white">
-      <div className="border-b px-5 py-4">
-        <div className="mb-1 flex items-center gap-2">
-          <Settings className="size-4 text-neutral-500" />
-          <span className="text-xs font-medium tracking-wide text-neutral-500 uppercase">
-            Editor
-          </span>
-        </div>
+    <aside className="border-background/15 bg-background/50 ring-muted fixed inset-y-4 left-4 z-10 flex w-72 flex-col rounded-4xl border p-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)] ring-1 backdrop-blur-2xl backdrop-saturate-150">
+      <Link to="/dashboard" className="flex items-center gap-2">
+        <ArrowLeft className="text-muted size-4" />
+        <Text className="text-muted text-sm">Go back to dashboard</Text>
+      </Link>
 
-        <h2 className="text-lg font-semibold text-neutral-900">Edit Profile</h2>
+      <div className="border-foreground border-b py-4">
+        <div className="mb-1 flex items-center gap-2">
+          <Settings className="text-foreground size-4" />
+          <Text className="text-foreground font-medium tracking-wide uppercase">
+            Editor
+          </Text>
+        </div>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
+      <nav className="mt-4 flex-1 space-y-1 overflow-y-auto p-3">
         <BannerInput />
         <StatisticsToggle />
-        <BrandingToggle />
+        <BrandingSwitch />
 
         {sections.map(({ label, icon: Icon }) => (
           <button
@@ -42,10 +46,6 @@ export const SidebarEditor = () => {
       </nav>
 
       <Button type="submit">Save Changes</Button>
-
-      <div className="border-t p-4">
-        <AuthButton />
-      </div>
     </aside>
   );
 };
