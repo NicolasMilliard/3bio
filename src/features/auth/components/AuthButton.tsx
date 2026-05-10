@@ -1,12 +1,4 @@
-import {
-  useAccount,
-  useAccountsAvailable,
-  useAuthenticatedUser,
-  useLogout,
-} from '@lens-protocol/react';
-import { useConnect, useConnection, useDisconnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
-import { useLensLogin } from '../hooks/useLensLogin';
+import { useAuthState } from '../hooks';
 
 import {
   Button,
@@ -16,107 +8,84 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Image,
 } from '@/components/ui';
 
 export const AuthButton = () => {
-  const connect = useConnect();
-  const connection = useConnection();
-  const disconnect = useDisconnect();
-  const { execute: lensLogout } = useLogout();
+  const {
+    isConnected,
+    profiles,
+    activeDisplayName,
+    activeAvatar,
+    connectWallet,
+    disconnectWallet,
+    switchProfile,
+    isConnecting,
+    isDisconnecting,
+  } = useAuthState();
 
-  const loginWithLens = useLensLogin();
-  const { data: accounts } = useAccountsAvailable({
-    managedBy: connection.address,
-  });
-  const { data: authenticatedUser } = useAuthenticatedUser();
-  const { data: account } = useAccount({
-    address: authenticatedUser?.address ?? '',
-  });
-
-  const handleDisconnect = async () => {
-    try {
-      if (authenticatedUser) {
-        await lensLogout();
-      }
-    } catch (error) {
-      console.warn('[AuthButton] Lens logout skipped:', error);
-    } finally {
-      await disconnect.mutateAsync();
-    }
-  };
-
-  if (!connection.isConnected) {
+  if (!isConnected) {
     return (
-      <Button
-        disabled={connect.isPending}
-        onClick={() => connect.mutate({ connector: injected() })}
-      >
-        {connect.isPending ? 'Connecting...' : 'Connect Wallet'}
+      <Button disabled={isConnecting} onClick={connectWallet}>
+        {isConnecting ? 'Connecting...' : 'Connect Wallet'}
       </Button>
     );
   }
-
-  const activeAddress = authenticatedUser?.address?.toLowerCase();
-  const displayName =
-    account?.metadata?.name ??
-    account?.username?.value ??
-    (activeAddress ? `${activeAddress.slice(0, 6)}...` : 'No profile selected');
-  const avatarLetter = account?.metadata?.name?.[0]?.toUpperCase() ?? 'U';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button>
-          <div className="bg-muted text-muted-foreground flex size-6 items-center justify-center rounded-full text-xs font-medium">
-            {avatarLetter}
-          </div>
-          <span className="max-w-30 truncate">{displayName}</span>
+          {activeAvatar && (
+            <Image
+              src={activeAvatar}
+              alt={activeDisplayName}
+              className="size-6 rounded-full object-cover"
+            />
+          )}
+          <span className="truncate">{activeDisplayName}</span>
           <span className="text-xs">▾</span>
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel className="text-ring text-xs font-normal">
-          Lens profiles
+        <DropdownMenuLabel className="text-muted-foreground font-semibold tracking-wider uppercase">
+          Your profiles
         </DropdownMenuLabel>
 
-        {!accounts?.items.length ? (
-          <DropdownMenuItem disabled className="text-ring text-sm">
-            No Lens accounts
-          </DropdownMenuItem>
-        ) : (
-          accounts.items.map((item) => {
-            const isActive =
-              activeAddress === item.account.address.toLowerCase();
-            const label =
-              item.account.username?.value ??
-              `${item.account.address.slice(0, 6)}...`;
-
-            return (
-              <DropdownMenuItem
-                key={item.account.address}
-                onClick={() => !isActive && loginWithLens(item)}
-                className={`gap-2 ${isActive ? 'cursor-default' : 'cursor-pointer'}`}
-              >
-                <div className="bg-background text-foreground flex size-5 shrink-0 items-center justify-center rounded-full text-xs">
-                  {label[0]?.toUpperCase() ?? 'U'}
-                </div>
-                <span className="truncate">{label}</span>
-                {isActive && (
-                  <span className="text-ring ml-auto text-xs">✓</span>
-                )}
-              </DropdownMenuItem>
-            );
-          })
+        {profiles.length === 0 && (
+          <DropdownMenuItem disabled>No profiles</DropdownMenuItem>
         )}
+
+        {profiles.map((p) => (
+          <DropdownMenuItem
+            key={p.address}
+            onClick={() => switchProfile(p.address)}
+            className={
+              p.isActive
+                ? 'bg-muted hover:bg-muted!'
+                : 'hover:bg-primary/40! cursor-pointer'
+            }
+          >
+            <Image
+              src={p.avatar}
+              alt={p.displayName}
+              className="size-6 rounded-full"
+            />
+            <span className="truncate">{p.displayName}</span>
+
+            {p.isActive && <span className="ml-auto">✓</span>}
+          </DropdownMenuItem>
+        ))}
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={handleDisconnect}
+          onClick={disconnectWallet}
+          disabled={isDisconnecting}
           className="text-destructive hover:bg-destructive! hover:text-primary-foreground! cursor-pointer"
         >
-          Disconnect wallet
+          Disconnect
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
