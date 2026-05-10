@@ -6,6 +6,7 @@ import {
   Card,
   Text,
 } from '@/components/ui';
+import { formatAddress } from '@/helpers';
 
 type ProfileCardProps = {
   address: string;
@@ -43,9 +44,7 @@ export const ProfileCard = ({
           <Text variant="h3" className="text-foreground">
             {name}
           </Text>
-          <Text className="text-xs">
-            {address.slice(0, 6)}...{address.slice(-4)}
-          </Text>
+          <Text className="text-xs">{formatAddress(address)}</Text>
         </div>
 
         <Button type="button" className="mt-6" onClick={onSelect}>

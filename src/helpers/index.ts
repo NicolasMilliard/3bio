@@ -1,3 +1,4 @@
+export * from './formatAddress';
 export * from './formatCount';
 export * from './formatMetadataBeforeUpload';
 export * from './formatSocialLink';
