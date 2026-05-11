@@ -36,10 +36,7 @@ export const EditSocialIconLink = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button
-          role="button"
-          className="text-primary hover:text-chart-2 cursor-pointer transition"
-        >
+        <button className="text-primary hover:text-chart-2 cursor-pointer transition">
           {icon}
         </button>
       </PopoverTrigger>
