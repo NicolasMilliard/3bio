@@ -65,7 +65,7 @@
 
   --destructive: oklch(0.6 0.26 345);
 
-  --border: oklch(0.88 0.11 325); /* #FCBFFF — matches accent for tag borders */
+  --border: oklch(0.94 0.02 288); /* #EBEAFA */
   --input: oklch(0.94 0.02 288); /* #EBEAFA — subtle input bg */
   --ring: oklch(0.45 0.3 266); /* #1710F7 — focus ring matches primary */
 

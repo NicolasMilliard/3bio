@@ -39,7 +39,7 @@ export const SUBSCRIPTION_PLANS: Array<SubscriptionPlan> = [
       additionalContent: (
         <Badge
           variant="outline"
-          className="text-primary bg-accent/15 border-2 p-4"
+          className="text-primary border-accent bg-accent/15 border-2 p-4"
         >
           Launch offer!
         </Badge>
