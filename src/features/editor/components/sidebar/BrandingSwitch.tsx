@@ -19,7 +19,7 @@ export const BrandingSwitch = () => {
         }
       />
       <Label htmlFor="display-branding" className="cursor-pointer">
-        {isChecked ? 'Hide' : 'Show'} branding
+        Branding
       </Label>
     </Field>
   );
