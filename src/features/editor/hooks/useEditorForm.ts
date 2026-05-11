@@ -83,7 +83,7 @@ export function useEditorForm(account: Account, inBioMetadata: InBioMetadata) {
   });
 
   const onSubmit = async (values: MetadataFormValues) => {
-    if (!sessionClient || !walletClient) {
+    if (!sessionClient) {
       toast.error('Not connected', {
         description: 'Please connect your wallet to update your profile.',
       });
@@ -160,9 +160,6 @@ export function useEditorForm(account: Account, inBioMetadata: InBioMetadata) {
         : 'Something went wrong. Please try again or contact support.';
 
       toast.error('Failed to save profile', { id: toastId, description });
-    } finally {
-      // Sonner ignores this dismiss if the toast was already resolved above.
-      toast.dismiss(toastId);
     }
   };
 
