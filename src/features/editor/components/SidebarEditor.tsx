@@ -3,16 +3,16 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
-  Text,
 } from '@/components/ui';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeft } from 'lucide-react';
-import { BannerInput } from './BannerInput';
-import { StatisticsToggle } from './StatisticsToggle';
-import { BrandingSwitch } from './sidebar/BrandingSwitch';
+import {
+  IdentityGroup,
+  LinksGroup,
+  StatisticsGroup,
+  ThemeGroup,
+} from './sidebar';
 
 export const SidebarEditor = () => {
   return (
@@ -26,38 +26,10 @@ export const SidebarEditor = () => {
         </Button>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="tracking-widest uppercase">
-            Identity
-          </SidebarGroupLabel>
-          <Text>Name</Text>
-          <Text>Bio</Text>
-          <Text>Avatar</Text>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="tracking-widest uppercase">
-            Links
-          </SidebarGroupLabel>
-          <Text>Social links</Text>
-          <Text>Buttons</Text>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="tracking-widest uppercase">
-            Statistics
-          </SidebarGroupLabel>
-          <StatisticsToggle />
-          <Text>Display followers number</Text>
-          <Text>Display following number</Text>
-          <Text>Display posts number</Text>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="tracking-widest uppercase">
-            Theme
-          </SidebarGroupLabel>
-          <BannerInput />
-          <BrandingSwitch />
-          <Text>Preset</Text>
-        </SidebarGroup>
+        <IdentityGroup />
+        <LinksGroup />
+        <StatisticsGroup />
+        <ThemeGroup />
       </SidebarContent>
       <SidebarFooter>
         <Button type="submit">Save Changes</Button>

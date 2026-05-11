@@ -1,17 +1,9 @@
-import { type InBioMetadata } from '@/schemas/inBioMetadata.schema';
-import { type Account } from '@lens-protocol/client';
 import { FormProvider } from 'react-hook-form';
+import { useEditorContext } from '../context/editor.context';
 import { useEditorForm } from '../hooks/useEditorForm';
 
-export const EditorForm = ({
-  account,
-  inBioMetadata,
-  children,
-}: {
-  account: Account;
-  inBioMetadata: InBioMetadata;
-  children: React.ReactNode;
-}) => {
+export const EditorForm = ({ children }: { children: React.ReactNode }) => {
+  const { account, inBioMetadata } = useEditorContext();
   const { methods, onSubmit } = useEditorForm(account, inBioMetadata);
 
   return (
