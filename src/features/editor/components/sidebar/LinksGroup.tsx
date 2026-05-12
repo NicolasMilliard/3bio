@@ -1,12 +1,13 @@
 import { SidebarGroup, SidebarGroupLabel, Text } from '@/components/ui';
+import { SocialLinks } from './form';
 
 export const LinksGroup = () => {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="tracking-widest uppercase">
+      <SidebarGroupLabel className="pl-0 tracking-widest uppercase">
         Links
       </SidebarGroupLabel>
-      <Text>Social links</Text>
+      <SocialLinks />
       <Text>Buttons</Text>
     </SidebarGroup>
   );

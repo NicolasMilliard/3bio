@@ -1,7 +1,7 @@
 import { ALL_SOCIAL_PLATFORMS, type PlatformName } from '@/constants';
+import type { SocialLink } from '@/features/editor/schemas/metadataForm.schema';
 import { useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
-import type { SocialLink } from '../../schemas/metadataForm.schema';
 
 import {
   Button,
@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui';
 import { Plus } from 'lucide-react';
-import { MenuSocialIcon } from './MenuSocialIcon';
+import { MenuSocialIcon } from '../../../socialIcons/MenuSocialIcon';
 
 export const AddSocialIconLink = () => {
   const [open, setOpen] = useState(false);
