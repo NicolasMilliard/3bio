@@ -5,7 +5,7 @@ export const ButtonLinks = () => {
   return (
     <div className="flex flex-col gap-2">
       <Text className="text-muted-foreground">Buttons</Text>
-      <div className="flex flex-wrap gap-2">
+      <div>
         <EditableButtonLinks />
         <AddButtonLink />
       </div>

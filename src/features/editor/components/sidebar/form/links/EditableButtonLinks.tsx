@@ -51,7 +51,6 @@ export const EditableButtonLinks = () => {
     const normalizedUrl = draftValue.trim();
 
     if (!isValidUrl) {
-      //TODO: Check if it is useful, if using formState.errors
       setError('Please enter a valid URL.');
 
       return;
