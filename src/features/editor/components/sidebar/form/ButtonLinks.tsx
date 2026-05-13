@@ -3,8 +3,10 @@ import { AddButtonLink, EditableButtonLinks } from './links';
 
 export const ButtonLinks = () => {
   return (
-    <div className="flex flex-col gap-2">
-      <Text className="text-sidebar-foreground/70">Buttons</Text>
+    <div>
+      <Text className="text-sidebar-foreground mb-1 text-sm font-medium">
+        Links
+      </Text>
       <div>
         <EditableButtonLinks />
         <AddButtonLink />

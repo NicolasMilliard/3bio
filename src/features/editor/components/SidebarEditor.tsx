@@ -4,10 +4,16 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  Text,
 } from '@/components/ui';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeft } from 'lucide-react';
-import { IdentityGroup, LinksGroup, ThemeGroup } from './sidebar';
+import {
+  AppearanceGroup,
+  DisplayGroup,
+  IdentityGroup,
+  PresenceGroup,
+} from './sidebar';
 
 export const SidebarEditor = () => {
   return (
@@ -15,18 +21,22 @@ export const SidebarEditor = () => {
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
           to="/dashboard"
-          className="hover:text-muted-foreground flex items-center gap-2 text-sm hover:underline"
+          className="hover:text-foreground flex items-center gap-1 text-sm hover:underline"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
           Back to dashboard
         </Link>
+        <Text variant="h3" className="text-foreground font-semibold">
+          Profile editor
+        </Text>
       </SidebarHeader>
       <SidebarContent>
         <IdentityGroup />
-        <LinksGroup />
-        <ThemeGroup />
+        <PresenceGroup />
+        <AppearanceGroup />
+        <DisplayGroup />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-foreground/40 border-t py-3">
         <Button type="submit">Save Changes</Button>
       </SidebarFooter>
     </Sidebar>
