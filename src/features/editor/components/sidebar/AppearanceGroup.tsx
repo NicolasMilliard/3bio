@@ -1,22 +1,20 @@
 import { useEditorContext } from '@/features/editor/context/editor.context';
 
-import { SidebarGroup, SidebarGroupLabel, Text } from '@/components/ui';
-import { BrandingSwitch, PictureController, StatisticsSwitch } from './form';
+import { SidebarGroup, SidebarGroupLabel } from '@/components/ui';
+import { PictureController, ThemeSelector } from './form';
 
-export const ThemeGroup = () => {
+export const AppearanceGroup = () => {
   const { account, inBioMetadata } = useEditorContext();
   const coverPicturePath =
     inBioMetadata.profile?.coverPicture ?? account.metadata?.coverPicture;
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="pl-0 tracking-widest uppercase">
-        Theme
+      <SidebarGroupLabel className="pl-0 tracking-wider">
+        Appearance
       </SidebarGroupLabel>
       <div className="flex flex-col gap-4">
-        <Text>Preset</Text>
-        <StatisticsSwitch />
-        <BrandingSwitch />
+        <ThemeSelector />
         <PictureController
           picturePath={coverPicturePath}
           formValue="coverPicture"

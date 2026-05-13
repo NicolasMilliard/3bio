@@ -1,3 +1,4 @@
+export * from './AppearanceGroup';
+export * from './DisplayGroup';
 export * from './IdentityGroup';
-export * from './LinksGroup';
-export * from './ThemeGroup';
+export * from './PresenceGroup';

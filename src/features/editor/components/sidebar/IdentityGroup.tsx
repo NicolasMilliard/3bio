@@ -18,7 +18,7 @@ export const IdentityGroup = () => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="pl-0 tracking-widest uppercase">
+      <SidebarGroupLabel className="pl-0 tracking-wider">
         Identity
       </SidebarGroupLabel>
       <div className="flex flex-col gap-4">
