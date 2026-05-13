@@ -4,7 +4,7 @@ import { AddSocialIconLink, EditableSocialLinks } from './social-links';
 export const SocialLinks = () => {
   return (
     <div className="flex flex-col gap-2">
-      <Text className="text-muted-foreground">Social icons</Text>
+      <Text className="text-sidebar-foreground/70">Social icons</Text>
       <div className="flex flex-wrap gap-2">
         <EditableSocialLinks />
         <AddSocialIconLink />

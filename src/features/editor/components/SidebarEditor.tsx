@@ -7,12 +7,7 @@ import {
 } from '@/components/ui';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeft } from 'lucide-react';
-import {
-  IdentityGroup,
-  LinksGroup,
-  StatisticsGroup,
-  ThemeGroup,
-} from './sidebar';
+import { IdentityGroup, LinksGroup, ThemeGroup } from './sidebar';
 
 export const SidebarEditor = () => {
   return (
@@ -29,7 +24,6 @@ export const SidebarEditor = () => {
       <SidebarContent>
         <IdentityGroup />
         <LinksGroup />
-        <StatisticsGroup />
         <ThemeGroup />
       </SidebarContent>
       <SidebarFooter>

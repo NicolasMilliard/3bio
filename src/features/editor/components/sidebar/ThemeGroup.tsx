@@ -1,7 +1,7 @@
 import { useEditorContext } from '@/features/editor/context/editor.context';
 
 import { SidebarGroup, SidebarGroupLabel, Text } from '@/components/ui';
-import { BrandingSwitch, PictureController } from './form';
+import { BrandingSwitch, PictureController, StatisticsSwitch } from './form';
 
 export const ThemeGroup = () => {
   const { account, inBioMetadata } = useEditorContext();
@@ -14,12 +14,13 @@ export const ThemeGroup = () => {
         Theme
       </SidebarGroupLabel>
       <div className="flex flex-col gap-4">
+        <Text>Preset</Text>
+        <StatisticsSwitch />
+        <BrandingSwitch />
         <PictureController
           picturePath={coverPicturePath}
           formValue="coverPicture"
         />
-        <BrandingSwitch />
-        <Text>Preset</Text>
       </div>
     </SidebarGroup>
   );
