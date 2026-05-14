@@ -8,7 +8,7 @@ const textVariants = cva('', {
       h1: 'text-primary text-[32px] font-extrabold',
       h2: 'text-primary text-[32px] font-extrabold',
       h3: 'text-primary text-2xl font-bold',
-      body: '',
+      body: 'text-foreground',
     },
   },
   defaultVariants: { variant: 'body' },
