@@ -203,10 +203,12 @@ TODO: Remove when dark theme is complete */
 }
 
 [data-theme='dark'] {
-  --background: oklch(0.14 0.02 260);
-  --foreground: oklch(0.96 0.01 255);
-  --border: oklch(74.93% 0.01856 289.406);
-  --muted: oklch(32.717% 0.05432 287.428);
+  --background: oklch(0.1867 0 0);
+  --foreground: oklch(0.876 0.0852 86.33);
+  --primary: oklch(0.876 0.0852 86.33);
+  --border: oklch(0.5661 0.0033 84.57);
+  --muted: oklch(0.7187 0 0);
+  --card: oklch(0.1867 0 0);
 
   --cover-background: var(--background);
   --cover-background-dot: var(--muted);
