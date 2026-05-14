@@ -197,17 +197,24 @@
    Themes
 ========================================================= */
 
-/* Should be empty
-TODO: Remove when dark theme is complete */
 [data-theme='default'] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.17 0.1 269);
+  --primary: oklch(0.45 0.3 266);
+  --border: oklch(0.94 0.02 288);
+  --muted: oklch(0.94 0.02 288);
+  --card: oklch(1 0 0);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--muted);
 }
 
 [data-theme='dark'] {
   --background: oklch(0.1867 0 0);
-  --foreground: oklch(0.876 0.0852 86.33);
+  --foreground: oklch(0.7187 0 0);
   --primary: oklch(0.876 0.0852 86.33);
   --border: oklch(0.5661 0.0033 84.57);
-  --muted: oklch(0.7187 0 0);
+  --muted: oklch(0.2682 0.0018 106.52);
   --card: oklch(0.1867 0 0);
 
   --cover-background: var(--background);

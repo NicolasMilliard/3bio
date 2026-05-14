@@ -27,10 +27,7 @@ export const Identity = ({
       </Avatar>
       <div className="flex animate-[blurFadeIn_0.4s_ease-out_0.30s_both] flex-col items-center">
         {name && (
-          <Text
-            variant="h1"
-            className="text-foreground text-2xl leading-tight font-bold"
-          >
+          <Text variant="h1" className="text-2xl leading-tight font-bold">
             {name}
           </Text>
         )}

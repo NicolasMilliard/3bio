@@ -18,12 +18,12 @@ export const Statistics = ({
         { value: posts, label: 'Posts' },
       ].map(({ value, label }, i) => (
         <Fragment key={label}>
-          {i > 0 && <div className="bg-ring h-7 w-px shrink-0" />}
+          {i > 0 && <div className="bg-border h-7 w-px shrink-0" />}
           <div className="flex flex-1 flex-col items-center gap-0.5">
-            <span className="text-base leading-none font-bold tracking-tight">
+            <span className="text-primary text-base leading-none font-bold tracking-tight">
               {value !== undefined ? formatCount(value) : '—'}
             </span>
-            <span className="text-muted-foreground text-[0.6875rem] font-medium tracking-wider uppercase">
+            <span className="text-foreground text-[12px] font-medium tracking-wider uppercase">
               {label}
             </span>
           </div>
