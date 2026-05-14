@@ -37,6 +37,9 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--muted);
 }
 
 :root {
@@ -97,7 +100,6 @@
   }
 }
 
-/* Custom keyframes referenced by animate-[...] in Tailwind v4 */
 @keyframes riseIn {
   from {
     opacity: 0;
@@ -195,12 +197,29 @@
    Themes
 ========================================================= */
 
+/* Should be empty
+TODO: Remove when dark theme is complete */
 [data-theme='default'] {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.17 0.1 269);
 }
 
 [data-theme='dark'] {
   --background: oklch(0.14 0.02 260);
   --foreground: oklch(0.96 0.01 255);
+  --border: oklch(74.93% 0.01856 289.406);
+  --muted: oklch(32.717% 0.05432 287.428);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--muted);
+}
+
+[data-theme='viber'] {
+  /* Sunrise gradient */
+}
+
+[data-theme='og'] {
+  /* OG web3? */
+}
+
+[data-theme='bitcoin'] {
+  /* BTC maxi? */
 }

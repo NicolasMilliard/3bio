@@ -1,4 +1,5 @@
 import { formatToInBioMetadata } from '@/helpers';
+import { cn } from '@/lib/utils';
 import { useAccount, useAccountStats } from '@lens-protocol/react';
 
 import { SpinnerScreen } from '@/components/ui';
@@ -30,17 +31,26 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   }
 
   const profile = formatToInBioMetadata(account)?.profile;
+  const themeName = formatToInBioMetadata(account)?.theme?.name ?? 'default';
   const followers = stats?.graphFollowStats?.followers;
   const following = stats?.graphFollowStats?.following;
   const posts = stats?.feedStats?.posts;
 
   return (
     <main
-      data-theme={'default'}
+      // data-theme={themeName}
+      data-theme="default"
       className="flex min-h-dvh flex-1 items-center justify-center"
     >
       <CoverPicture coverPicture={profile.coverPicture} />
-      <section className="sm:bg-card/55 sm:border-secondary relative z-2 flex w-full animate-[riseIn_0.5s_cubic-bezier(0.22,1,0.36,1)_both] flex-col items-center gap-6 px-6 pt-12 pb-10 sm:my-8 sm:min-h-0 sm:w-105 sm:rounded-3xl sm:border sm:px-8 sm:pt-10 sm:pb-8 sm:shadow-[0_8px_48px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] sm:backdrop-blur-xl sm:backdrop-saturate-180">
+      <section
+        className={cn(
+          'relative z-2 mx-4 flex w-full flex-col items-center gap-6 px-6 pt-12 pb-10',
+          // Card
+          'bg-card/55 border-border my-8 min-h-0 w-full max-w-105 rounded-3xl border px-8 pt-10 pb-8 shadow-[0_8px_48px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-180',
+          'animate-[blurFadeIn_0.4s_ease-out_forwards]',
+        )}
+      >
         <Identity lensHandle={lensHandle} profile={profile} />
         <Statistics followers={followers} following={following} posts={posts} />
         <SocialLinks socialLinks={profile.socialLinks} />
