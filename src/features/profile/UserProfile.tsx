@@ -1,6 +1,7 @@
 import { formatToInBioMetadata } from '@/helpers';
 import { cn } from '@/lib/utils';
 import { useAccount, useAccountStats } from '@lens-protocol/react';
+import { useEffect } from 'react';
 
 import { SpinnerScreen } from '@/components/ui';
 import {
@@ -24,6 +25,13 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
     account: account?.address ?? '',
   });
 
+  const themeName =
+    (account && formatToInBioMetadata(account)?.theme?.name) ?? 'default';
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', themeName);
+  }, [themeName]);
+
   if (loading) return <SpinnerScreen text="Loading profile..." />;
 
   if (error || !account) {
@@ -31,17 +39,12 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   }
 
   const profile = formatToInBioMetadata(account)?.profile;
-  const themeName = formatToInBioMetadata(account)?.theme?.name ?? 'default';
   const followers = stats?.graphFollowStats?.followers;
   const following = stats?.graphFollowStats?.following;
   const posts = stats?.feedStats?.posts;
 
   return (
-    <main
-      // data-theme={themeName}
-      data-theme="default"
-      className="flex min-h-dvh flex-1 items-center justify-center"
-    >
+    <main className="flex min-h-dvh flex-1 items-center justify-center">
       <CoverPicture coverPicture={profile.coverPicture} />
       <section
         className={cn(
