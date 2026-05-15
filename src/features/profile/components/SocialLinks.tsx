@@ -24,7 +24,7 @@ export const SocialLinks = ({ socialLinks }: { socialLinks?: LensLink[] }) => {
                 href={socialLink.value}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-chart-2 transition"
+                className="text-primary hover:text-primary/55 transition"
                 aria-label={platform.label}
               >
                 <platform.Icon className="size-6" />
