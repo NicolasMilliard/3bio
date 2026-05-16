@@ -222,13 +222,46 @@ html[data-theme='dark'] {
 }
 
 html[data-theme='viber'] {
-  /* Sunrise gradient */
+  --background: oklch(0.18 0.03 290); /* deep violet */
+  --foreground: oklch(0.95 0.02 275);
+
+  --primary: oklch(0.68 0.3 305); /* Viber neon purple */
+  --border: oklch(0.3 0.04 295);
+  --muted: oklch(0.25 0.04 295);
+  --card: oklch(0.22 0.03 290);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--primary);
+
+  --accent: oklch(0.72 0.22 330); /* magenta pop */
 }
 
 html[data-theme='og'] {
-  /* OG web3? */
+  --background: oklch(0.1 0.01 260); /* near-black blue */
+  --foreground: oklch(0.85 0.01 255);
+
+  --primary: oklch(0.65 0.12 200); /* cyan/blue OG crypto */
+  --border: oklch(0.25 0.01 250);
+  --muted: oklch(0.18 0.01 255);
+  --card: oklch(0.13 0.01 260);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--primary);
+
+  --accent: oklch(0.7 0.15 160); /* hacker green */
 }
 
 html[data-theme='bitcoin'] {
-  /* BTC maxi? */
+  --background: oklch(0.12 0.02 85); /* warm dark brown-black */
+  --foreground: oklch(0.92 0.01 85);
+
+  --primary: oklch(0.78 0.18 75); /* Bitcoin orange */
+  --border: oklch(0.28 0.03 80);
+  --muted: oklch(0.2 0.02 80);
+  --card: oklch(0.16 0.02 85);
+
+  --cover-background: var(--background);
+  --cover-background-dot: var(--primary);
+
+  --accent: oklch(0.82 0.2 95); /* gold highlight */
 }
