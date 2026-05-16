@@ -23,7 +23,7 @@ export const Statistics = ({
             <span className="text-primary text-base leading-none font-bold tracking-tight">
               {value !== undefined ? formatCount(value) : '—'}
             </span>
-            <span className="text-foreground text-[12px] font-medium tracking-wider uppercase">
+            <span className="text-foreground text-[10px] font-medium tracking-wider uppercase sm:text-[12px]">
               {label}
             </span>
           </div>
