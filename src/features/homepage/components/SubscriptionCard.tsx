@@ -17,7 +17,7 @@ export const SubscriptionCard = ({
   features,
 }: SubscriptionPlan) => {
   return (
-    <Card className="min-h-85 py-0 shadow-none ring-0">
+    <Card className="min-h-85 max-w-88 flex-1/2 py-0 shadow-none ring-0">
       <CardHeader
         className={`${variant === 'free' ? 'bg-muted' : 'bg-accent'} py-4`}
       >

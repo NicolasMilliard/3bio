@@ -15,7 +15,7 @@ export const PricingSection = () => {
           time. <br />
           Pay with crypto (GHO or USDC) or credit card.
         </Text>
-        <div className="mt-16 flex flex-col gap-16 md:flex-row">
+        <div className="mt-16 flex w-full flex-col justify-center gap-16 md:flex-row">
           {SUBSCRIPTION_PLANS.map((plan) => (
             <SubscriptionCard
               key={plan.variant}
