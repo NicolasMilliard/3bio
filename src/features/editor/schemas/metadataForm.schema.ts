@@ -27,7 +27,7 @@ export const metadataFormSchema = z.object({
   links: z.array(z.url()).optional(),
   displayStatistics: z.boolean().optional(),
   displayBranding: z.boolean().optional(),
-  theme: z.string(),
+  theme: z.enum(['light', 'dark']).default('light').optional(),
 });
 
 export type MetadataFormValues = z.infer<typeof metadataFormSchema>;

@@ -44,7 +44,7 @@ function buildDefaultValues(inBioMetadata: InBioMetadata): MetadataFormValues {
       return { platform: key, url: existing?.value };
     }),
     links: profile?.links?.map((link) => link.value) ?? [],
-    theme: theme?.name ?? 'default',
+    theme: theme?.name ?? 'light',
     displayStatistics: theme?.displayStatistics ?? true,
     displayBranding: theme?.displayBranding ?? true,
   };
@@ -122,7 +122,7 @@ export function useEditorForm(account: Account, inBioMetadata: InBioMetadata) {
           links: buildLinkAttributes(values.links),
         },
         theme: {
-          name: values.theme,
+          name: values.theme ?? 'light',
           displayStatistics: values.displayStatistics ?? true,
           displayBranding: values.displayBranding ?? true,
         },

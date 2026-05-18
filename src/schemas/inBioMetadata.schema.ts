@@ -27,10 +27,12 @@ export const profileSchema = z.object({
 export type InBioProfile = z.infer<typeof profileSchema>;
 
 const themeSchema = z.object({
-  name: z.string(),
+  name: z.enum(['light', 'dark']).default('light'),
   displayStatistics: z.boolean().default(true),
   displayBranding: z.boolean().default(true),
 });
+
+export type InBioTheme = z.infer<typeof themeSchema>;
 
 const settingsSchema = z.object({
   subscription: z.object({

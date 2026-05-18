@@ -1,7 +1,6 @@
 import { formatToInBioMetadata } from '@/helpers';
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/hooks/useTheme';
 import { useAccount, useAccountStats } from '@lens-protocol/react';
-import { useEffect } from 'react';
 
 import { SpinnerScreen } from '@/components/ui';
 import {
@@ -10,6 +9,7 @@ import {
   Identity,
   Links,
   NotFoundScreen,
+  ProfileSection,
   SocialLinks,
   Statistics,
 } from './components';
@@ -28,9 +28,7 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   const themeName =
     (account && formatToInBioMetadata(account)?.theme?.name) ?? 'default';
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', themeName);
-  }, [themeName]);
+  useTheme(themeName);
 
   if (loading) return <SpinnerScreen text="Loading profile..." />;
 
@@ -46,20 +44,13 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   return (
     <main className="flex min-h-dvh flex-1 items-center justify-center">
       <CoverPicture coverPicture={profile.coverPicture} />
-      <section
-        className={cn(
-          'relative z-2 mx-4 flex w-full flex-col items-center gap-6 px-6 pt-12 pb-10',
-          // Card
-          'bg-card/55 border-border my-8 min-h-0 w-full max-w-105 rounded-3xl border px-8 pt-10 pb-8 shadow-[0_8px_48px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-180',
-          'animate-[blurFadeIn_0.4s_ease-out_forwards]',
-        )}
-      >
+      <ProfileSection>
         <Identity lensHandle={lensHandle} profile={profile} />
         <Statistics followers={followers} following={following} posts={posts} />
         <SocialLinks socialLinks={profile.socialLinks} />
         <Links links={profile.links} />
         <Branding />
-      </section>
+      </ProfileSection>
     </main>
   );
 };

@@ -1,6 +1,7 @@
 export * from './BrandingSection';
 export * from './CoverPictureSection';
 export * from './EditorForm';
+export * from './EditorProfilePreview';
 export * from './IdentitySection';
 export * from './LinksSection';
 export * from './SidebarEditor';

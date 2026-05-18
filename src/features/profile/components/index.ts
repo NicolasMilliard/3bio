@@ -4,5 +4,6 @@ export * from './Identity';
 export * from './LinkButton';
 export * from './Links';
 export * from './NotFoundScreen';
+export * from './ProfileSection';
 export * from './SocialLinks';
 export * from './Statistics';

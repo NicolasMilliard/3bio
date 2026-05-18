@@ -1,4 +1,5 @@
 import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
+import type { InBioTheme } from '@/schemas/inBioMetadata.schema';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import {
@@ -22,7 +23,7 @@ export const ThemeSelector = () => {
     <Select
       value={theme}
       onValueChange={(value) => {
-        setValue('theme', value, {
+        setValue('theme', value as InBioTheme['name'], {
           shouldDirty: true,
           shouldTouch: true,
           shouldValidate: true,
@@ -34,9 +35,8 @@ export const ThemeSelector = () => {
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value="default">Default</SelectItem>
+          <SelectItem value="light">Light</SelectItem>
           <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
