@@ -148,6 +148,7 @@ export function useEditorForm(account: Account, inBioMetadata: InBioMetadata) {
         return;
       }
 
+      methods.reset(values);
       toast.success('Profile saved!', {
         id: toastId,
         description: 'Your changes are now live.',

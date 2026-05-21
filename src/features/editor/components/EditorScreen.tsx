@@ -29,8 +29,6 @@ export const EditorScreen = ({
     posts: stats?.feedStats?.posts,
   };
 
-  console.log(inBioMetadata?.theme?.name);
-
   return (
     <EditorProvider value={{ account, stats, inBioMetadata }}>
       <EditorForm>
