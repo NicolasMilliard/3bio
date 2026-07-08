@@ -1,6 +1,9 @@
 import { useAuthState } from '../hooks';
 
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -67,11 +70,12 @@ export const AuthButton = () => {
                 : 'hover:bg-primary/40! cursor-pointer'
             }
           >
-            <Image
-              src={p.avatar}
-              alt={p.displayName}
-              className="size-6 rounded-full"
-            />
+            <Avatar size="sm">
+              <AvatarImage src={p.avatar} alt={p.displayName} />
+              <AvatarFallback>
+                {p.displayName ? p.displayName[0].toUpperCase() : 'U'}
+              </AvatarFallback>
+            </Avatar>
             <span className="truncate">{p.displayName}</span>
 
             {p.isActive && <span className="ml-auto">✓</span>}
