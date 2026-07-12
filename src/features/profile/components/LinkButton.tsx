@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 import { Image } from '@/components/ui';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Link2 } from 'lucide-react';
 
 type LinkButtonProps = {
   href?: string;
@@ -53,28 +53,36 @@ export const LinkButton = ({
       };
 
   return (
-    <div className={cn('w-full max-w-prose', className)}>
+    <div className={cn('w-full max-w-60', className)}>
       <Wrapper
         {...wrapperProps}
-        className="group bg-muted/50 text-foreground hover:bg-muted/80 active:bg-muted focus-visible:ring-primary/20 flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner"
+        className="group bg-links-background text-links-text hover:bg-links-background/90 focus-visible:ring-name-text flex w-full cursor-pointer items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner"
       >
-        <div className="flex size-6 shrink-0 items-center justify-center">
+        <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full">
           {imgSrc ? (
             <Image
               src={imgSrc}
-              alt={label}
+              alt=""
+              aria-hidden="true"
               referrerPolicy="no-referrer"
-              className="size-4 rounded-sm"
+              className="size-3.5 rounded-sm"
               onError={handleImageError}
             />
           ) : (
-            <span className="text-sm opacity-60">🔗</span>
+            <Link2 aria-hidden="true" className="size-3.5" />
           )}
-        </div>
+        </span>
 
-        <span className="flex-1 truncate text-left">{label}</span>
+        <span className="flex-1 truncate text-left" title={label}>
+          {label}
+        </span>
 
-        <ExternalLink className="size-4 shrink-0 opacity-40 transition-all group-hover:translate-x-0.5 group-hover:opacity-80" />
+        <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-full">
+          <ExternalLink
+            aria-hidden="true"
+            className="size-3.5 transition-transform group-hover:translate-x-0.5"
+          />
+        </span>
       </Wrapper>
     </div>
   );

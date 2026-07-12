@@ -4,6 +4,38 @@ import type { Account } from '@lens-protocol/react';
 
 import type { UseProfileData } from './UserProfile';
 
+const aoifeThreeBioMetadata = JSON.stringify({
+  profile: {
+    socialLinks: [
+      {
+        type: 'String',
+        key: 'socialLinks.github',
+        value: 'https://github.com',
+      },
+      {
+        type: 'String',
+        key: 'socialLinks.instagram',
+        value: 'https://instagram.com',
+      },
+      {
+        type: 'String',
+        key: 'socialLinks.twitter',
+        value: 'https://x.com',
+      },
+    ],
+    links: Array.from({ length: 15 }, (_, index) => ({
+      type: 'String',
+      key: `links.3bio.social.${index + 1}`,
+      value: 'https://3bio.social',
+    })),
+  },
+  theme: {
+    name: 'light',
+    displayStatistics: true,
+    displayBranding: true,
+  },
+});
+
 export const offlineAccountResponses = {
   aoifeodwyer: {
     data: {
@@ -44,7 +76,14 @@ export const offlineAccountResponses = {
         },
         metadata: {
           __typename: 'AccountMetadata',
-          attributes: [],
+          attributes: [
+            {
+              __typename: 'MetadataAttribute',
+              type: 'JSON',
+              key: '3bio',
+              value: aoifeThreeBioMetadata,
+            },
+          ],
           bio: `Artist, designer & founder trying to figure out what lives in the gaps of human perception via /hyefa 🌿
 
 I enjoy subverting expectations by combining the familiar in unfamiliar ways – often via queer and neurodivergent storytelling perspectives.
@@ -194,8 +233,8 @@ const offlineAccountsByHandle: Record<string, Account> = {
 // in the supplied responses.
 const offlineStatsByHandle = {
   aoifeodwyer: {
-    graphFollowStats: { followers: 12_345, following: 321 },
-    feedStats: { posts: 678 },
+    graphFollowStats: { followers: 26_500, following: 457 },
+    feedStats: { posts: 8_000 },
   },
   inbio: {
     graphFollowStats: { followers: 345, following: 12 },

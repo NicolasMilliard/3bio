@@ -7,7 +7,10 @@ export const Links = ({ links }: { links?: LensLink[] }) => {
   if (!links || links.length === 0) return null;
 
   return (
-    <div className="animate-[blurFadeIn_0.4s_ease-out_0.75s_both]">
+    <nav
+      aria-label="External links"
+      className="flex w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_both] flex-col gap-6 motion-reduce:animate-none"
+    >
       {links.map((link) => (
         <LinkButton
           key={link.key}
@@ -15,6 +18,6 @@ export const Links = ({ links }: { links?: LensLink[] }) => {
           label={formatUrlLabel(link.value)}
         />
       ))}
-    </div>
+    </nav>
   );
 };

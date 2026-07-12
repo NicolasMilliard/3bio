@@ -8,7 +8,7 @@ export const SocialLinks = ({ socialLinks }: { socialLinks?: LensLink[] }) => {
   if (!socialLinks || socialLinks.length === 0) return null;
 
   return (
-    <div className="flex max-w-prose flex-wrap items-center justify-center gap-3">
+    <div className="-ml-2 flex min-h-10 w-full max-w-prose flex-wrap items-center">
       {socialLinks.map((socialLink) => {
         const formattedSocialLink = formatSocialLink(socialLink);
         const platform = formattedSocialLink.platform
@@ -19,12 +19,12 @@ export const SocialLinks = ({ socialLinks }: { socialLinks?: LensLink[] }) => {
 
         return (
           <Tooltip key={socialLink.key}>
-            <TooltipTrigger className="animate-[blurFadeIn_0.4s_ease-out_0.60s_both]">
+            <TooltipTrigger asChild>
               <a
                 href={socialLink.value}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary/55 transition"
+                className="text-icons hover:text-icons/60 focus-visible:ring-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_both] items-center justify-center rounded-full transition motion-reduce:animate-none focus-visible:ring-2 focus-visible:outline-none"
                 aria-label={platform.label}
               >
                 <platform.Icon className="size-6" />

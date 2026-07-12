@@ -10,7 +10,8 @@ export type SocialLink = {
 
 export const formatSocialLink = (link: LensLink) => {
   const hostname = getHostname(link.value);
-  const platform = hostname?.replace(/^www\./, '').split('.')[0];
+  const hostnamePlatform = hostname?.replace(/^www\./, '').split('.')[0];
+  const platform = hostnamePlatform === 'x' ? 'twitter' : hostnamePlatform;
 
   return {
     key: link.key,

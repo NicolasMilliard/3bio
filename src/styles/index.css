@@ -52,6 +52,8 @@
   --color-content-background: var(--content-background);
   --color-links-text: var(--links-text);
   --color-links-background: var(--links-background);
+  --color-links-icon-background: var(--links-icon-background);
+  --color-links-icon: var(--links-icon);
   --color-branding-text: var(--branding-text);
 }
 
@@ -107,9 +109,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior: none;
   }
   html {
     @apply font-sans;
+    overscroll-behavior: none;
   }
 }
 
@@ -235,9 +239,11 @@
 }
 
 /* =========================================================
-   Themes - v2
+   Profile themes
 ========================================================= */
-[data-theme='default'] {
+[data-theme='default'],
+[data-theme='classic'],
+[data-theme='light'] {
   --background: oklch(0.98 0.0162 322.69);
   --avatar-background: oklch(0.8797 0.108 324.91);
   --name-text: oklch(0.4509 0.2989 266.03);
@@ -247,8 +253,10 @@
   --statistics-title: oklch(0.7556 0.0984 285.11);
   --statistics-number: oklch(0.4509 0.2989 266.03);
   --content-background: oklch(0.8797 0.108 324.91);
-  --links-text: oklch(0.7556 0.0984 285.11);
+  --links-text: oklch(0.1683 0.1042 269.45);
   --links-background: oklch(1 0 0);
+  --links-icon-background: oklch(0.88 0 0);
+  --links-icon: oklch(0.1683 0.1042 269.45 / 0.6);
   --branding-text: oklch(0.1683 0.1042 269.45);
 
   html,
@@ -257,23 +265,56 @@
   }
 }
 
-/* TEST: TO REMOVE WHEN COMPLETE */
-[data-theme='test'] {
-  --background: red;
-  --avatar-background: green;
-  --name-text: white;
-  --bio-text: yellow;
-  --icons: purple;
-  --statistics-background: blue;
-  --statistics-title: purple;
-  --statistics-number: green;
-  --content-background: purple;
-  --links-text: lightgrey;
-  --links-background: red;
-  --branding-text: yellow;
+[data-theme='dark'],
+[data-theme='midnight'] {
+  --background: #2d1a4e;
+  --avatar-background: #ff7582;
+  --name-text: #ff7582;
+  --bio-text: #c9dae8;
+  --icons: #ff7582;
+  --statistics-background: #422673;
+  --statistics-title: #ff7582;
+  --statistics-number: #c9dae8;
+  --content-background: #422673;
+  --links-text: #422673;
+  --links-background: #ffffff;
+  --links-icon-background: #d9d9d9;
+  --links-icon: rgb(66 38 115 / 60%);
+  --branding-text: #c9dae8;
 
   html,
   body {
     background-color: var(--background);
+  }
+}
+
+.profile-content-scroll {
+  scrollbar-color: color-mix(in oklab, var(--links-text) 35%, transparent)
+    transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.profile-content-scroll::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.profile-content-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--links-text) 35%, transparent);
+  border: 0.125rem solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+@media (min-width: 64rem) and (min-height: 44rem) {
+  .profile-page {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .profile-layout {
+    height: 100%;
+    min-height: 0;
   }
 }
