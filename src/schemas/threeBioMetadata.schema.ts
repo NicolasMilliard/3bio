@@ -1,3 +1,7 @@
+import {
+  THREE_BIO_DEFAULT_THEME,
+  THREE_BIO_THEME_NAMES,
+} from '@/constants/themes';
 import { MetadataAttributeType } from '@lens-protocol/metadata';
 import { z } from 'zod';
 
@@ -26,8 +30,10 @@ export const profileSchema = z.object({
 
 export type ThreeBioProfile = z.infer<typeof profileSchema>;
 
+export const threeBioThemeNameSchema = z.enum(THREE_BIO_THEME_NAMES);
+
 const themeSchema = z.object({
-  name: z.enum(['light', 'dark']).default('light'),
+  name: threeBioThemeNameSchema.default(THREE_BIO_DEFAULT_THEME),
   displayStatistics: z.boolean().default(true),
   displayBranding: z.boolean().default(true),
 });

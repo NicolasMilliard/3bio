@@ -1,14 +1,14 @@
 // TODO: Remove file when possible
 
+import type { ThreeBioThemeName } from '@/constants';
 import { cn } from '@/lib/utils';
-import type { ThreeBioTheme } from '@/schemas/threeBioMetadata.schema';
 
 export const ProfileSection = ({
   children,
   dataTheme,
 }: {
   children: React.ReactNode;
-  dataTheme?: ThreeBioTheme['name'];
+  dataTheme?: ThreeBioThemeName;
 }) => {
   return (
     <section

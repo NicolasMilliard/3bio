@@ -1,3 +1,4 @@
+import { threeBioThemeNameSchema } from '@/schemas/threeBioMetadata.schema';
 import { z } from 'zod';
 
 const optionalUrl = z
@@ -27,7 +28,7 @@ export const metadataFormSchema = z.object({
   links: z.array(z.url()).optional(),
   displayStatistics: z.boolean().optional(),
   displayBranding: z.boolean().optional(),
-  theme: z.enum(['light', 'dark']).default('light').optional(),
+  theme: threeBioThemeNameSchema,
 });
 
 export type MetadataFormValues = z.infer<typeof metadataFormSchema>;

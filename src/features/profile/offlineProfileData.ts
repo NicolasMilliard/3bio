@@ -1,5 +1,6 @@
 import aoifeAvatar from '@/assets/carousel/creators/aoifeodwyer.avif';
 import aoifeCover from '@/assets/profile/offline/aoife-cover.jpeg';
+import { THREE_BIO_DEFAULT_THEME } from '@/constants';
 import type { Account } from '@lens-protocol/react';
 
 import type { UseProfileData } from './UserProfile';
@@ -30,7 +31,7 @@ const aoifeThreeBioMetadata = JSON.stringify({
     })),
   },
   theme: {
-    name: 'light',
+    name: THREE_BIO_DEFAULT_THEME,
     displayStatistics: true,
     displayBranding: true,
   },
@@ -168,14 +169,14 @@ I work primarily in hand-drawn digital illustration and across an evolving body 
               type: 'JSON',
               key: 'inBio',
               value:
-                '{"profile":{"avatar":"https://api.grove.storage/a728622e8502b04c61934f50dc840018593f316abc28b22045962ffde075c11c","coverPicture":"https://api.grove.storage/39935b69368cb85fd2d77150786b3a37e4490af6651038560999460ec2775d55","name":"inBio","bio":"Hello, Lens.","socialLinks":[{"type":"String","key":"socialLinks.instagram","value":"https://instagram.com/@inbio"},{"type":"String","key":"socialLinks.github","value":"https://github.com/inbio2"}],"links":[{"type":"String","key":"links.inbio.social","value":"https://inbio.social"}]},"theme":{"name":"light","displayStatistics":true,"displayBranding":true}}',
+                '{"profile":{"avatar":"https://api.grove.storage/a728622e8502b04c61934f50dc840018593f316abc28b22045962ffde075c11c","coverPicture":"https://api.grove.storage/39935b69368cb85fd2d77150786b3a37e4490af6651038560999460ec2775d55","name":"inBio","bio":"Hello, Lens.","socialLinks":[{"type":"String","key":"socialLinks.instagram","value":"https://instagram.com/@inbio"},{"type":"String","key":"socialLinks.github","value":"https://github.com/inbio2"}],"links":[{"type":"String","key":"links.inbio.social","value":"https://inbio.social"}]},"theme":{"name":"classic","displayStatistics":true,"displayBranding":true}}',
             },
             {
               __typename: 'MetadataAttribute',
               type: 'JSON',
               key: '3bio',
               value:
-                '{"profile":{"name":"3bio","bio":"Hello, this is my bio.","socialLinks":[{"type":"String","key":"socialLinks.github","value":"https://github.com/3bio"}],"links":[{"type":"String","key":"links.3bio.social","value":"https://3bio.social"}]},"theme":{"name":"light","displayStatistics":true,"displayBranding":true}}',
+                '{"profile":{"name":"3bio","bio":"Hello, this is my bio.","socialLinks":[{"type":"String","key":"socialLinks.github","value":"https://github.com/3bio"}],"links":[{"type":"String","key":"links.3bio.social","value":"https://3bio.social"}]},"theme":{"name":"classic","displayStatistics":true,"displayBranding":true}}',
             },
           ],
           bio: null,

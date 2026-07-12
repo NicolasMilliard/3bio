@@ -1,3 +1,4 @@
+import { THREE_BIO_DEFAULT_THEME } from '@/constants';
 import { formatToThreeBioMetadata } from '@/helpers';
 import { useTheme } from '@/hooks/useTheme';
 import type { ThreeBioProfile } from '@/schemas/threeBioMetadata.schema';
@@ -64,7 +65,7 @@ const UserProfile = ({
     ? formatToThreeBioMetadata(account)
     : undefined;
   const theme = threeBioMetadata?.theme;
-  const themeName = theme?.name ?? 'default';
+  const themeName = theme?.name ?? THREE_BIO_DEFAULT_THEME;
   const contentPanelRef = useRef<HTMLElement>(null);
 
   useTheme(themeName);

@@ -1,4 +1,4 @@
-import type { ThreeBioTheme } from '@/schemas/threeBioMetadata.schema';
+import type { ThreeBioThemeName } from '@/constants';
 import { useFormContext, useWatch } from 'react-hook-form';
 import type { MetadataFormValues } from '../schemas/metadataForm.schema';
 
@@ -9,7 +9,7 @@ export const EditorProfilePreview = ({
   defaultTheme,
 }: {
   children: React.ReactNode;
-  defaultTheme: ThreeBioTheme['name'];
+  defaultTheme: ThreeBioThemeName;
 }) => {
   const { control } = useFormContext<MetadataFormValues>();
 

@@ -1,6 +1,7 @@
+import type { ThreeBioThemeName } from '@/constants';
 import { useEffect } from 'react';
 
-export const useTheme = (theme: string) => {
+export const useTheme = (theme: ThreeBioThemeName) => {
   useEffect(() => {
     const root = document.documentElement;
 

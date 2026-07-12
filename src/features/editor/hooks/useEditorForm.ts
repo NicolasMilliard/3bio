@@ -6,7 +6,7 @@ import { MetadataAttributeType } from '@lens-protocol/metadata';
 import { uri, useSessionClient, type Account } from '@lens-protocol/react';
 import { useWalletClient } from 'wagmi';
 
-import { SOCIAL_MAP } from '@/constants';
+import { SOCIAL_MAP, THREE_BIO_DEFAULT_THEME } from '@/constants';
 import {
   formatMetadataBeforeUpload,
   formatSocialLink,
@@ -46,7 +46,7 @@ function buildDefaultValues(
       return { platform: key, url: existing?.value };
     }),
     links: profile?.links?.map((link) => link.value) ?? [],
-    theme: theme?.name ?? 'light',
+    theme: theme?.name ?? THREE_BIO_DEFAULT_THEME,
     displayStatistics: theme?.displayStatistics ?? true,
     displayBranding: theme?.displayBranding ?? true,
   };
@@ -127,7 +127,7 @@ export function useEditorForm(
           links: buildLinkAttributes(values.links),
         },
         theme: {
-          name: values.theme ?? 'light',
+          name: values.theme,
           displayStatistics: values.displayStatistics ?? true,
           displayBranding: values.displayBranding ?? true,
         },

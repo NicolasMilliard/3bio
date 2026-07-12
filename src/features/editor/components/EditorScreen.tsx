@@ -1,3 +1,4 @@
+import { THREE_BIO_DEFAULT_THEME } from '@/constants';
 import { formatToThreeBioMetadata } from '@/helpers';
 import type { Account, AccountStats } from '@lens-protocol/react';
 
@@ -43,7 +44,9 @@ export const EditorScreen = ({
               <CoverPictureSection />
 
               <EditorProfilePreview
-                defaultTheme={threeBioMetadata?.theme?.name ?? 'light'}
+                defaultTheme={
+                  threeBioMetadata?.theme?.name ?? THREE_BIO_DEFAULT_THEME
+                }
               >
                 <IdentitySection
                   lensHandle={account.username?.localName ?? ''}
