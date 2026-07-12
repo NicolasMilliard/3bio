@@ -1,6 +1,10 @@
 import { formatToThreeBioMetadata } from '@/helpers';
 import { useTheme } from '@/hooks/useTheme';
-import { useAccount, useAccountStats } from '@lens-protocol/react';
+import {
+  type Account,
+  useAccount,
+  useAccountStats,
+} from '@lens-protocol/react';
 
 import { SpinnerScreen } from '@/components/ui';
 import {
@@ -12,7 +16,26 @@ import {
   Statistics,
 } from './components';
 
-const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
+type ProfileStats = {
+  graphFollowStats?: {
+    followers?: number;
+    following?: number;
+  };
+  feedStats?: {
+    posts?: number;
+  };
+};
+
+export type ProfileDataResult = {
+  account: Account | null | undefined;
+  stats: ProfileStats | undefined;
+  loading: boolean;
+  error: unknown;
+};
+
+export type UseProfileData = (lensHandle: string) => ProfileDataResult;
+
+const useLensProfileData: UseProfileData = (lensHandle) => {
   const {
     data: account,
     loading,
@@ -22,6 +45,18 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   const { data: stats } = useAccountStats({
     account: account?.address ?? '',
   });
+
+  return { account, stats, loading, error };
+};
+
+const UserProfile = ({
+  lensHandle,
+  useProfileData = useLensProfileData,
+}: {
+  lensHandle: string;
+  useProfileData?: UseProfileData;
+}) => {
+  const { account, stats, loading, error } = useProfileData(lensHandle);
 
   const themeName =
     (account && formatToThreeBioMetadata(account)?.theme?.name) ?? 'default';
