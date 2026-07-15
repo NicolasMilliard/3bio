@@ -2,11 +2,7 @@ import { THREE_BIO_DEFAULT_THEME } from '@/constants';
 import { formatToThreeBioMetadata } from '@/helpers';
 import { useTheme } from '@/hooks/useTheme';
 import type { ThreeBioProfile } from '@/schemas/threeBioMetadata.schema';
-import {
-  type Account,
-  useAccount,
-  useAccountStats,
-} from '@lens-protocol/react';
+import { useAccount, useAccountStats } from '@lens-protocol/react';
 import { useRef, type WheelEvent } from 'react';
 
 import { SpinnerScreen } from '@/components/ui';
@@ -20,26 +16,7 @@ import {
   Statistics,
 } from './components';
 
-type ProfileStats = {
-  graphFollowStats?: {
-    followers?: number;
-    following?: number;
-  };
-  feedStats?: {
-    posts?: number;
-  };
-};
-
-export type ProfileDataResult = {
-  account: Account | null | undefined;
-  stats: ProfileStats | undefined;
-  loading: boolean;
-  error: unknown;
-};
-
-export type UseProfileData = (lensHandle: string) => ProfileDataResult;
-
-const useLensProfileData: UseProfileData = (lensHandle) => {
+const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   const {
     data: account,
     loading,
@@ -49,18 +26,6 @@ const useLensProfileData: UseProfileData = (lensHandle) => {
   const { data: stats } = useAccountStats({
     account: account?.address ?? '',
   });
-
-  return { account, stats, loading, error };
-};
-
-const UserProfile = ({
-  lensHandle,
-  useProfileData = useLensProfileData,
-}: {
-  lensHandle: string;
-  useProfileData?: UseProfileData;
-}) => {
-  const { account, stats, loading, error } = useProfileData(lensHandle);
 
   const threeBioMetadata = account
     ? formatToThreeBioMetadata(account)

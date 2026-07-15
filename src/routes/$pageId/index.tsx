@@ -1,9 +1,18 @@
 import UserProfile from '@/features/profile/UserProfile';
-// Uncomment this import and the prop below to use local profile data.
-import { useOfflineProfileData } from '@/features/profile/offlineProfileData';
-import { createFileRoute, useParams } from '@tanstack/react-router';
+import { createFileRoute, redirect, useParams } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/$pageId/')({
+  beforeLoad: ({ params }) => {
+    const normalizedPageId = params.pageId.toLowerCase();
+
+    if (params.pageId !== normalizedPageId) {
+      throw redirect({
+        to: '/$pageId',
+        params: { pageId: normalizedPageId },
+        replace: true,
+      });
+    }
+  },
   component: PageContent,
 });
 
@@ -12,10 +21,5 @@ function PageContent() {
 
   const lensHandle = pageId.toLowerCase();
 
-  return (
-    <UserProfile
-      lensHandle={lensHandle}
-      useProfileData={useOfflineProfileData}
-    />
-  );
+  return <UserProfile lensHandle={lensHandle} />;
 }
