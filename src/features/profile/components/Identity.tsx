@@ -26,14 +26,12 @@ export const Identity = ({
         </AvatarFallback>
       </Avatar>
       <div className="flex animate-[blurFadeIn_0.4s_ease-out_0.30s_both] flex-col motion-reduce:animate-none">
-        {name && (
-          <Text
-            variant="h1"
-            className="text-name-text text-[1.75rem] leading-tight font-bold sm:text-[2rem]"
-          >
-            {name}
-          </Text>
-        )}
+        <Text
+          variant="h1"
+          className="text-name-text text-[1.75rem] leading-tight font-bold sm:text-[2rem]"
+        >
+          {name ?? `@${lensHandle}`}
+        </Text>
         {bio && (
           <Text className="text-bio-text mt-4 max-w-97 leading-[1.3]">
             {bio}

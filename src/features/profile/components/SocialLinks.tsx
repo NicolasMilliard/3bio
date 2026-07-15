@@ -23,7 +23,7 @@ export const SocialLinks = ({ socialLinks }: { socialLinks?: LensLink[] }) => {
               <a
                 href={socialLink.value}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="ugc noopener noreferrer"
                 className="text-icons hover:text-icons/60 focus-visible:ring-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_both] items-center justify-center rounded-full transition motion-reduce:animate-none focus-visible:ring-2 focus-visible:outline-none"
                 aria-label={platform.label}
               >

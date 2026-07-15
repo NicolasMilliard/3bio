@@ -49,7 +49,7 @@ export const LinkButton = ({
     : {
         href,
         target: '_blank',
-        rel: 'noopener noreferrer',
+        rel: 'ugc noopener noreferrer',
       };
 
   return (

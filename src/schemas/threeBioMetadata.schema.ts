@@ -2,6 +2,7 @@ import {
   THREE_BIO_DEFAULT_THEME,
   THREE_BIO_THEME_NAMES,
 } from '@/constants/themes';
+import { httpUrlSchema } from '@/schemas/httpUrl.schema';
 import { MetadataAttributeType } from '@lens-protocol/metadata';
 import { z } from 'zod';
 
@@ -14,14 +15,14 @@ const linkSchema = z.object({
     MetadataAttributeType.STRING,
   ]),
   key: z.string(),
-  value: z.url(),
+  value: httpUrlSchema,
 });
 
 export type LensLink = z.infer<typeof linkSchema>;
 
 export const profileSchema = z.object({
-  coverPicture: z.url().optional(),
-  avatar: z.url().optional(),
+  coverPicture: httpUrlSchema.optional(),
+  avatar: httpUrlSchema.optional(),
   name: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
   socialLinks: z.array(linkSchema).optional(),
