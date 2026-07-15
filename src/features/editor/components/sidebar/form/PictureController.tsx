@@ -1,7 +1,7 @@
 import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
 import { cn } from '@/lib/utils';
 import { useEffect, useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 import {
   DropdownMenu,
@@ -26,11 +26,14 @@ export const PictureController = ({
   label,
   description,
 }: PictureControllerProps) => {
-  const { setValue, watch } = useFormContext<MetadataFormValues>();
+  const { control, setValue } = useFormContext<MetadataFormValues>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const currentPicture = watch(`${formValue}.preview`);
+  const currentPicture = useWatch({ control, name: formValue })?.preview;
   const normalizedLabel = label.toLowerCase();
   const inputId = `${formValue}-image`;
+  const descriptionId = description ? `${inputId}-description` : undefined;
+  const previewClassName =
+    formValue === 'avatar' ? 'size-8 rounded-full' : 'h-8 w-12 rounded-md';
 
   useEffect(
     () => () => {
@@ -76,52 +79,71 @@ export const PictureController = ({
   };
 
   return (
-    <>
+    <FieldSet className="gap-2">
+      <Label htmlFor={inputId}>{label}</Label>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <FieldSet className="gap-2">
-            <Label htmlFor={inputId}>{label}</Label>
-            <div className="bg-input/50 flex items-center gap-4 rounded-3xl px-3 py-1">
+          <button
+            type="button"
+            aria-describedby={descriptionId}
+            className="bg-input/50 hover:bg-input/70 focus-visible:border-ring focus-visible:ring-ring/30 flex h-10 w-full items-center gap-3 rounded-3xl border border-transparent px-3 text-left text-sm transition-[color,box-shadow,background-color] outline-none select-none focus-visible:ring-3"
+          >
+            <span
+              className={cn(
+                'bg-muted flex shrink-0 items-center justify-center overflow-hidden',
+                previewClassName,
+              )}
+            >
               {currentPicture ? (
                 <Image
+                  key={currentPicture}
                   src={currentPicture}
-                  className={cn(
-                    formValue === 'avatar'
-                      ? 'size-6 rounded-full'
-                      : 'h-6 w-auto rounded-md',
-                  )}
+                  alt=""
+                  aria-hidden="true"
+                  className={cn('object-cover', previewClassName)}
                 />
               ) : (
-                <div className="bg-muted flex size-8 items-center justify-center rounded-full">
-                  <ImageIcon />
-                </div>
+                <ImageIcon aria-hidden="true" className="size-4" />
               )}
-              <Text className="text-sm">{label}</Text>
-            </div>
-            {description && (
-              <Text className="text-muted-foreground text-xs leading-snug">
-                {description}
-              </Text>
-            )}
-          </FieldSet>
+            </span>
+
+            <span>{label}</span>
+          </button>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent>
           <DropdownMenuItem onSelect={openFilePicker}>
-            Change {normalizedLabel}
+            {currentPicture ? 'Change' : 'Upload'} {normalizedLabel}
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive" onSelect={removePicture}>
+          <DropdownMenuItem
+            variant="destructive"
+            disabled={!currentPicture}
+            onSelect={removePicture}
+          >
             Remove {normalizedLabel}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {description && (
+        <Text
+          id={descriptionId}
+          className="text-muted-foreground text-xs leading-snug"
+        >
+          {description}
+        </Text>
+      )}
+
       <input
         id={inputId}
         ref={inputRef}
         type="file"
         accept="image/*"
+        aria-describedby={descriptionId}
         className="hidden"
         onChange={onFileChange}
       />
-    </>
+    </FieldSet>
   );
 };
