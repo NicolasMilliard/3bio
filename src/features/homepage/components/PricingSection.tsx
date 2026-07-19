@@ -8,14 +8,13 @@ export const PricingSection = () => {
     <section className="bg-secondary pt-30 pb-30">
       <div className="mx-auto flex max-w-6xl flex-col items-center px-4">
         <Text variant="h2" className="mb-6">
-          Choose your right plan!
+          Start with 3bio for free
         </Text>
-        <Text className="max-w-97">
-          Simple pricing and powerful features, cancellation possible at any
-          time. <br />
-          Pay with crypto (GHO or USDC) or credit card.
+        <Text className="max-w-122 text-center">
+          Everything you need to turn your Lens profile into a personalized
+          link&nbsp;in&nbsp;bio page. No subscription or payment required.
         </Text>
-        <div className="mt-16 flex w-full flex-col justify-center gap-16 md:flex-row">
+        <div className="mt-16 flex w-full justify-center">
           {SUBSCRIPTION_PLANS.map((plan) => (
             <SubscriptionCard
               key={plan.variant}

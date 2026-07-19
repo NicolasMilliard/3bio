@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import {
-  AnalyticsSection,
   HeroSection,
   PricingSection,
   SocialProofSection,
@@ -16,10 +15,7 @@ function HomePage() {
     <>
       <HeroSection />
       <SocialProofSection />
-      <div>
-        <AnalyticsSection />
-        <PricingSection />
-      </div>
+      <PricingSection />
     </>
   );
 }

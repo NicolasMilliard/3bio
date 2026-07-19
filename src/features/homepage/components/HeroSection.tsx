@@ -16,8 +16,8 @@ export const HeroSection = () => {
             Finally, your decentralized link&nbsp;in&nbsp;bio.
           </Text>
           <Text className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0">
-            It's time to take back control of your digital identity. 3bio is
-            decentralized,{' '}
+            Turn your Lens profile into a link&nbsp;in&nbsp;bio page you can
+            customize and share. 3bio is{' '}
             <a
               href={THREEBIO_GITHUB_URL}
               target="_blank"
@@ -25,8 +25,8 @@ export const HeroSection = () => {
               className="text-primary font-bold hover:underline"
             >
               open source
-            </a>
-            , and your profile is already live.
+            </a>{' '}
+            and built on Lens.
           </Text>
           <ProfileCheckingForm />
         </div>
