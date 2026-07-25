@@ -17,9 +17,9 @@ export const Links = ({
       aria-label="External links"
       className="flex w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] flex-col gap-6 motion-reduce:animate-none"
     >
-      {links.map((link) => (
+      {links.map((link, index) => (
         <LinkButton
-          key={link.key}
+          key={`${link.key}-${index}`}
           href={link.value}
           label={formatUrlLabel(link.value)}
           interactive={interactive}

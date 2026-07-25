@@ -8,6 +8,8 @@ import {
 } from '@/components/ui';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeft } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import type { MetadataFormValues } from '../schemas/metadataForm.schema';
 import {
   AppearanceGroup,
   DisplayGroup,
@@ -16,6 +18,10 @@ import {
 } from './sidebar';
 
 export const SidebarEditor = () => {
+  const {
+    formState: { isDirty, isSubmitting },
+  } = useFormContext<MetadataFormValues>();
+
   return (
     <Sidebar variant="floating">
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
@@ -37,8 +43,12 @@ export const SidebarEditor = () => {
         <DisplayGroup />
       </SidebarContent>
       <SidebarFooter className="border-foreground/40 border-t py-3">
-        <Button type="submit" form="profile-editor-form">
-          Save Changes
+        <Button
+          type="submit"
+          form="profile-editor-form"
+          disabled={!isDirty || isSubmitting}
+        >
+          {isSubmitting ? 'Saving…' : 'Save Changes'}
         </Button>
       </SidebarFooter>
     </Sidebar>

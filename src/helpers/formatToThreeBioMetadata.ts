@@ -1,6 +1,6 @@
 import { THREEBIO_ATTRIBUTE_KEY } from '@/constants';
-import { threeBioMetadataSchema } from '@/schemas/threeBioMetadata.schema';
 import { type Account } from '@lens-protocol/react';
+import { parseThreeBioMetadata } from './parseThreeBioMetadata';
 
 function findAttribute<T extends string, V>(
   attributes: { key: string; value: unknown }[] | undefined,
@@ -17,18 +17,7 @@ export const formatToThreeBioMetadata = (account: Account) => {
     typeof THREEBIO_ATTRIBUTE_KEY,
     unknown
   >(attributes, THREEBIO_ATTRIBUTE_KEY);
-  let parsedThreeBioMetadata: unknown = rawThreeBioMetadata;
-
-  if (typeof rawThreeBioMetadata === 'string') {
-    try {
-      parsedThreeBioMetadata = JSON.parse(rawThreeBioMetadata);
-    } catch {
-      parsedThreeBioMetadata = undefined;
-    }
-  }
-
-  const parsedResult = threeBioMetadataSchema.safeParse(parsedThreeBioMetadata);
-  const threeBioMetadata = parsedResult.success ? parsedResult.data : undefined;
+  const threeBioMetadata = parseThreeBioMetadata(rawThreeBioMetadata);
 
   const threeBioProfile = threeBioMetadata?.profile;
   const threeBioTheme = threeBioMetadata?.theme;

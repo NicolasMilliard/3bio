@@ -66,6 +66,7 @@ export const AddSocialIconLink = () => {
     setValue(`socialLinks.${index}.url`, normalizedUrl, {
       shouldDirty: true,
       shouldTouch: true,
+      shouldValidate: true,
     });
 
     handleClose();

@@ -15,10 +15,13 @@ export const EditorForm = ({
   threeBioMetadata: ThreeBioMetadata;
   children: React.ReactNode;
 }) => {
-  const { methods, onSubmit } = useEditorForm(account, threeBioMetadata);
+  const { methods, onSubmit, onInvalid } = useEditorForm(
+    account,
+    threeBioMetadata,
+  );
 
   const {
-    formState: { isDirty },
+    formState: { isDirty, isSubmitting },
   } = methods;
   const navigation = usePreventNavigation({
     enabled: isDirty,
@@ -30,9 +33,15 @@ export const EditorForm = ({
         <form
           id="profile-editor-form"
           className="min-h-dvh w-full"
-          onSubmit={methods.handleSubmit(onSubmit)}
+          aria-busy={isSubmitting}
+          onSubmit={methods.handleSubmit(onSubmit, onInvalid)}
         >
-          {children}
+          <fieldset
+            disabled={isSubmitting}
+            className="m-0 w-full min-w-0 border-0 p-0"
+          >
+            {children}
+          </fieldset>
         </form>
       </FormProvider>
       <UnsavedChangesDialog

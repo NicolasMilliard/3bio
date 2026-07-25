@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 
+import { isSocialProfileUrl } from '@/helpers/isSocialProfileUrl';
 import {
   BlueskyIcon,
   DiscordIcon,
@@ -57,14 +58,19 @@ export const POPULAR_SOCIAL_PLATFORMS: SocialPlatform[] = [
     label: 'Instagram',
     Icon: InstagramIcon,
     placeholder: 'https://instagram.com/yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://instagram.com/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, { hostnames: ['instagram.com'] }),
   },
   {
     value: 'tiktok',
     label: 'TikTok',
     Icon: TikTokIcon,
     placeholder: 'https://tiktok.com/@yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://tiktok.com/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, {
+        hostnames: ['tiktok.com'],
+        pathPrefixes: ['/@'],
+      }),
   },
   {
     value: 'twitter',
@@ -72,15 +78,17 @@ export const POPULAR_SOCIAL_PLATFORMS: SocialPlatform[] = [
     Icon: TwitterIcon,
     placeholder: 'https://x.com/yourhandle',
     validateUrl: (url: string) =>
-      url.startsWith('https://x.com/') ||
-      url.startsWith('https://twitter.com/'),
+      isSocialProfileUrl(url, { hostnames: ['x.com', 'twitter.com'] }),
   },
   {
     value: 'facebook',
     label: 'Facebook',
     Icon: FacebookIcon,
     placeholder: 'https://facebook.com/yourpage',
-    validateUrl: (url: string) => url.startsWith('https://facebook.com/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, {
+        hostnames: ['facebook.com', 'm.facebook.com'],
+      }),
   },
 ];
 
@@ -90,7 +98,11 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     label: 'Bluesky',
     Icon: BlueskyIcon,
     placeholder: 'https://bsky.app/profile/yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://bsky.app/profile/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, {
+        hostnames: ['bsky.app'],
+        pathPrefixes: ['/profile/'],
+      }),
   },
   {
     value: 'discord',
@@ -98,50 +110,63 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     Icon: DiscordIcon,
     placeholder: 'https://discord.gg/yourserver',
     validateUrl: (url: string) =>
-      url.startsWith('https://discord.gg/') ||
-      url.startsWith('https://discord.com/'),
+      isSocialProfileUrl(url, {
+        hostnames: ['discord.gg', 'discord.com'],
+      }),
   },
   {
     value: 'farcaster',
     label: 'Farcaster',
     Icon: FarcasterIcon,
     placeholder: 'https://farcaster.xyz/yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://farcaster.xyz/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, { hostnames: ['farcaster.xyz'] }),
   },
   {
     value: 'github',
     label: 'GitHub',
     Icon: GithubIcon,
     placeholder: 'https://github.com/yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://github.com/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, { hostnames: ['github.com'] }),
   },
   {
     value: 'mastodon',
     label: 'Mastodon',
     Icon: MastodonIcon,
     placeholder: 'https://mastodon.social/@yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://mastodon.social/@'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, { pathPrefixes: ['/@', '/users/'] }),
   },
   {
     value: 'threads',
     label: 'Threads',
     Icon: ThreadsIcon,
     placeholder: 'https://threads.net/@yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://threads.net/@'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, {
+        hostnames: ['threads.net'],
+        pathPrefixes: ['/@'],
+      }),
   },
   {
     value: 'twitch',
     label: 'Twitch',
     Icon: TwitchIcon,
     placeholder: 'https://twitch.tv/yourhandle',
-    validateUrl: (url: string) => url.startsWith('https://twitch.tv/'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, { hostnames: ['twitch.tv'] }),
   },
   {
     value: 'youtube',
     label: 'YouTube',
     Icon: YouTubeIcon,
     placeholder: 'https://youtube.com/@yourchannel',
-    validateUrl: (url: string) => url.startsWith('https://youtube.com/@'),
+    validateUrl: (url: string) =>
+      isSocialProfileUrl(url, {
+        hostnames: ['youtube.com'],
+        pathPrefixes: ['/@', '/channel/', '/c/', '/user/'],
+      }),
   },
 ];
 

@@ -17,7 +17,7 @@ export const SocialLinks = ({
 
   return (
     <div className="-ml-2 flex min-h-10 w-full max-w-prose flex-wrap items-center">
-      {socialLinks.map((socialLink) => {
+      {socialLinks.map((socialLink, index) => {
         const formattedSocialLink = formatSocialLink(socialLink);
         const platform = formattedSocialLink.platform
           ? SOCIAL_MAP[formattedSocialLink.platform]
@@ -28,7 +28,7 @@ export const SocialLinks = ({
         if (!interactive) {
           return (
             <span
-              key={socialLink.key}
+              key={`${socialLink.key}-${index}`}
               className="text-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_backwards] items-center justify-center rounded-full motion-reduce:animate-none"
               role="img"
               aria-label={platform.label}
@@ -39,7 +39,7 @@ export const SocialLinks = ({
         }
 
         return (
-          <Tooltip key={socialLink.key}>
+          <Tooltip key={`${socialLink.key}-${index}`}>
             <TooltipTrigger asChild>
               <a
                 href={socialLink.value}

@@ -1,5 +1,5 @@
 import { THREEBIO_ATTRIBUTE_KEY } from '@/constants';
-import { type ThreeBioMetadata } from '@/schemas/threeBioMetadata.schema';
+import { parseThreeBioMetadata } from './parseThreeBioMetadata';
 
 export const getThreeBioProfile = (
   attributes: { key: string; value: unknown }[] | undefined,
@@ -8,14 +8,5 @@ export const getThreeBioProfile = (
     (attribute) => attribute.key === THREEBIO_ATTRIBUTE_KEY,
   )?.value;
 
-  if (typeof rawThreeBioMetadata === 'string') {
-    try {
-      return (JSON.parse(rawThreeBioMetadata) as ThreeBioMetadata | undefined)
-        ?.profile;
-    } catch {
-      return undefined;
-    }
-  }
-
-  return (rawThreeBioMetadata as ThreeBioMetadata | undefined)?.profile;
+  return parseThreeBioMetadata(rawThreeBioMetadata)?.profile;
 };

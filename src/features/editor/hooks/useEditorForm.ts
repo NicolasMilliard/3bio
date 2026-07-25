@@ -1,14 +1,12 @@
 import { chains } from '@lens-chain/sdk/viem';
 import { lensAccountOnly, StorageClient } from '@lens-chain/storage-client';
-import { setAccountMetadata } from '@lens-protocol/client/actions';
-import { handleOperationWith } from '@lens-protocol/client/viem';
-import { MetadataAttributeType } from '@lens-protocol/metadata';
-import { uri, type Account } from '@lens-protocol/react';
 import {
-  getConnection,
-  getWalletClient,
-  switchChain,
-} from '@wagmi/core';
+  fetchAccount,
+  setAccountMetadata,
+} from '@lens-protocol/client/actions';
+import { handleOperationWith } from '@lens-protocol/client/viem';
+import { uri, type Account } from '@lens-protocol/react';
+import { getConnection, getWalletClient, switchChain } from '@wagmi/core';
 import { useConfig } from 'wagmi';
 
 import { SOCIAL_MAP, THREE_BIO_DEFAULT_THEME } from '@/constants';
@@ -16,16 +14,18 @@ import {
   resolveAccountSessionBinding,
   type AccountSessionBindingState,
 } from '@/features/auth/sessionBinding';
-import {
-  formatMetadataBeforeUpload,
-  formatSocialLink,
-  getHostname,
-} from '@/helpers';
+import { formatMetadataBeforeUpload, formatSocialLink } from '@/helpers';
 import { client } from '@/lib';
 import type { ThreeBioMetadata } from '@/schemas/threeBioMetadata.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useRef } from 'react';
+import { useForm, type SubmitErrorHandler } from 'react-hook-form';
 import { toast } from 'sonner';
+import { getTransactionFailureReason } from '../helpers/getTransactionFailureReason';
+import {
+  toLinkAttributes,
+  toSocialLinkAttributes,
+} from '../helpers/metadataAttributes';
 import {
   metadataFormSchema,
   type MetadataFormValues,
@@ -62,34 +62,12 @@ function buildDefaultValues(
   };
 }
 
-function toSocialLinkAttributes(
-  socialLinks: MetadataFormValues['socialLinks'],
-) {
-  return (socialLinks ?? [])
-    .filter((l): l is { platform: string; url: string } => !!l.url?.trim())
-    .map((l) => ({
-      type: MetadataAttributeType.STRING,
-      key: `socialLinks.${l.platform}`,
-      value: l.url.trim(),
-    }));
-}
-
-function toLinkAttributes(links: MetadataFormValues['links']) {
-  return (links ?? [])
-    .filter(Boolean) // guard against empty strings
-    .map((l) => {
-      const hostname = getHostname(l);
-      // Guard against malformed URLs that would produce a null/undefined key
-      const key = hostname ? `links.${hostname}` : `links.unknown`;
-      return { type: MetadataAttributeType.STRING, key, value: l };
-    });
-}
-
 export function useEditorForm(
   account: Account,
   threeBioMetadata: ThreeBioMetadata,
 ) {
   const config = useConfig();
+  const saveInFlight = useRef(false);
   const acl = lensAccountOnly(account.address, chains.mainnet.id);
 
   const methods = useForm<MetadataFormValues>({
@@ -150,7 +128,8 @@ export function useEditorForm(
       },
       'account-mismatch': {
         title: 'Lens profile changed',
-        description: 'Switch back to this Lens profile before saving its draft.',
+        description:
+          'Switch back to this Lens profile before saving its draft.',
       },
       bound: {
         title: 'Wallet session changed',
@@ -166,6 +145,8 @@ export function useEditorForm(
   };
 
   const onSubmit = async (values: MetadataFormValues) => {
+    if (saveInFlight.current || !methods.formState.isDirty) return;
+
     const initialSession = getCurrentEditorSession();
 
     if (!initialSession.sessionClient) {
@@ -173,6 +154,7 @@ export function useEditorForm(
       return;
     }
 
+    saveInFlight.current = true;
     const toastId = toast.loading('Uploading avatar...');
 
     try {
@@ -244,14 +226,18 @@ export function useEditorForm(
       }
 
       const operationResult = operation.value;
+      const failureReason = getTransactionFailureReason(operationResult);
 
-      if ('reason' in operationResult) {
+      if (failureReason !== null) {
         toast.error('Transaction failed', {
           id: toastId,
-          description: operationResult.reason,
+          description: failureReason,
         });
         return;
       }
+
+      let transactionHash =
+        'hash' in operationResult ? operationResult.hash : undefined;
 
       if (!('hash' in operationResult)) {
         const signingConnection = getConnection(config);
@@ -305,7 +291,8 @@ export function useEditorForm(
         ) {
           toast.error('Lens session changed', {
             id: toastId,
-            description: 'Your profile changed before the transaction was sent.',
+            description:
+              'Your profile changed before the transaction was sent.',
           });
           return;
         }
@@ -334,7 +321,8 @@ export function useEditorForm(
         ) {
           toast.error('Lens session changed', {
             id: toastId,
-            description: 'Your profile changed before the transaction was sent.',
+            description:
+              'Your profile changed before the transaction was sent.',
           });
           return;
         }
@@ -357,7 +345,40 @@ export function useEditorForm(
           });
           return;
         }
+
+        transactionHash = result.value;
       }
+
+      if (!transactionHash) {
+        toast.error('Transaction failed', {
+          id: toastId,
+          description: 'The wallet did not return a transaction hash.',
+        });
+        return;
+      }
+
+      toast.loading('Confirming profile update...', { id: toastId });
+
+      const confirmation =
+        await transactionSession.sessionClient.waitForTransaction(
+          transactionHash,
+        );
+
+      if (confirmation.isErr()) {
+        toast.error('Profile update failed', {
+          id: toastId,
+          description:
+            confirmation.error.message ??
+            'Lens could not confirm the profile update.',
+        });
+        return;
+      }
+
+      // Refresh the shared Lens cache so dashboard/editor consumers do not keep
+      // rendering the pre-save account metadata.
+      await fetchAccount(transactionSession.sessionClient, {
+        address: account.address,
+      });
 
       methods.reset({
         ...values,
@@ -377,8 +398,23 @@ export function useEditorForm(
         : 'Something went wrong. Please try again or contact support.';
 
       toast.error('Failed to save profile', { id: toastId, description });
+    } finally {
+      saveInFlight.current = false;
     }
   };
 
-  return { methods, onSubmit };
+  const onInvalid: SubmitErrorHandler<MetadataFormValues> = (errors) => {
+    const hasLinkError = Boolean(errors.links || errors.socialLinks);
+
+    toast.error(
+      hasLinkError ? 'Check your profile links' : 'Check your profile details',
+      {
+        description: hasLinkError
+          ? 'Use complete HTTP or HTTPS URLs that match the selected platform.'
+          : 'Correct the invalid fields before saving.',
+      },
+    );
+  };
+
+  return { methods, onSubmit, onInvalid };
 }

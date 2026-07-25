@@ -1,8 +1,5 @@
+import { httpUrlSchema } from '@/schemas/httpUrl.schema';
+
 export const isValidUrl = (value: string) => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
+  return httpUrlSchema.safeParse(value).success;
 };

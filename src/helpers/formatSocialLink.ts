@@ -24,13 +24,11 @@ export const formatSocialLink = (
         : hostnamePlatform;
   const isPlatformName = (value?: string): value is PlatformName =>
     !!value && value in SOCIAL_MAP;
-  const platform = isPlatformName(link.platform)
-    ? link.platform
-    : isPlatformName(storedPlatform)
-      ? storedPlatform
-      : isPlatformName(inferredPlatform)
-        ? inferredPlatform
-        : undefined;
+  const platform = [link.platform, inferredPlatform, storedPlatform].find(
+    (candidate): candidate is PlatformName =>
+      isPlatformName(candidate) &&
+      SOCIAL_MAP[candidate].validateUrl(link.value),
+  );
 
   return {
     key: link.key,

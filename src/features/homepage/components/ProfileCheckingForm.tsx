@@ -29,7 +29,7 @@ export const ProfileCheckingForm = () => {
   } = methods;
 
   const onSubmit = (values: ProfileCheckingFormValues) => {
-    const profilePath = values.link;
+    const profilePath = `/${encodeURIComponent(values.link)}`;
     window.open(profilePath, '_blank', 'noopener noreferrer');
   };
 

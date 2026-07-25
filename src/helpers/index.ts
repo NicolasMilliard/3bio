@@ -6,4 +6,6 @@ export * from './formatToThreeBioMetadata';
 export * from './formatUrlLabel';
 export * from './getHostname';
 export * from './getThreeBioProfile';
+export * from './isSocialProfileUrl';
 export * from './isValidUrl';
+export * from './parseThreeBioMetadata';
