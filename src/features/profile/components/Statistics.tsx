@@ -9,7 +9,7 @@ export const Statistics = ({
   posts?: number;
 }) => {
   return (
-    <dl className="bg-statistics-background flex w-full max-w-97 animate-[blurFadeIn_0.45s_ease-out_0.45s_both] items-center rounded-2xl px-5 py-5 motion-reduce:animate-none">
+    <dl className="bg-statistics-background flex w-full max-w-97 animate-[blurFadeIn_0.45s_ease-out_0.45s_backwards] items-center rounded-2xl px-5 py-5 motion-reduce:animate-none">
       {[
         { value: following, label: 'Following' },
         { value: followers, label: 'Followers' },

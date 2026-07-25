@@ -14,7 +14,7 @@ export const Identity = ({
     <div className="flex min-w-0 flex-col gap-5">
       <Avatar
         size="xl"
-        className="animate-[blurFadeIn_0.4s_ease-out_0.15s_both] after:border-transparent data-[size=xl]:size-28 motion-reduce:animate-none sm:data-[size=xl]:size-32"
+        className="animate-[blurFadeIn_0.4s_ease-out_0.15s_backwards] after:border-transparent data-[size=xl]:size-28 motion-reduce:animate-none sm:data-[size=xl]:size-32"
       >
         <AvatarImage src={avatar} alt={name ?? lensHandle} />
         <AvatarFallback className="bg-avatar-background text-bio-text">
@@ -25,7 +25,7 @@ export const Identity = ({
               : 'U'}
         </AvatarFallback>
       </Avatar>
-      <div className="flex animate-[blurFadeIn_0.4s_ease-out_0.30s_both] flex-col motion-reduce:animate-none">
+      <div className="flex animate-[blurFadeIn_0.4s_ease-out_0.30s_backwards] flex-col motion-reduce:animate-none">
         <Text
           variant="h1"
           className="text-name-text text-[1.75rem] leading-tight font-bold sm:text-[2rem]"

@@ -15,7 +15,7 @@ export const Links = ({
   return (
     <nav
       aria-label="External links"
-      className="flex w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_both] flex-col gap-6 motion-reduce:animate-none"
+      className="flex w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] flex-col gap-6 motion-reduce:animate-none"
     >
       {links.map((link) => (
         <LinkButton

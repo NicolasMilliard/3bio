@@ -11,7 +11,7 @@ export const Branding = ({
   return (
     <p
       className={cn(
-        'text-branding-text animate-[blurFadeIn_0.4s_ease-out_0.90s_both] text-sm leading-5 motion-reduce:animate-none',
+        'text-branding-text animate-[blurFadeIn_0.4s_ease-out_0.90s_backwards] text-sm leading-5 motion-reduce:animate-none',
         className,
       )}
     >
