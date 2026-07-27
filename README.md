@@ -26,4 +26,6 @@ deployment.
 
 ## License
 
-3bio is available under the [MIT License](./LICENSE).
+3bio's source code and original project assets are available under the
+[MIT License](./LICENSE). That license does not grant rights to user-generated
+content, Lens profile content, or third-party names and trademarks.

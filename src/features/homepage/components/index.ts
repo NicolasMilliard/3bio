@@ -1,3 +1,3 @@
+export * from './CreatorRightsSection';
 export * from './HeroSection';
 export * from './PricingSection';
-export * from './SocialProofSection';

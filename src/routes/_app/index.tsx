@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import {
+  CreatorRightsSection,
   HeroSection,
   PricingSection,
-  SocialProofSection,
 } from '@/features/homepage/components';
 
 export const Route = createFileRoute('/_app/')({
@@ -14,7 +14,7 @@ function HomePage() {
   return (
     <>
       <HeroSection />
-      <SocialProofSection />
+      <CreatorRightsSection />
       <PricingSection />
     </>
   );
