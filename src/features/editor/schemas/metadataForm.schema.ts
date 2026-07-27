@@ -2,6 +2,7 @@ import { SOCIAL_MAP, type PlatformName } from '@/constants/platforms';
 import { httpUrlSchema } from '@/schemas/httpUrl.schema';
 import { threeBioThemeNameSchema } from '@/schemas/threeBioMetadata.schema';
 import { z } from 'zod';
+import { imageUploadFileSchema } from './imageUpload.schema';
 
 const optionalPreviewUrl = z
   .union([z.url(), z.literal('')])
@@ -34,12 +35,16 @@ export const socialLinkSchema = z
   });
 
 export const metadataFormSchema = z.object({
+  _imageValidation: z.object({
+    avatar: z.boolean(),
+    coverPicture: z.boolean(),
+  }),
   avatar: z.object({
-    file: z.instanceof(File).optional(),
+    file: imageUploadFileSchema.optional(),
     preview: optionalPreviewUrl,
   }),
   coverPicture: z.object({
-    file: z.instanceof(File).optional(),
+    file: imageUploadFileSchema.optional(),
     preview: optionalPreviewUrl,
   }),
   name: z.string().optional(),

@@ -24,5 +24,6 @@ export * from './toggle';
 export * from './tooltip';
 
 export * from './Image';
+export * from './ErrorScreen';
 export * from './SpinnerScreen';
 export * from './Text';

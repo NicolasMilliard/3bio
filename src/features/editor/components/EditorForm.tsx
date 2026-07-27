@@ -23,8 +23,16 @@ export const EditorForm = ({
   const {
     formState: { isDirty, isSubmitting },
   } = methods;
+  const imageValidation = methods.watch('_imageValidation');
+  const isCheckingImage =
+    imageValidation.avatar || imageValidation.coverPicture;
   const navigation = usePreventNavigation({
-    enabled: isDirty,
+    enabled: isDirty || isSubmitting || isCheckingImage,
+    message: isSubmitting
+      ? 'Your profile is still saving. Wait for it to finish before leaving.'
+      : isCheckingImage
+        ? 'Your image is still being checked. Wait for it to finish before leaving.'
+        : undefined,
   });
 
   return (
@@ -33,7 +41,7 @@ export const EditorForm = ({
         <form
           id="profile-editor-form"
           className="min-h-dvh w-full"
-          aria-busy={isSubmitting}
+          aria-busy={isSubmitting || isCheckingImage}
           onSubmit={methods.handleSubmit(onSubmit, onInvalid)}
         >
           <fieldset
@@ -46,6 +54,8 @@ export const EditorForm = ({
       </FormProvider>
       <UnsavedChangesDialog
         open={navigation.open}
+        isSaving={isSubmitting}
+        isCheckingImage={isCheckingImage}
         onCancel={navigation.cancelNavigation}
         onConfirm={navigation.confirmNavigation}
       />

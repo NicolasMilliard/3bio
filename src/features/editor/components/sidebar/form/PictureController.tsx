@@ -1,6 +1,11 @@
+import {
+  IMAGE_UPLOAD_ACCEPT,
+  IMAGE_UPLOAD_HELP_TEXT,
+  validateImageUpload,
+} from '@/features/editor/schemas/imageUpload.schema';
 import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
 import { cn } from '@/lib/utils';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import {
@@ -8,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  FieldError,
   FieldSet,
   Image,
   Label,
@@ -26,12 +32,24 @@ export const PictureController = ({
   label,
   description,
 }: PictureControllerProps) => {
-  const { control, setValue } = useFormContext<MetadataFormValues>();
+  const {
+    clearErrors,
+    control,
+    formState: { errors },
+    setError,
+    setValue,
+  } = useFormContext<MetadataFormValues>();
   const inputRef = useRef<HTMLInputElement>(null);
+  const validationRequestRef = useRef(0);
+  const [isValidating, setIsValidating] = useState(false);
   const currentPicture = useWatch({ control, name: formValue })?.preview;
+  const fileError = errors[formValue]?.file;
   const normalizedLabel = label.toLowerCase();
   const inputId = `${formValue}-image`;
-  const descriptionId = description ? `${inputId}-description` : undefined;
+  const validationField = `_imageValidation.${formValue}` as const;
+  const descriptionId = `${inputId}-description`;
+  const errorId = fileError ? `${inputId}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ');
   const previewClassName =
     formValue === 'avatar' ? 'size-8 rounded-full' : 'h-8 w-12 rounded-md';
 
@@ -44,30 +62,69 @@ export const PictureController = ({
     [currentPicture],
   );
 
+  useEffect(
+    () => () => {
+      validationRequestRef.current += 1;
+    },
+    [],
+  );
+
   const openFilePicker = () => {
     inputRef.current?.click();
   };
 
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
+    event.target.value = '';
 
     if (!selectedFile) return;
 
-    const previewURL = URL.createObjectURL(selectedFile);
+    const requestId = ++validationRequestRef.current;
+    setIsValidating(true);
+    setValue(validationField, true, { shouldDirty: false });
+    clearErrors(`${formValue}.file`);
 
-    setValue(
-      formValue,
-      { file: selectedFile, preview: previewURL },
-      {
-        shouldDirty: true,
-        shouldValidate: true,
-      },
-    );
+    try {
+      const validationError = await validateImageUpload(selectedFile);
 
-    event.target.value = '';
+      if (requestId !== validationRequestRef.current) return;
+
+      if (validationError) {
+        setError(`${formValue}.file`, {
+          type: 'validate',
+          message: validationError,
+        });
+        return;
+      }
+
+      const previewURL = URL.createObjectURL(selectedFile);
+
+      setValue(
+        formValue,
+        { file: selectedFile, preview: previewURL },
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        },
+      );
+    } catch {
+      if (requestId !== validationRequestRef.current) return;
+
+      setError(`${formValue}.file`, {
+        type: 'validate',
+        message: 'The selected image could not be checked. Choose it again.',
+      });
+    } finally {
+      if (requestId === validationRequestRef.current) {
+        setValue(validationField, false, { shouldDirty: false });
+        setIsValidating(false);
+      }
+    }
   };
 
   const removePicture = () => {
+    clearErrors(`${formValue}.file`);
     setValue(
       formValue,
       { file: undefined, preview: null },
@@ -86,7 +143,10 @@ export const PictureController = ({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-describedby={descriptionId}
+            aria-busy={isValidating}
+            aria-describedby={describedBy}
+            aria-invalid={Boolean(fileError)}
+            disabled={isValidating}
             className="bg-input/50 hover:bg-input/70 focus-visible:border-ring focus-visible:ring-ring/30 flex h-10 w-full items-center gap-3 rounded-3xl border border-transparent px-3 text-left text-sm transition-[color,box-shadow,background-color] outline-none select-none focus-visible:ring-3"
           >
             <span
@@ -108,7 +168,7 @@ export const PictureController = ({
               )}
             </span>
 
-            <span>{label}</span>
+            <span>{isValidating ? 'Checking image...' : label}</span>
           </button>
         </DropdownMenuTrigger>
 
@@ -126,23 +186,24 @@ export const PictureController = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {description && (
-        <Text
-          id={descriptionId}
-          className="text-muted-foreground text-xs leading-snug"
-        >
-          {description}
-        </Text>
-      )}
+      <Text
+        id={descriptionId}
+        className="text-muted-foreground text-xs leading-snug"
+      >
+        {[description, IMAGE_UPLOAD_HELP_TEXT].filter(Boolean).join(' ')}
+      </Text>
+
+      <FieldError id={errorId} errors={[fileError]} />
 
       <input
         id={inputId}
         ref={inputRef}
         type="file"
-        accept="image/*"
-        aria-describedby={descriptionId}
+        accept={IMAGE_UPLOAD_ACCEPT}
+        aria-describedby={describedBy}
+        aria-invalid={Boolean(fileError)}
         className="hidden"
-        onChange={onFileChange}
+        onChange={(event) => void onFileChange(event)}
       />
     </FieldSet>
   );

@@ -22,10 +22,16 @@ import { useRef } from 'react';
 import { useForm, type SubmitErrorHandler } from 'react-hook-form';
 import { toast } from 'sonner';
 import { getTransactionFailureReason } from '../helpers/getTransactionFailureReason';
+import { getMetadataUploadCacheKey } from '../helpers/metadataUploadCache';
 import {
   toLinkAttributes,
   toSocialLinkAttributes,
 } from '../helpers/metadataAttributes';
+import {
+  getSaveErrorFeedback,
+  type SaveStage,
+} from '../helpers/saveErrorFeedback';
+import { validateImageUpload } from '../schemas/imageUpload.schema';
 import {
   metadataFormSchema,
   type MetadataFormValues,
@@ -45,6 +51,10 @@ function buildDefaultValues(
   const theme = threeBioMetadata.theme;
 
   return {
+    _imageValidation: {
+      avatar: false,
+      coverPicture: false,
+    },
     avatar: { preview: profile?.avatar ?? null },
     coverPicture: { preview: profile?.coverPicture ?? null },
     name: profile?.name ?? '',
@@ -68,6 +78,10 @@ export function useEditorForm(
 ) {
   const config = useConfig();
   const saveInFlight = useRef(false);
+  const metadataUploadCache = useRef<{
+    key: string;
+    uri: string;
+  } | null>(null);
   const acl = lensAccountOnly(account.address, chains.mainnet.id);
 
   const methods = useForm<MetadataFormValues>({
@@ -145,35 +159,119 @@ export function useEditorForm(
   };
 
   const onSubmit = async (values: MetadataFormValues) => {
-    if (saveInFlight.current || !methods.formState.isDirty) return;
+    const isImageValidationPending =
+      values._imageValidation.avatar || values._imageValidation.coverPicture;
 
-    const initialSession = getCurrentEditorSession();
-
-    if (!initialSession.sessionClient) {
-      showSessionError(initialSession.state);
+    if (
+      saveInFlight.current ||
+      !methods.formState.isDirty ||
+      isImageValidationPending
+    ) {
+      if (isImageValidationPending) {
+        toast.info('Checking your image', {
+          description: 'Wait for the image check to finish before saving.',
+        });
+      }
       return;
     }
 
     saveInFlight.current = true;
-    const toastId = toast.loading('Uploading avatar...');
+    let saveStage: SaveStage = 'validating-images';
+    let toastId: string | number | undefined;
 
     try {
+      const imageFields = [
+        ['avatar', values.avatar.file],
+        ['coverPicture', values.coverPicture.file],
+      ] as const;
+      const imageErrors: Array<{
+        field: (typeof imageFields)[number][0];
+        error: string | null;
+      }> = [];
+
+      for (const [field, file] of imageFields) {
+        imageErrors.push({
+          field,
+          error: file ? await validateImageUpload(file) : null,
+        });
+      }
+
+      let hasImageError = false;
+
+      imageErrors.forEach(({ field, error }) => {
+        if (error) {
+          hasImageError = true;
+          methods.setError(`${field}.file`, {
+            type: 'validate',
+            message: error,
+          });
+        } else {
+          methods.clearErrors(`${field}.file`);
+        }
+      });
+
+      if (hasImageError) {
+        toast.error('Check your profile images', {
+          description: 'Correct the highlighted images before saving.',
+        });
+        return;
+      }
+
+      const initialSession = getCurrentEditorSession();
+
+      if (!initialSession.sessionClient) {
+        showSessionError(initialSession.state);
+        return;
+      }
+
+      toastId = toast.loading(
+        values.avatar.file
+          ? 'Uploading avatar...'
+          : values.coverPicture.file
+            ? 'Uploading social image...'
+            : 'Saving profile...',
+      );
+
       // Step 1: Upload avatar if a new file was selected
-      const avatarUpload = values.avatar.file
-        ? await storageClient.uploadFile(values.avatar.file, { acl })
-        : null;
-      const avatarUri = avatarUpload?.gatewayUrl ?? values.avatar.preview;
+      let avatarUri = values.avatar.preview;
+
+      if (values.avatar.file) {
+        saveStage = 'uploading-avatar';
+        const avatarUpload = await storageClient.uploadFile(
+          values.avatar.file,
+          { acl },
+        );
+        avatarUri = avatarUpload.gatewayUrl;
+
+        methods.setValue(
+          'avatar',
+          { preview: avatarUri },
+          { shouldDirty: true, shouldValidate: true },
+        );
+      }
 
       // Step 2: Upload cover picture if a new file was selected
-      toast.loading('Uploading cover picture...', { id: toastId });
-      const coverPictureUpload = values.coverPicture.file
-        ? await storageClient.uploadFile(values.coverPicture.file, { acl })
-        : null;
-      const coverPictureUri =
-        coverPictureUpload?.gatewayUrl ?? values.coverPicture.preview;
+      let coverPictureUri = values.coverPicture.preview;
+
+      if (values.coverPicture.file) {
+        saveStage = 'uploading-social-image';
+        toast.loading('Uploading social image...', { id: toastId });
+        const coverPictureUpload = await storageClient.uploadFile(
+          values.coverPicture.file,
+          { acl },
+        );
+        coverPictureUri = coverPictureUpload.gatewayUrl;
+
+        methods.setValue(
+          'coverPicture',
+          { preview: coverPictureUri },
+          { shouldDirty: true, shouldValidate: true },
+        );
+      }
 
       // Step 3: Build and upload metadata JSON
-      toast.loading('Uploading metadata...', { id: toastId });
+      saveStage = 'uploading-profile-data';
+      toast.loading('Uploading profile data...', { id: toastId });
 
       const nextThreeBioMetadata = {
         ...threeBioMetadata,
@@ -192,12 +290,27 @@ export function useEditorForm(
         },
       };
 
-      const data = formatMetadataBeforeUpload(account, nextThreeBioMetadata);
-      const { uri: metadataUri } = await storageClient.uploadAsJson(data, {
-        acl,
-      });
+      const metadataKey = getMetadataUploadCacheKey(
+        account.metadata,
+        nextThreeBioMetadata,
+      );
+      let metadataUri =
+        metadataUploadCache.current?.key === metadataKey
+          ? metadataUploadCache.current.uri
+          : undefined;
+
+      if (!metadataUri) {
+        const data = formatMetadataBeforeUpload(account, nextThreeBioMetadata);
+        const upload = await storageClient.uploadAsJson(data, { acl });
+        metadataUri = upload.uri;
+        metadataUploadCache.current = {
+          key: metadataKey,
+          uri: metadataUri,
+        };
+      }
 
       // Step 4: Submit on-chain
+      saveStage = 'submitting-transaction';
       toast.loading('Waiting for transaction...', { id: toastId });
 
       const transactionSession = getCurrentEditorSession();
@@ -357,6 +470,7 @@ export function useEditorForm(
         return;
       }
 
+      saveStage = 'confirming-transaction';
       toast.loading('Confirming profile update...', { id: toastId });
 
       const confirmation =
@@ -365,39 +479,52 @@ export function useEditorForm(
         );
 
       if (confirmation.isErr()) {
-        toast.error('Profile update failed', {
+        const feedback = getSaveErrorFeedback('confirming-transaction');
+
+        console.warn(
+          '[useEditorForm] Lens could not confirm the submitted transaction:',
+          confirmation.error,
+        );
+        toast.error(feedback.title, {
           id: toastId,
-          description:
-            confirmation.error.message ??
-            'Lens could not confirm the profile update.',
+          description: feedback.description,
         });
         return;
       }
 
       // Refresh the shared Lens cache so dashboard/editor consumers do not keep
       // rendering the pre-save account metadata.
-      await fetchAccount(transactionSession.sessionClient, {
-        address: account.address,
-      });
+      const refreshResult = await fetchAccount(
+        transactionSession.sessionClient,
+        {
+          address: account.address,
+        },
+      );
+
+      if (refreshResult.isErr()) {
+        console.warn(
+          '[useEditorForm] Profile saved, but refreshing the Lens cache failed:',
+          refreshResult.error,
+        );
+      }
 
       methods.reset({
         ...values,
         avatar: { preview: avatarUri ?? null },
         coverPicture: { preview: coverPictureUri ?? null },
       });
+      metadataUploadCache.current = null;
       toast.success('Profile saved!', {
         id: toastId,
         description: 'Your changes are now live.',
       });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Something went wrong';
+    } catch {
+      const feedback = getSaveErrorFeedback(saveStage);
 
-      const description = message.toLowerCase().includes('upload')
-        ? 'Failed to upload your files. Check your connection and try again.'
-        : 'Something went wrong. Please try again or contact support.';
-
-      toast.error('Failed to save profile', { id: toastId, description });
+      toast.error(feedback.title, {
+        id: toastId,
+        description: feedback.description,
+      });
     } finally {
       saveInFlight.current = false;
     }

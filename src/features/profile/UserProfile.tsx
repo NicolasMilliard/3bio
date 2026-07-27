@@ -3,8 +3,10 @@ import { formatToThreeBioMetadata } from '@/helpers';
 import { useTheme } from '@/hooks/useTheme';
 import type { ThreeBioProfile } from '@/schemas/threeBioMetadata.schema';
 import { useAccount, useAccountStats } from '@lens-protocol/react';
+import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
 
-import { SpinnerScreen } from '@/components/ui';
+import { Button, ErrorScreen, SpinnerScreen } from '@/components/ui';
 import {
   NotFoundScreen,
   ProfileDocumentMetadata,
@@ -12,6 +14,24 @@ import {
 } from './components';
 
 const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
+  const [requestKey, setRequestKey] = useState(0);
+
+  return (
+    <UserProfileContent
+      key={requestKey}
+      lensHandle={lensHandle}
+      onRetry={() => setRequestKey((key) => key + 1)}
+    />
+  );
+};
+
+const UserProfileContent = ({
+  lensHandle,
+  onRetry,
+}: {
+  lensHandle: string;
+  onRetry: () => void;
+}) => {
   const {
     data: account,
     loading,
@@ -45,12 +65,30 @@ const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
         following={following}
         posts={posts}
         displayStatistics={displayStatistics}
-        status={loading ? 'loading' : error || !account ? 'not-found' : 'ready'}
+        status={
+          loading
+            ? 'loading'
+            : error
+              ? 'error'
+              : !account
+                ? 'not-found'
+                : 'ready'
+        }
       />
 
       {loading ? (
         <SpinnerScreen text="Loading profile..." />
-      ) : error || !account ? (
+      ) : error ? (
+        <ErrorScreen
+          title="We couldn't load this profile."
+          description="There was a problem connecting to Lens. Check your connection and try again."
+          onRetry={onRetry}
+        >
+          <Button asChild variant="outline">
+            <Link to="/">Go back home</Link>
+          </Button>
+        </ErrorScreen>
+      ) : !account ? (
         <NotFoundScreen lensHandle={lensHandle} />
       ) : (
         <ProfileLayout

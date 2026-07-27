@@ -12,7 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Image,
+  Spinner,
 } from '@/components/ui';
+import { ChevronDownIcon } from 'lucide-react';
 
 export const AuthButton = () => {
   const {
@@ -23,22 +25,41 @@ export const AuthButton = () => {
     connectWallet,
     disconnectWallet,
     switchProfile,
+    profilesLoading,
+    profilesError,
     isConnecting,
     isDisconnecting,
+    switchingProfileAddress,
   } = useAuthState();
 
   if (!isConnected) {
     return (
-      <Button disabled={isConnecting} onClick={connectWallet}>
-        {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+      <Button
+        disabled={isConnecting || isDisconnecting}
+        onClick={connectWallet}
+      >
+        {isDisconnecting
+          ? 'Disconnecting...'
+          : isConnecting
+            ? 'Connecting...'
+            : 'Connect Wallet'}
       </Button>
     );
   }
 
+  const activeLabel = profilesLoading
+    ? 'Loading profiles...'
+    : switchingProfileAddress
+      ? 'Switching profile...'
+      : profilesError
+        ? 'Profiles unavailable'
+        : activeDisplayName;
+  const profileActionPending = switchingProfileAddress !== null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>
+        <Button disabled={isDisconnecting || profileActionPending}>
           {activeAvatar && (
             <Image
               src={activeAvatar}
@@ -46,8 +67,9 @@ export const AuthButton = () => {
               className="size-6 rounded-full object-cover"
             />
           )}
-          <span className="truncate">{activeDisplayName}</span>
-          <span className="text-xs">▾</span>
+          {profilesLoading || profileActionPending ? <Spinner /> : null}
+          <span className="truncate">{activeLabel}</span>
+          <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
 
@@ -56,38 +78,57 @@ export const AuthButton = () => {
           Your profiles
         </DropdownMenuLabel>
 
-        {profiles.length === 0 && (
-          <DropdownMenuItem disabled>No profiles</DropdownMenuItem>
+        {profilesLoading && (
+          <DropdownMenuItem disabled>
+            <Spinner />
+            Loading profiles...
+          </DropdownMenuItem>
         )}
 
-        {profiles.map((p) => (
-          <DropdownMenuItem
-            key={p.address}
-            onClick={() => switchProfile(p.address)}
-            className={
-              p.isActive ? 'bg-muted hover:bg-muted!' : 'hover:bg-primary/40!'
-            }
-          >
-            <Avatar size="sm">
-              <AvatarImage src={p.avatar} alt={p.displayName} />
-              <AvatarFallback>
-                {p.displayName ? p.displayName[0].toUpperCase() : 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <span className="truncate">{p.displayName}</span>
-
-            {p.isActive && <span className="ml-auto">✓</span>}
+        {!profilesLoading && profilesError && (
+          <DropdownMenuItem disabled>
+            Couldn&apos;t load profiles
           </DropdownMenuItem>
-        ))}
+        )}
+
+        {!profilesLoading && !profilesError && profiles.length === 0 && (
+          <DropdownMenuItem disabled>No Lens profiles found</DropdownMenuItem>
+        )}
+
+        {!profilesLoading &&
+          !profilesError &&
+          profiles.map((p) => (
+            <DropdownMenuItem
+              key={p.address}
+              disabled={profileActionPending}
+              onClick={() => void switchProfile(p.address)}
+              className={
+                p.isActive ? 'bg-muted hover:bg-muted!' : 'hover:bg-primary/40!'
+              }
+            >
+              <Avatar size="sm">
+                <AvatarImage src={p.avatar} alt={p.displayName} />
+                <AvatarFallback>
+                  {p.displayName ? p.displayName[0].toUpperCase() : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{p.displayName}</span>
+
+              {switchingProfileAddress === p.address ? (
+                <Spinner className="ml-auto" />
+              ) : null}
+              {p.isActive && <span className="ml-auto">✓</span>}
+            </DropdownMenuItem>
+          ))}
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={disconnectWallet}
-          disabled={isDisconnecting}
+          onClick={() => void disconnectWallet()}
+          disabled={isDisconnecting || profileActionPending}
           className="text-destructive hover:bg-destructive! hover:text-primary-foreground!"
         >
-          Disconnect
+          {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

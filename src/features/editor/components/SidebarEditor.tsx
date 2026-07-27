@@ -20,14 +20,23 @@ import {
 export const SidebarEditor = () => {
   const {
     formState: { isDirty, isSubmitting },
+    watch,
   } = useFormContext<MetadataFormValues>();
+  const imageValidation = watch('_imageValidation');
+  const isCheckingImage =
+    imageValidation.avatar || imageValidation.coverPicture;
+  const isBusy = isSubmitting || isCheckingImage;
 
   return (
     <Sidebar variant="floating">
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
           to="/dashboard"
-          className="hover:text-foreground flex items-center gap-1 text-sm hover:underline"
+          aria-disabled={isBusy}
+          onClick={(event) => {
+            if (isBusy) event.preventDefault();
+          }}
+          className="hover:text-foreground aria-disabled:text-muted-foreground flex items-center gap-1 text-sm hover:underline aria-disabled:pointer-events-none aria-disabled:no-underline"
         >
           <ChevronLeft size={14} />
           Back to dashboard
@@ -46,9 +55,13 @@ export const SidebarEditor = () => {
         <Button
           type="submit"
           form="profile-editor-form"
-          disabled={!isDirty || isSubmitting}
+          disabled={!isDirty || isBusy}
         >
-          {isSubmitting ? 'Saving…' : 'Save Changes'}
+          {isSubmitting
+            ? 'Saving...'
+            : isCheckingImage
+              ? 'Checking image...'
+              : 'Save Changes'}
         </Button>
       </SidebarFooter>
     </Sidebar>

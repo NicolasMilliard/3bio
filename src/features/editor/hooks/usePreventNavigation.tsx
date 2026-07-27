@@ -13,6 +13,7 @@ export const usePreventNavigation = ({
     shouldBlockFn: () => enabled,
     withResolver: true,
   });
+  const { proceed, reset, status } = blocker;
 
   // Prevent browser navigation
   useEffect(() => {
@@ -33,16 +34,22 @@ export const usePreventNavigation = ({
     };
   }, [enabled, message]);
 
+  useEffect(() => {
+    if (!enabled && status === 'blocked') {
+      proceed?.();
+    }
+  }, [enabled, proceed, status]);
+
   const confirmNavigation = () => {
-    blocker.proceed?.();
+    proceed?.();
   };
 
   const cancelNavigation = () => {
-    blocker.reset?.();
+    reset?.();
   };
 
   return {
-    open: blocker.status === 'blocked',
+    open: status === 'blocked',
     confirmNavigation,
     cancelNavigation,
   };

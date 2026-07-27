@@ -12,7 +12,7 @@ export const AppearanceGroup = () => {
         <PictureController
           formValue="coverPicture"
           label="Social share image"
-          description="Used for Open Graph and X/Twitter previews. It is not displayed on your profile."
+          description="Used for Open Graph and X/Twitter previews. It is not displayed on your profile. 1200 × 630 px is recommended."
         />
       </div>
     </SidebarGroup>

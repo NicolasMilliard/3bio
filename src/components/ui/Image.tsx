@@ -12,13 +12,17 @@ export const Image = ({
   decoding = 'async',
   showSkeleton = false,
   skeletonClassName = '',
+  onError,
+  onLoad,
+  src,
   ...props
 }: ImageProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [settledSrc, setSettledSrc] = useState<string | undefined>();
+  const isSettled = settledSrc === src;
 
   return (
     <div className="relative overflow-hidden">
-      {showSkeleton && !isLoaded && (
+      {showSkeleton && !isSettled && (
         <div
           className={cn(
             'bg-muted absolute inset-0 animate-pulse rounded-4xl',
@@ -27,10 +31,18 @@ export const Image = ({
         />
       )}
       <img
+        {...props}
+        src={src}
         loading={loading}
         decoding={decoding}
-        onLoad={() => setIsLoaded(true)}
-        {...props}
+        onLoad={(event) => {
+          setSettledSrc(src);
+          onLoad?.(event);
+        }}
+        onError={(event) => {
+          setSettledSrc(src);
+          onError?.(event);
+        }}
       />
     </div>
   );

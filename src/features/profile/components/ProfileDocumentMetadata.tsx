@@ -11,7 +11,7 @@ type ProfileDocumentMetadataProps = {
   following?: number;
   posts?: number;
   displayStatistics?: boolean;
-  status: 'loading' | 'ready' | 'not-found';
+  status: 'loading' | 'ready' | 'not-found' | 'error';
 };
 
 const normalizeText = (value?: string | null) =>
@@ -24,7 +24,7 @@ const truncateText = (value: string, maxLength: number) => {
   const lastSpace = truncated.lastIndexOf(' ');
   const cutoff = lastSpace > maxLength * 0.6 ? lastSpace : truncated.length;
 
-  return `${truncated.slice(0, cutoff).trimEnd()}…`;
+  return `${truncated.slice(0, cutoff).trimEnd()}...`;
 };
 
 const asPublicUrl = (value?: string | null) => {
@@ -66,21 +66,25 @@ export const ProfileDocumentMetadata = ({
   const title =
     status === 'not-found'
       ? 'Profile not found | 3bio'
-      : profileName
-        ? `${truncateText(profileName, 50)} (@${normalizedHandle}) | 3bio`
-        : `@${normalizedHandle} | 3bio`;
+      : status === 'error'
+        ? 'Profile temporarily unavailable | 3bio'
+        : profileName
+          ? `${truncateText(profileName, 50)} (@${normalizedHandle}) | 3bio`
+          : `@${normalizedHandle} | 3bio`;
   const normalizedBio = normalizeText(profile?.bio);
   const description =
     status === 'not-found'
       ? `The 3bio profile @${normalizedHandle} could not be found.`
-      : normalizedBio
-        ? truncateText(normalizedBio, DESCRIPTION_MAX_LENGTH)
-        : `Explore @${normalizedHandle}'s profile and links on 3bio, built on Lens.`;
+      : status === 'error'
+        ? `The 3bio profile @${normalizedHandle} could not be loaded right now.`
+        : normalizedBio
+          ? truncateText(normalizedBio, DESCRIPTION_MAX_LENGTH)
+          : `Explore @${normalizedHandle}'s profile and links on 3bio, built on Lens.`;
   const avatarUrl = asPublicUrl(profile?.avatar);
   const coverPictureUrl = asPublicUrl(profile?.coverPicture);
   const socialImageUrl = coverPictureUrl ?? avatarUrl;
   const socialImageAlt = `${displayName}'s profile image`;
-  const isIndexable = status !== 'not-found';
+  const isIndexable = status !== 'not-found' && status !== 'error';
 
   useEffect(() => {
     document.title = title;
@@ -127,9 +131,7 @@ export const ProfileDocumentMetadata = ({
             ...(interactionStatistics.length > 0
               ? { interactionStatistic: interactionStatistics }
               : {}),
-            ...(agentInteractionStatistic
-              ? { agentInteractionStatistic }
-              : {}),
+            ...(agentInteractionStatistic ? { agentInteractionStatistic } : {}),
           },
         }
       : undefined;
@@ -175,10 +177,7 @@ export const ProfileDocumentMetadata = ({
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
-                __html: JSON.stringify(structuredData).replace(
-                  /</g,
-                  '\\u003c',
-                ),
+                __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
               }}
             />
           )}

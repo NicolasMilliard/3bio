@@ -10,12 +10,16 @@ import {
 
 type UnsavedChangesDialogProps = {
   open: boolean;
+  isSaving?: boolean;
+  isCheckingImage?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 };
 
 export const UnsavedChangesDialog = ({
   open,
+  isSaving = false,
+  isCheckingImage = false,
   onCancel,
   onConfirm,
 }: UnsavedChangesDialogProps) => {
@@ -23,21 +27,33 @@ export const UnsavedChangesDialog = ({
     <Dialog open={open} onOpenChange={onCancel}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Unsaved Changes</DialogTitle>
+          <DialogTitle>
+            {isSaving
+              ? 'Save in progress'
+              : isCheckingImage
+                ? 'Image check in progress'
+                : 'Unsaved changes'}
+          </DialogTitle>
 
           <DialogDescription>
-            You have unsaved changes. Are you sure you want to leave?
+            {isSaving
+              ? 'Your profile is still being published. Wait for the save to finish before leaving this page.'
+              : isCheckingImage
+                ? 'Your image is still being checked. Wait for it to finish before leaving this page.'
+                : 'You have unsaved changes. Are you sure you want to leave?'}
           </DialogDescription>
         </DialogHeader>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
+            {isSaving || isCheckingImage ? 'Stay on this page' : 'Cancel'}
           </Button>
 
-          <Button type="button" variant="destructive" onClick={onConfirm}>
-            Discard
-          </Button>
+          {!isSaving && !isCheckingImage && (
+            <Button type="button" variant="destructive" onClick={onConfirm}>
+              Discard
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

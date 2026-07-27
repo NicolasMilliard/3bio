@@ -4,6 +4,7 @@ import {
   AvatarImage,
   Button,
   Card,
+  Spinner,
   Text,
 } from '@/components/ui';
 import { formatAddress } from '@/helpers';
@@ -13,6 +14,8 @@ type ProfileCardProps = {
   avatar?: string;
   avatarFallback: string;
   coverPicture?: string;
+  disabled?: boolean;
+  isLoading?: boolean;
   name: string;
   onSelect: () => void;
 };
@@ -22,6 +25,8 @@ export const ProfileCard = ({
   avatar,
   avatarFallback,
   coverPicture,
+  disabled = false,
+  isLoading = false,
   name,
   onSelect,
 }: ProfileCardProps) => {
@@ -47,8 +52,21 @@ export const ProfileCard = ({
           <Text className="text-xs">{formatAddress(address)}</Text>
         </div>
 
-        <Button type="button" className="mt-6" onClick={onSelect}>
-          Select profile
+        <Button
+          type="button"
+          className="mt-6"
+          disabled={disabled}
+          aria-busy={isLoading}
+          onClick={onSelect}
+        >
+          {isLoading ? (
+            <>
+              <Spinner />
+              Signing in...
+            </>
+          ) : (
+            'Select profile'
+          )}
         </Button>
       </div>
     </Card>
