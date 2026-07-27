@@ -21,11 +21,11 @@ export const AppHeader = () => {
       />
 
       <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
-        <Link to="/">
+        <Link to="/" aria-label="3bio home">
           <Logo isAtTop />
         </Link>
 
-        <nav className="flex items-center gap-2">
+        <nav aria-label="Primary" className="flex items-center gap-2">
           {isHome ? (
             <Button asChild>
               <Link to="/dashboard">Launch App</Link>

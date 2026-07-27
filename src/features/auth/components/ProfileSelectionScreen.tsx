@@ -71,8 +71,12 @@ const ProfileSelectionQuery = ({
       </div>
 
       {loading && (
-        <section className="mt-30 flex items-center justify-center gap-4">
-          <Spinner />
+        <section
+          role="status"
+          aria-live="polite"
+          className="mt-30 flex items-center justify-center gap-4"
+        >
+          <Spinner aria-hidden="true" />
           <Text>Loading your profiles...</Text>
         </section>
       )}

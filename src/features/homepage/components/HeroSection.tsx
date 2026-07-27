@@ -11,11 +11,11 @@ export const HeroSection = () => {
         <div className="mx-auto flex flex-col gap-10 md:mx-0">
           <Text
             variant="h1"
-            className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_forwards]"
+            className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_forwards] motion-reduce:animate-none"
           >
             Finally, your decentralized link&nbsp;in&nbsp;bio.
           </Text>
-          <Text className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0">
+          <Text className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100">
             Turn your Lens profile into a link&nbsp;in&nbsp;bio page you can
             customize and share. 3bio is{' '}
             <a
@@ -25,6 +25,7 @@ export const HeroSection = () => {
               className="text-primary font-bold hover:underline"
             >
               open source
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>{' '}
             and built on Lens.
           </Text>
@@ -34,8 +35,9 @@ export const HeroSection = () => {
           src={heroImages.homepageHero}
           loading="eager"
           fetchPriority="high"
+          alt=""
           aria-hidden="true"
-          className="animate-[blurFadeIn_0.8s_ease-out_0.45s_forwards] rounded-4xl opacity-0"
+          className="animate-[blurFadeIn_0.8s_ease-out_0.45s_forwards] rounded-4xl opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
         />
       </div>
     </section>

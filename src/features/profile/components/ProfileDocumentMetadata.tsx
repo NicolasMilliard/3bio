@@ -1,8 +1,12 @@
 import { THREE_BIO_ORIGIN } from '@/constants';
+import { useClearServerMetadata } from '@/hooks/useClearServerMetadata';
 import type { ThreeBioProfile } from '@/schemas/threeBioMetadata.schema';
 import { useEffect } from 'react';
-
-const DESCRIPTION_MAX_LENGTH = 160;
+import {
+  buildProfileDocumentMetadata,
+  HOME_TITLE,
+  type ProfileMetadataStatus,
+} from '../documentMetadata';
 
 type ProfileDocumentMetadataProps = {
   lensHandle: string;
@@ -11,44 +15,8 @@ type ProfileDocumentMetadataProps = {
   following?: number;
   posts?: number;
   displayStatistics?: boolean;
-  status: 'loading' | 'ready' | 'not-found' | 'error';
+  status: ProfileMetadataStatus;
 };
-
-const normalizeText = (value?: string | null) =>
-  value?.replace(/\s+/g, ' ').trim() || undefined;
-
-const truncateText = (value: string, maxLength: number) => {
-  if (value.length <= maxLength) return value;
-
-  const truncated = value.slice(0, maxLength - 1);
-  const lastSpace = truncated.lastIndexOf(' ');
-  const cutoff = lastSpace > maxLength * 0.6 ? lastSpace : truncated.length;
-
-  return `${truncated.slice(0, cutoff).trimEnd()}...`;
-};
-
-const asPublicUrl = (value?: string | null) => {
-  if (!value) return undefined;
-
-  try {
-    const url = new URL(value, THREE_BIO_ORIGIN);
-
-    return url.protocol === 'http:' || url.protocol === 'https:'
-      ? url.toString()
-      : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-const interactionCounter = (interactionType: string, count?: number) =>
-  Number.isFinite(count)
-    ? {
-        '@type': 'InteractionCounter',
-        interactionType,
-        userInteractionCount: count,
-      }
-    : undefined;
 
 export const ProfileDocumentMetadata = ({
   lensHandle,
@@ -59,125 +27,85 @@ export const ProfileDocumentMetadata = ({
   displayStatistics = true,
   status,
 }: ProfileDocumentMetadataProps) => {
-  const normalizedHandle = lensHandle.toLowerCase();
-  const canonicalUrl = `${THREE_BIO_ORIGIN}/${encodeURIComponent(normalizedHandle)}`;
-  const profileName = normalizeText(profile?.name);
-  const displayName = profileName ?? `@${normalizedHandle}`;
-  const title =
-    status === 'not-found'
-      ? 'Profile not found | 3bio'
-      : status === 'error'
-        ? 'Profile temporarily unavailable | 3bio'
-        : profileName
-          ? `${truncateText(profileName, 50)} (@${normalizedHandle}) | 3bio`
-          : `@${normalizedHandle} | 3bio`;
-  const normalizedBio = normalizeText(profile?.bio);
-  const description =
-    status === 'not-found'
-      ? `The 3bio profile @${normalizedHandle} could not be found.`
-      : status === 'error'
-        ? `The 3bio profile @${normalizedHandle} could not be loaded right now.`
-        : normalizedBio
-          ? truncateText(normalizedBio, DESCRIPTION_MAX_LENGTH)
-          : `Explore @${normalizedHandle}'s profile and links on 3bio, built on Lens.`;
-  const avatarUrl = asPublicUrl(profile?.avatar);
-  const coverPictureUrl = asPublicUrl(profile?.coverPicture);
-  const socialImageUrl = coverPictureUrl ?? avatarUrl;
-  const socialImageAlt = `${displayName}'s profile image`;
-  const isIndexable = status !== 'not-found' && status !== 'error';
+  const isResolved = status !== 'loading';
+
+  useClearServerMetadata(isResolved);
+
+  const metadata = buildProfileDocumentMetadata({
+    origin: THREE_BIO_ORIGIN,
+    lensHandle,
+    profile,
+    followers,
+    following,
+    posts,
+    displayStatistics,
+    status,
+  });
 
   useEffect(() => {
-    document.title = title;
+    if (!isResolved) return;
+
+    document.title = metadata.title;
 
     return () => {
-      document.title = '3bio';
+      document.title = HOME_TITLE;
     };
-  }, [title]);
+  }, [isResolved, metadata.title]);
 
-  const sameAs = Array.from(
-    new Set(
-      profile?.socialLinks
-        ?.map((link) => asPublicUrl(link.value))
-        .filter((url): url is string => Boolean(url)) ?? [],
-    ),
-  );
-
-  const interactionStatistics = displayStatistics
-    ? [
-        interactionCounter('https://schema.org/FollowAction', followers),
-        interactionCounter('https://schema.org/WriteAction', posts),
-      ].filter((statistic) => statistic !== undefined)
-    : [];
-  const agentInteractionStatistic = displayStatistics
-    ? interactionCounter('https://schema.org/FollowAction', following)
-    : undefined;
-
-  const structuredData =
-    status === 'ready'
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'ProfilePage',
-          url: canonicalUrl,
-          mainEntity: {
-            '@type': 'Person',
-            '@id': `${canonicalUrl}#profile`,
-            name: displayName,
-            alternateName: `@${normalizedHandle}`,
-            identifier: normalizedHandle,
-            url: canonicalUrl,
-            ...(normalizedBio ? { description: normalizedBio } : {}),
-            ...(avatarUrl ? { image: avatarUrl } : {}),
-            ...(sameAs.length > 0 ? { sameAs } : {}),
-            ...(interactionStatistics.length > 0
-              ? { interactionStatistic: interactionStatistics }
-              : {}),
-            ...(agentInteractionStatistic ? { agentInteractionStatistic } : {}),
-          },
-        }
-      : undefined;
+  if (!isResolved) return null;
 
   return (
     <>
-      <meta name="description" content={description} />
-      <meta
-        name="robots"
-        content={
-          isIndexable
-            ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-            : 'noindex, nofollow'
-        }
-      />
+      <meta name="description" content={metadata.description} />
+      <meta name="robots" content={metadata.robots} />
 
-      {isIndexable && (
+      {metadata.isIndexable && (
         <>
-          <link rel="canonical" href={canonicalUrl} />
+          <link rel="canonical" href={metadata.canonicalUrl} />
           <meta property="og:type" content="profile" />
           <meta property="og:site_name" content="3bio" />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="og:url" content={canonicalUrl} />
-          <meta property="profile:username" content={normalizedHandle} />
+          <meta property="og:title" content={metadata.title} />
+          <meta property="og:description" content={metadata.description} />
+          <meta property="og:url" content={metadata.canonicalUrl} />
           <meta
-            name="twitter:card"
-            content={coverPictureUrl ? 'summary_large_image' : 'summary'}
+            property="profile:username"
+            content={metadata.normalizedHandle}
           />
-          <meta name="twitter:title" content={title} />
-          <meta name="twitter:description" content={description} />
+          <meta name="twitter:card" content={metadata.twitterCard} />
+          <meta name="twitter:title" content={metadata.title} />
+          <meta name="twitter:description" content={metadata.description} />
 
-          {socialImageUrl && (
+          {metadata.socialImageUrl && metadata.socialImageAlt && (
             <>
-              <meta property="og:image" content={socialImageUrl} />
-              <meta property="og:image:alt" content={socialImageAlt} />
-              <meta name="twitter:image" content={socialImageUrl} />
-              <meta name="twitter:image:alt" content={socialImageAlt} />
+              <meta property="og:image" content={metadata.socialImageUrl} />
+              <meta
+                property="og:image:secure_url"
+                content={metadata.socialImageUrl}
+              />
+              <meta property="og:image:alt" content={metadata.socialImageAlt} />
+              <meta name="twitter:image" content={metadata.socialImageUrl} />
+              <meta
+                name="twitter:image:alt"
+                content={metadata.socialImageAlt}
+              />
+              {metadata.socialImageKind === 'default' && (
+                <>
+                  <meta property="og:image:type" content="image/png" />
+                  <meta property="og:image:width" content="1200" />
+                  <meta property="og:image:height" content="630" />
+                </>
+              )}
             </>
           )}
 
-          {structuredData && (
+          {metadata.structuredData && (
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{
-                __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+                __html: JSON.stringify(metadata.structuredData).replace(
+                  /</g,
+                  '\\u003c',
+                ),
               }}
             />
           )}

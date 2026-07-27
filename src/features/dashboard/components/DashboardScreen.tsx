@@ -17,13 +17,13 @@ export const DashboardScreen = () => {
               <Link to="/edit">Edit profile</Link>
             </Button>
           }
-          className="animate-[blurFadeIn_0.5s_ease-out_forwards] opacity-0"
+          className="animate-[blurFadeIn_0.5s_ease-out_forwards] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
         />
         <DashboardCard
           title="Statistics"
           description="Consult your activity and usage."
           footer={<Button disabled>Coming soon</Button>}
-          className="animate-[blurFadeIn_0.5s_ease-out_0.15s_forwards] opacity-0"
+          className="animate-[blurFadeIn_0.5s_ease-out_0.15s_forwards] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
         />
       </section>
     </div>

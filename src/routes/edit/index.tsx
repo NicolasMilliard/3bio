@@ -8,6 +8,7 @@ import {
   SidebarProvider,
   SpinnerScreen,
 } from '@/components/ui';
+import { PrivateRouteDocumentMetadata } from '@/components/layout';
 import { AuthGuard } from '@/features/auth/components';
 import { EditorScreen } from '@/features/editor/components/EditorScreen';
 import { NotFoundScreen } from '@/features/profile/components';
@@ -20,19 +21,22 @@ function EditorPage() {
   const [requestKey, setRequestKey] = useState(0);
 
   return (
-    <AuthGuard>
-      <EditorContent
-        key={requestKey}
-        onRetry={() => setRequestKey((key) => key + 1)}
-      />
-    </AuthGuard>
+    <>
+      <PrivateRouteDocumentMetadata title="Edit profile | 3bio" />
+      <AuthGuard>
+        <EditorContent
+          key={requestKey}
+          onRetry={() => setRequestKey((key) => key + 1)}
+        />
+      </AuthGuard>
+    </>
   );
 }
 
 function EditorContent({ onRetry }: { onRetry: () => void }) {
   const { account, stats, loading, error } = useEditorAccount();
 
-  if (loading) return <SpinnerScreen text="Loading profile..." />;
+  if (loading) return <SpinnerScreen as="main" text="Loading profile..." />;
 
   if (error) {
     return (

@@ -18,7 +18,7 @@ export const Footer = () => {
               <Logo />
             </Link>
             <p className="mt-3 text-sm leading-6">
-              Open-source link-in-bio profiles for Lens.
+              Open-source link in bio profiles for Lens.
             </p>
           </div>
 

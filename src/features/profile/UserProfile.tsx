@@ -77,7 +77,7 @@ const UserProfileContent = ({
       />
 
       {loading ? (
-        <SpinnerScreen text="Loading profile..." />
+        <SpinnerScreen as="main" text="Loading profile..." />
       ) : error ? (
         <ErrorScreen
           title="We couldn't load this profile."

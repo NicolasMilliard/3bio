@@ -24,6 +24,7 @@ export const Branding = ({
           rel="noopener noreferrer"
         >
           3bio
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       ) : (
         <span className="text-branding-text font-medium underline decoration-1 underline-offset-2">

@@ -1,6 +1,7 @@
 import { THREEBIO_URL } from '@/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useId } from 'react';
 import {
   type ProfileCheckingFormValues,
   profileCheckingFormSchema,
@@ -16,6 +17,9 @@ import {
 import { ExternalLink } from 'lucide-react';
 
 export const ProfileCheckingForm = () => {
+  const inputId = useId();
+  const prefixId = `${inputId}-prefix`;
+  const errorId = `${inputId}-error`;
   const methods = useForm<ProfileCheckingFormValues>({
     resolver: zodResolver(profileCheckingFormSchema),
     defaultValues: {
@@ -37,28 +41,45 @@ export const ProfileCheckingForm = () => {
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.3s_forwards] flex-col gap-2 opacity-0"
+        className="flex max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.3s_forwards] flex-col gap-2 opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
       >
-        <div className="flex gap-2">
+        <label htmlFor={inputId} className="sr-only">
+          Lens profile handle
+        </label>
+        <div className="flex flex-col gap-2 sm:flex-row">
           <InputGroup
             className="bg-background"
             aria-invalid={errors.link ? 'true' : 'false'}
           >
             <InputGroupAddon>
-              <span>{THREEBIO_URL}</span>
+              <span id={prefixId}>{THREEBIO_URL}</span>
             </InputGroupAddon>
             <InputGroupInput
+              id={inputId}
               placeholder="YourLensHandle"
               aria-invalid={errors.link ? 'true' : 'false'}
+              aria-describedby={
+                errors.link ? `${prefixId} ${errorId}` : prefixId
+              }
+              aria-errormessage={errors.link ? errorId : undefined}
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
               {...register('link')}
             />
           </InputGroup>
-          <Button type="submit">
-            Check my Profile <ExternalLink />
+          <Button type="submit" className="w-full sm:w-auto">
+            Check my Profile
+            <span className="sr-only"> (opens in a new tab)</span>
+            <ExternalLink aria-hidden="true" />
           </Button>
         </div>
         {errors.link?.message ? (
-          <Text className="text-destructive px-3 text-sm">
+          <Text
+            id={errorId}
+            role="alert"
+            className="text-destructive px-3 text-sm"
+          >
             {errors.link.message}
           </Text>
         ) : null}

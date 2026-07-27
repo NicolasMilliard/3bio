@@ -21,7 +21,7 @@ export const SubscriptionCard = ({
       className={`${variant === 'free' ? 'bg-muted' : 'bg-accent'} py-4`}
     >
       <CardTitle>
-        <Text variant="h2" className="capitalize">
+        <Text variant="h3" className="text-[32px] capitalize">
           {variant}
         </Text>
       </CardTitle>
@@ -29,7 +29,9 @@ export const SubscriptionCard = ({
     <CardContent>
       <div className="mb-8">
         <div className="flex items-center gap-6">
-          <Text variant="h2">{price.value}</Text>
+          <Text className="text-primary text-[32px] font-extrabold">
+            {price.value}
+          </Text>
           {price.previousValue && (
             <Text className="text-muted-foreground line-through">
               {price.previousValue}

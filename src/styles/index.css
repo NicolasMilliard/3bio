@@ -39,6 +39,7 @@
   --color-background: var(--background);
 
   --color-avatar-background: var(--avatar-background);
+  --color-avatar-foreground: var(--avatar-foreground);
   --color-name-text: var(--name-text);
   --color-bio-text: var(--bio-text);
   --color-icons: var(--icons);
@@ -70,14 +71,16 @@
   --secondary-foreground: oklch(0.17 0.1 269); /* #04023B */
 
   --muted: oklch(0.94 0.02 288); /* #EBEAFA — pricing section title bg */
-  --muted-foreground: oklch(0.76 0.1 285); /* #A9A7EC — input placeholders */
+  --muted-foreground: oklch(
+    0.55 0.12 285
+  ); /* #6B66B4 — secondary text / placeholders */
 
   --accent: oklch(
     0.88 0.11 325
   ); /* #FCBFFF — image placeholders, tag borders */
   --accent-foreground: oklch(0.17 0.1 269); /* #04023B */
 
-  --destructive: oklch(0.6 0.26 345);
+  --destructive: oklch(0.55 0.24 345);
 
   --border: oklch(0.94 0.02 288); /* #EBEAFA */
   --input: oklch(0.94 0.02 288); /* #EBEAFA — subtle input bg */
@@ -97,6 +100,8 @@
   --sidebar-accent-foreground: oklch(0.17 0.1 269);
   --sidebar-border: oklch(1 0 0); /* #FFFFFF */
   --sidebar-ring: oklch(0.45 0.3 266); /* #1710F7 */
+
+  --avatar-foreground: var(--foreground);
 }
 
 @layer base {
@@ -143,11 +148,12 @@
   --popover-foreground: oklch(0.16833 0.10425 269.45);
   --ring: oklch(0.4509 0.2989 266.03);
   --avatar-background: oklch(0.87966 0.10803 324.91);
+  --avatar-foreground: oklch(0.16833 0.10425 269.45);
   --name-text: oklch(0.4509 0.2989 266.03);
   --bio-text: oklch(0.16833 0.10425 269.45);
   --icons: oklch(0.4509 0.2989 266.03);
   --statistics-background: oklch(1 0 0);
-  --statistics-title: oklch(0.75562 0.09843 285.11);
+  --statistics-title: oklch(0.52 0.11 285.11);
   --statistics-number: oklch(0.4509 0.2989 266.03);
   --content-background: oklch(0.87966 0.10803 324.91);
   --links-text: oklch(0.16833 0.10425 269.45);
@@ -171,6 +177,7 @@
   --popover-foreground: oklch(0.87986 0.02665 242.78);
   --ring: oklch(0.72945 0.16825 16.45);
   --avatar-background: oklch(0.72945 0.16825 16.45);
+  --avatar-foreground: oklch(0.27402 0.09174 296.72);
   --name-text: oklch(0.72945 0.16825 16.45);
   --bio-text: oklch(0.87986 0.02665 242.78);
   --icons: oklch(0.72945 0.16825 16.45);
@@ -199,6 +206,7 @@
   --popover-foreground: oklch(0.48333 0.09234 242.02);
   --ring: oklch(0.27404 0.04625 241.44);
   --avatar-background: oklch(0.79768 0.11121 202.49);
+  --avatar-foreground: oklch(0.27404 0.04625 241.44);
   --name-text: oklch(0.27404 0.04625 241.44);
   --bio-text: oklch(0.48333 0.09234 242.02);
   --icons: oklch(0.48333 0.09234 242.02);

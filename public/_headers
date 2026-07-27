@@ -9,6 +9,18 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+/dashboard
+  X-Robots-Tag: noindex, nofollow
+
+/dashboard/*
+  X-Robots-Tag: noindex, nofollow
+
+/edit
+  X-Robots-Tag: noindex, nofollow
+
+/edit/*
+  X-Robots-Tag: noindex, nofollow
+
 https://:project.pages.dev/*
   X-Robots-Tag: noindex, nofollow
 

@@ -16,8 +16,8 @@ export const Identity = ({
         size="xl"
         className="animate-[blurFadeIn_0.4s_ease-out_0.15s_backwards] after:border-transparent data-[size=xl]:size-28 motion-reduce:animate-none sm:data-[size=xl]:size-32"
       >
-        <AvatarImage src={avatar} alt={name ?? lensHandle} />
-        <AvatarFallback className="bg-avatar-background text-bio-text">
+        <AvatarImage src={avatar} alt="" />
+        <AvatarFallback className="bg-avatar-background text-avatar-foreground">
           {name
             ? name[0].toUpperCase()
             : lensHandle

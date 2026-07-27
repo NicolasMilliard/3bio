@@ -19,10 +19,15 @@ connecting the custom domain, set `VITE_PUBLIC_ORIGIN` to its HTTPS origin and
 redeploy.
 
 Cloudflare Pages automatically applies the SPA fallback because the build does
-not contain a top-level `404.html`. The rules in `public/_headers` keep preview
-domains out of search results and apply production security and caching headers.
-No Wrangler configuration is required for this static, Git-integrated Pages
-deployment.
+not contain a top-level `404.html`. It also deploys the root `functions`
+directory, whose profile route adds crawler-visible Lens profile metadata to
+social-preview responses. `public/_routes.json` keeps static assets and private
+app routes out of that Function.
+
+The rules in `public/_headers` keep preview domains and private app routes out
+of search results and apply production security and caching headers. No Wrangler
+configuration or additional runtime environment variable is required for this
+Git-integrated Pages deployment.
 
 ## License
 

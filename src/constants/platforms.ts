@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, SVGProps } from 'react';
 
 import { isSocialProfileUrl } from '@/helpers/isSocialProfileUrl';
 import {
@@ -47,7 +47,7 @@ type PlatformLabel =
 export type SocialPlatform = {
   value: PlatformName;
   label: PlatformLabel;
-  Icon: ComponentType<{ className?: string }>;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
   placeholder: string;
   validateUrl: (url: string) => boolean;
 };
