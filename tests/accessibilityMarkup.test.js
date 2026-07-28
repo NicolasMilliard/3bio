@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import { SpinnerScreen } from '../src/components/ui/SpinnerScreen.tsx';
 import { HeroSection } from '../src/features/homepage/components/HeroSection.tsx';
+import { calculateHeroTilt } from '../src/features/homepage/components/heroMotion.ts';
 import { ProfileCheckingForm } from '../src/features/homepage/components/ProfileCheckingForm.tsx';
 import { LinkButton } from '../src/features/profile/components/LinkButton.tsx';
 import { ProfileLayout } from '../src/features/profile/components/ProfileLayout.tsx';
@@ -18,6 +19,29 @@ test('homepage hero labels its content and keeps the visual decorative', () => {
   expect(markup).not.toContain('@miravale');
   expect(markup).toContain('data-hero-layer="socials"');
   expect(markup).toContain('data-hero-layer="link-3"');
+  expect(markup).toContain('data-hero-motion="ambient"');
+  expect(markup).toContain('data-hero-tilt="true"');
+  expect(markup).toContain('hero-visual-enter');
+  expect(markup).toContain('hero-profile-tilt');
+});
+
+test('hero card tilt is neutral at center and capped at its corners', () => {
+  expect(calculateHeroTilt(100, 50, 200, 100)).toEqual({
+    rotateX: 0,
+    rotateY: 0,
+  });
+  expect(calculateHeroTilt(200, 0, 200, 100)).toEqual({
+    rotateX: 3.5,
+    rotateY: 4.5,
+  });
+  expect(calculateHeroTilt(-20, 140, 200, 100)).toEqual({
+    rotateX: -3.5,
+    rotateY: -4.5,
+  });
+  expect(calculateHeroTilt(10, 10, 0, 0)).toEqual({
+    rotateX: 0,
+    rotateY: 0,
+  });
 });
 
 test('profile links use the branded canvas without changing link semantics', () => {

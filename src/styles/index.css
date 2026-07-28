@@ -132,6 +132,196 @@
 }
 
 /* =========================================================
+   Homepage hero motion
+========================================================= */
+@keyframes heroVisualEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes heroVisualReducedEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroRailEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(-1.125rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroProfileEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(1rem, 1.875rem, 0) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes heroBadgeEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.625rem, 0) scale(0.9)
+      rotate(var(--hero-badge-rotation, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1)
+      rotate(var(--hero-badge-rotation, 0deg));
+  }
+}
+
+@keyframes heroLinkEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroOrbitDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-0.625rem, 0.5rem, 0) scale(1.025);
+  }
+}
+
+@keyframes heroConnectorTurn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-visual-enter {
+  animation: heroVisualEnter 680ms cubic-bezier(0.16, 1, 0.3, 1) 240ms both;
+}
+
+.hero-rail-enter {
+  animation: heroRailEnter 520ms cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+
+.hero-profile-enter {
+  animation: heroProfileEnter 760ms cubic-bezier(0.16, 1, 0.3, 1) 380ms both;
+}
+
+.hero-badge-enter {
+  --hero-badge-rotation: 0deg;
+  transform: rotate(var(--hero-badge-rotation));
+  animation: heroBadgeEnter 420ms cubic-bezier(0.16, 1, 0.3, 1) 600ms both;
+}
+
+[data-hero-layer='stamp'].hero-badge-enter {
+  --hero-badge-rotation: 6deg;
+  animation-delay: 680ms;
+}
+
+[data-hero-layer='ownership'].hero-badge-enter {
+  animation-delay: 760ms;
+}
+
+.hero-link-enter {
+  animation: heroLinkEnter 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-hero-layer='link-1'].hero-link-enter {
+  animation-delay: 720ms;
+}
+
+[data-hero-layer='link-2'].hero-link-enter {
+  animation-delay: 770ms;
+}
+
+[data-hero-layer='link-3'].hero-link-enter {
+  animation-delay: 820ms;
+}
+
+.hero-orbit-motion {
+  transform-origin: center;
+  animation: heroOrbitDrift 14s ease-in-out 1.35s infinite;
+}
+
+.hero-connector-motion {
+  transform-origin: center;
+  animation: heroConnectorTurn 32s linear 1.35s infinite;
+}
+
+.hero-profile-hit-area {
+  --hero-tilt-scale: 1;
+  --hero-tilt-x: 0deg;
+  --hero-tilt-y: 0deg;
+}
+
+.hero-profile-tilt {
+  transform-style: preserve-3d;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .hero-profile-tilt {
+    backface-visibility: hidden;
+    transform: perspective(900px) rotateX(var(--hero-tilt-x))
+      rotateY(var(--hero-tilt-y)) scale(var(--hero-tilt-scale));
+    transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+
+  .hero-profile-hit-area[data-tilting='true'] .hero-profile-tilt {
+    --hero-tilt-scale: 1.012;
+    transition-duration: 90ms;
+    transition-timing-function: ease-out;
+  }
+
+  .hero-profile-tilt [data-hero-depth='front'] {
+    transform: translateZ(1.125rem);
+  }
+
+  .hero-profile-tilt [data-hero-depth='middle'] {
+    transform: translateZ(0.625rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-visual-enter {
+    animation: heroVisualReducedEnter 180ms ease-out both;
+  }
+
+  .hero-rail-enter,
+  .hero-profile-enter,
+  .hero-badge-enter,
+  .hero-link-enter,
+  .hero-orbit-motion,
+  .hero-connector-motion {
+    animation: none;
+  }
+}
+
+/* =========================================================
    Profile themes
 ========================================================= */
 [data-theme='classic'] {
