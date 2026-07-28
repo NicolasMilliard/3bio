@@ -28,7 +28,10 @@ export const SidebarEditor = () => {
   const isBusy = isSubmitting || isCheckingImage;
 
   return (
-    <Sidebar variant="floating">
+    <Sidebar
+      variant="floating"
+      className="**:data-[slot=sidebar-inner]:shadow-none"
+    >
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
           to="/dashboard"

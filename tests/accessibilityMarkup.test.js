@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { SpinnerScreen } from '../src/components/ui/SpinnerScreen.tsx';
 import { HeroSection } from '../src/features/homepage/components/HeroSection.tsx';
 import { ProfileCheckingForm } from '../src/features/homepage/components/ProfileCheckingForm.tsx';
+import { LinkButton } from '../src/features/profile/components/LinkButton.tsx';
 import { ProfileLayout } from '../src/features/profile/components/ProfileLayout.tsx';
 
 test('homepage hero labels its content and keeps the visual decorative', () => {
@@ -37,6 +38,22 @@ test('profile links use the branded canvas without changing link semantics', () 
   expect(markup).toContain('profile-links-canvas');
   expect(markup).toContain('focus-visible:ring-name-text');
   expect(markup).toContain('aria-label="External links"');
+});
+
+test('editor links use a distinct surface without moving the external icon', () => {
+  const markup = renderToStaticMarkup(
+    createElement(LinkButton, {
+      as: 'button',
+      label: 'example.com',
+      surface: 'editor',
+    }),
+  );
+
+  expect(markup).toContain('bg-sidebar-accent');
+  expect(markup).toContain('bg-accent');
+  expect(markup).toContain('focus-visible:ring-sidebar-ring');
+  expect(markup).not.toContain('group-hover:translate-x');
+  expect(markup).not.toContain('transition-transform');
 });
 
 test('homepage profile form exposes a real label and new-tab notice', () => {

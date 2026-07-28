@@ -8,7 +8,7 @@ import {
   SidebarProvider,
   SpinnerScreen,
 } from '@/components/ui';
-import { PrivateRouteDocumentMetadata } from '@/components/layout';
+import { AppShell, PrivateRouteDocumentMetadata } from '@/components/layout';
 import { AuthGuard } from '@/features/auth/components';
 import { EditorScreen } from '@/features/editor/components/EditorScreen';
 import { NotFoundScreen } from '@/features/profile/components';
@@ -23,7 +23,7 @@ function EditorPage() {
   return (
     <>
       <PrivateRouteDocumentMetadata title="Edit profile | 3bio" />
-      <AuthGuard>
+      <AuthGuard fallbackLayout={AppShell}>
         <EditorContent
           key={requestKey}
           onRetry={() => setRequestKey((key) => key + 1)}

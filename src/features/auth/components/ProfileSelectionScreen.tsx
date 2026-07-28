@@ -60,7 +60,7 @@ const ProfileSelectionQuery = ({
   };
 
   return (
-    <section className="mt-30 flex flex-col items-center gap-8 px-4 text-center">
+    <section className="my-30 flex flex-col items-center gap-8 px-4 text-center">
       <div className="space-y-2">
         <Text variant="h1">Choose your profile</Text>
         <Text className="max-w-97">

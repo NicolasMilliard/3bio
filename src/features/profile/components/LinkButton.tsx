@@ -17,6 +17,7 @@ type LinkButtonBaseProps = {
   className?: string;
   interactive?: boolean;
   loadFavicon?: boolean;
+  surface?: 'profile' | 'editor';
 };
 
 type LinkButtonProps = LinkButtonBaseProps &
@@ -41,6 +42,7 @@ export const LinkButton = forwardRef<
     className = '',
     interactive = true,
     loadFavicon = true,
+    surface = 'profile',
     as = 'link',
     ...elementProps
   },
@@ -68,10 +70,25 @@ export const LinkButton = forwardRef<
 
     setFavicon({ hostname, src: null });
   };
+  const isEditorSurface = surface === 'editor';
+  const iconSurfaceClassName = isEditorSurface
+    ? 'bg-accent text-accent-foreground'
+    : 'bg-links-icon-background text-links-icon';
+  const linkSurfaceClassName = isEditorSurface
+    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+    : 'bg-links-background text-links-text';
+  const interactiveSurfaceClassName = isEditorSurface
+    ? 'hover:bg-sidebar-accent/75 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar'
+    : 'hover:bg-links-background/90 focus-visible:ring-links-text';
 
   const content = (
     <>
-      <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full">
+      <span
+        className={cn(
+          'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full',
+          iconSurfaceClassName,
+        )}
+      >
         {imgSrc ? (
           <Image
             src={imgSrc}
@@ -90,11 +107,13 @@ export const LinkButton = forwardRef<
         {label}
       </span>
 
-      <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-full">
-        <ExternalLink
-          aria-hidden="true"
-          className="size-3.5 transition-transform group-hover:translate-x-0.5"
-        />
+      <span
+        className={cn(
+          'flex size-6 shrink-0 items-center justify-center rounded-full',
+          iconSurfaceClassName,
+        )}
+      >
+        <ExternalLink aria-hidden="true" className="size-3.5" />
       </span>
     </>
   );
@@ -102,7 +121,12 @@ export const LinkButton = forwardRef<
   return (
     <div className={cn('w-full max-w-60', className)}>
       {!interactive ? (
-        <div className="group bg-links-background text-links-text flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal">
+        <div
+          className={cn(
+            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal',
+            linkSurfaceClassName,
+          )}
+        >
           {content}
         </div>
       ) : as === 'button' ? (
@@ -110,7 +134,11 @@ export const LinkButton = forwardRef<
           {...(elementProps as ButtonHTMLAttributes<HTMLButtonElement>)}
           ref={ref as Ref<HTMLButtonElement>}
           type="button"
-          className="group bg-links-background text-links-text hover:bg-links-background/90 focus-visible:ring-links-text flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner"
+          className={cn(
+            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            linkSurfaceClassName,
+            interactiveSurfaceClassName,
+          )}
         >
           {content}
         </button>
@@ -121,7 +149,11 @@ export const LinkButton = forwardRef<
           href={href}
           target="_blank"
           rel="ugc noopener noreferrer"
-          className="group bg-links-background text-links-text hover:bg-links-background/90 focus-visible:ring-links-text flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner"
+          className={cn(
+            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            linkSurfaceClassName,
+            interactiveSurfaceClassName,
+          )}
         >
           {content}
           <span className="sr-only"> (opens in a new tab)</span>

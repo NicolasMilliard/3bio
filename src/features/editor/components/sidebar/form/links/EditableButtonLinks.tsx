@@ -90,6 +90,7 @@ export const EditableButtonLinks = () => {
             <LinkButton
               as="button"
               label={formatUrlLabel(link)}
+              surface="editor"
               className="mb-4"
             />
           </DialogTrigger>
