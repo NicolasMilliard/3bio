@@ -2,7 +2,10 @@ import { expect, test } from 'bun:test';
 import { MetadataAttributeType } from '@lens-protocol/metadata';
 
 import { SOCIAL_MAP, THREE_BIO_DEFAULT_THEME } from '../src/constants/index.ts';
-import { socialLinkSchema } from '../src/features/editor/schemas/metadataForm.schema.ts';
+import {
+  metadataFormSchema,
+  socialLinkSchema,
+} from '../src/features/editor/schemas/metadataForm.schema.ts';
 import { profileCheckingFormSchema } from '../src/features/homepage/schema/profileCheckingForm.schema.ts';
 import { formatSocialLink } from '../src/helpers/formatSocialLink.ts';
 import { formatUrlLabel } from '../src/helpers/formatUrlLabel.ts';
@@ -52,6 +55,51 @@ test('an empty social URL remains valid when a user removes a link', () => {
   expect(
     socialLinkSchema.safeParse({ platform: 'github', url: '' }).success,
   ).toBe(true);
+});
+
+test('image form values cannot persist non-HTTP URLs', () => {
+  const formValues = {
+    _imageValidation: {
+      avatar: false,
+      coverPicture: false,
+    },
+    avatar: { preview: 'https://images.example/avatar.png' },
+    coverPicture: { preview: null },
+    theme: THREE_BIO_DEFAULT_THEME,
+  };
+
+  expect(metadataFormSchema.safeParse(formValues).success).toBe(true);
+
+  for (const preview of [
+    'ipfs://example/avatar.png',
+    'lens://example/avatar.png',
+    'javascript:alert(1)',
+  ]) {
+    expect(
+      metadataFormSchema.safeParse({
+        ...formValues,
+        avatar: { preview },
+      }).success,
+    ).toBe(false);
+  }
+
+  const localFile = new File(['image'], 'avatar.png', {
+    type: 'image/png',
+  });
+  const localPreview = 'blob:https://3bio.social/local-preview';
+
+  expect(
+    metadataFormSchema.safeParse({
+      ...formValues,
+      avatar: { file: localFile, preview: localPreview },
+    }).success,
+  ).toBe(true);
+  expect(
+    metadataFormSchema.safeParse({
+      ...formValues,
+      avatar: { preview: localPreview },
+    }).success,
+  ).toBe(false);
 });
 
 test('social links accept canonical host variants and reject mismatched hosts', () => {

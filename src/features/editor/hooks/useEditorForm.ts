@@ -21,12 +21,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
 import { useForm, type SubmitErrorHandler } from 'react-hook-form';
 import { toast } from 'sonner';
+import { buildPersistedThreeBioMetadata } from '../helpers/buildPersistedThreeBioMetadata';
 import { getTransactionFailureReason } from '../helpers/getTransactionFailureReason';
 import { getMetadataUploadCacheKey } from '../helpers/metadataUploadCache';
-import {
-  toLinkAttributes,
-  toSocialLinkAttributes,
-} from '../helpers/metadataAttributes';
 import {
   getSaveErrorFeedback,
   type SaveStage,
@@ -273,22 +270,12 @@ export function useEditorForm(
       saveStage = 'uploading-profile-data';
       toast.loading('Uploading profile data...', { id: toastId });
 
-      const nextThreeBioMetadata = {
-        ...threeBioMetadata,
-        profile: {
-          avatar: avatarUri ?? undefined,
-          coverPicture: coverPictureUri ?? undefined,
-          name: values.name,
-          bio: values.bio,
-          socialLinks: toSocialLinkAttributes(values.socialLinks),
-          links: toLinkAttributes(values.links),
-        },
-        theme: {
-          name: values.theme,
-          displayStatistics: values.displayStatistics ?? true,
-          displayBranding: values.displayBranding ?? true,
-        },
-      };
+      const nextThreeBioMetadata = buildPersistedThreeBioMetadata({
+        current: threeBioMetadata,
+        values,
+        avatarUri,
+        coverPictureUri,
+      });
 
       const metadataKey = getMetadataUploadCacheKey(
         account.metadata,

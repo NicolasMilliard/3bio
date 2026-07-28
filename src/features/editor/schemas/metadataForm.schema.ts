@@ -4,14 +4,34 @@ import { threeBioThemeNameSchema } from '@/schemas/threeBioMetadata.schema';
 import { z } from 'zod';
 import { imageUploadFileSchema } from './imageUpload.schema';
 
+const localImagePreviewUrlSchema = z.url({
+  protocol: /^blob$/,
+  error: 'Use an HTTP or HTTPS image, or upload a new image.',
+});
 const optionalPreviewUrl = z
-  .union([z.url(), z.literal('')])
+  .union([httpUrlSchema, localImagePreviewUrlSchema, z.literal('')], {
+    error: 'Use an HTTP or HTTPS image, or upload a new image.',
+  })
   .nullable()
   .optional();
 const optionalHttpUrl = z
   .union([z.literal(''), httpUrlSchema])
   .nullable()
   .optional();
+const imageFormValueSchema = z
+  .object({
+    file: imageUploadFileSchema.optional(),
+    preview: optionalPreviewUrl,
+  })
+  .superRefine(({ file, preview }, context) => {
+    if (typeof preview === 'string' && preview.startsWith('blob:') && !file) {
+      context.addIssue({
+        code: 'custom',
+        path: ['preview'],
+        message: 'Choose the local image again before saving.',
+      });
+    }
+  });
 
 export const socialLinkSchema = z
   .object({
@@ -39,14 +59,8 @@ export const metadataFormSchema = z.object({
     avatar: z.boolean(),
     coverPicture: z.boolean(),
   }),
-  avatar: z.object({
-    file: imageUploadFileSchema.optional(),
-    preview: optionalPreviewUrl,
-  }),
-  coverPicture: z.object({
-    file: imageUploadFileSchema.optional(),
-    preview: optionalPreviewUrl,
-  }),
+  avatar: imageFormValueSchema,
+  coverPicture: imageFormValueSchema,
   name: z.string().optional(),
   bio: z.string().optional(),
   socialLinks: z.array(socialLinkSchema).optional(),

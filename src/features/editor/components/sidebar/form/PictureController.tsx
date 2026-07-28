@@ -43,12 +43,12 @@ export const PictureController = ({
   const validationRequestRef = useRef(0);
   const [isValidating, setIsValidating] = useState(false);
   const currentPicture = useWatch({ control, name: formValue })?.preview;
-  const fileError = errors[formValue]?.file;
+  const imageError = errors[formValue]?.file ?? errors[formValue]?.preview;
   const normalizedLabel = label.toLowerCase();
   const inputId = `${formValue}-image`;
   const validationField = `_imageValidation.${formValue}` as const;
   const descriptionId = `${inputId}-description`;
-  const errorId = fileError ? `${inputId}-error` : undefined;
+  const errorId = imageError ? `${inputId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ');
   const previewClassName =
     formValue === 'avatar' ? 'size-8 rounded-full' : 'h-8 w-12 rounded-md';
@@ -82,7 +82,7 @@ export const PictureController = ({
     const requestId = ++validationRequestRef.current;
     setIsValidating(true);
     setValue(validationField, true, { shouldDirty: false });
-    clearErrors(`${formValue}.file`);
+    clearErrors(formValue);
 
     try {
       const validationError = await validateImageUpload(selectedFile);
@@ -124,7 +124,7 @@ export const PictureController = ({
   };
 
   const removePicture = () => {
-    clearErrors(`${formValue}.file`);
+    clearErrors(formValue);
     setValue(
       formValue,
       { file: undefined, preview: null },
@@ -145,7 +145,7 @@ export const PictureController = ({
             type="button"
             aria-busy={isValidating}
             aria-describedby={describedBy}
-            aria-invalid={Boolean(fileError)}
+            aria-invalid={Boolean(imageError)}
             disabled={isValidating}
             className="bg-input/50 hover:bg-input/70 focus-visible:border-ring focus-visible:ring-ring/30 flex h-10 w-full items-center gap-3 rounded-3xl border border-transparent px-3 text-left text-sm transition-[color,box-shadow,background-color] outline-none select-none focus-visible:ring-3"
           >
@@ -193,7 +193,7 @@ export const PictureController = ({
         {[description, IMAGE_UPLOAD_HELP_TEXT].filter(Boolean).join(' ')}
       </Text>
 
-      <FieldError id={errorId} errors={[fileError]} />
+      <FieldError id={errorId} errors={[imageError]} />
 
       <input
         id={inputId}
@@ -201,7 +201,7 @@ export const PictureController = ({
         type="file"
         accept={IMAGE_UPLOAD_ACCEPT}
         aria-describedby={describedBy}
-        aria-invalid={Boolean(fileError)}
+        aria-invalid={Boolean(imageError)}
         className="hidden"
         onChange={(event) => void onFileChange(event)}
       />
