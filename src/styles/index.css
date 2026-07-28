@@ -149,13 +149,15 @@
   --ring: oklch(0.4509 0.2989 266.03);
   --avatar-background: oklch(0.87966 0.10803 324.91);
   --avatar-foreground: oklch(0.16833 0.10425 269.45);
+  --profile-canvas-accent: var(--avatar-background);
+  --profile-scrollbar: var(--links-background);
   --name-text: oklch(0.4509 0.2989 266.03);
   --bio-text: oklch(0.16833 0.10425 269.45);
   --icons: oklch(0.4509 0.2989 266.03);
   --statistics-background: oklch(1 0 0);
   --statistics-title: oklch(0.52 0.11 285.11);
   --statistics-number: oklch(0.4509 0.2989 266.03);
-  --content-background: oklch(0.87966 0.10803 324.91);
+  --content-background: var(--primary);
   --links-text: oklch(0.16833 0.10425 269.45);
   --links-background: oklch(1 0 0);
   --links-icon-background: oklch(0.88531 0 0);
@@ -178,6 +180,8 @@
   --ring: oklch(0.72945 0.16825 16.45);
   --avatar-background: oklch(0.72945 0.16825 16.45);
   --avatar-foreground: oklch(0.27402 0.09174 296.72);
+  --profile-canvas-accent: var(--avatar-background);
+  --profile-scrollbar: var(--links-background);
   --name-text: oklch(0.72945 0.16825 16.45);
   --bio-text: oklch(0.87986 0.02665 242.78);
   --icons: oklch(0.72945 0.16825 16.45);
@@ -207,6 +211,8 @@
   --ring: oklch(0.27404 0.04625 241.44);
   --avatar-background: oklch(0.79768 0.11121 202.49);
   --avatar-foreground: oklch(0.27404 0.04625 241.44);
+  --profile-canvas-accent: var(--primary);
+  --profile-scrollbar: var(--primary);
   --name-text: oklch(0.27404 0.04625 241.44);
   --bio-text: oklch(0.48333 0.09234 242.02);
   --icons: oklch(0.48333 0.09234 242.02);
@@ -222,7 +228,11 @@
 }
 
 .profile-content-scroll {
-  scrollbar-color: color-mix(in oklab, var(--links-text) 35%, transparent)
+  scrollbar-color: color-mix(
+      in oklab,
+      var(--profile-scrollbar) 70%,
+      transparent
+    )
     transparent;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
@@ -233,10 +243,34 @@
 }
 
 .profile-content-scroll::-webkit-scrollbar-thumb {
-  background: color-mix(in oklab, var(--links-text) 35%, transparent);
+  background: color-mix(in oklab, var(--profile-scrollbar) 70%, transparent);
   border: 0.125rem solid transparent;
   border-radius: 999px;
   background-clip: padding-box;
+}
+
+.profile-links-canvas {
+  background-image:
+    radial-gradient(
+      circle at 100% 0%,
+      transparent 0 5rem,
+      color-mix(in oklab, var(--profile-canvas-accent) 24%, transparent) 5.1rem
+        8.5rem,
+      transparent 8.6rem
+    ),
+    radial-gradient(
+      circle at 78% 70%,
+      transparent 0 7rem,
+      color-mix(in oklab, var(--links-background) 18%, transparent) 7.1rem
+        7.2rem,
+      transparent 7.3rem
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      color-mix(in oklab, var(--links-background) 11%, transparent) 0 4.5rem,
+      transparent 4.6rem
+    );
+  background-repeat: no-repeat;
 }
 
 .profile-viewport {

@@ -1,21 +1,33 @@
-import { heroImages } from '@/assets/hero';
 import { THREEBIO_GITHUB_URL } from '@/constants';
 
-import { Image, Text } from '@/components/ui';
+import { Text } from '@/components/ui';
+import { HeroVisual } from './HeroVisual';
 import { ProfileCheckingForm } from './ProfileCheckingForm';
 
 export const HeroSection = () => {
   return (
-    <section className="bg-secondary min-h-dvh pt-28 pb-8">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-16 px-4 md:flex-row">
-        <div className="mx-auto flex flex-col gap-10 md:mx-0">
+    <section
+      aria-labelledby="home-hero-title"
+      className="bg-secondary min-h-dvh overflow-hidden pt-28 pb-10 sm:pt-32 sm:pb-14"
+    >
+      <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(24rem,1.1fr)] lg:gap-16">
+        <div className="mx-auto flex w-full max-w-xl flex-col gap-8 lg:mx-0">
+          <p className="text-primary flex animate-[blurFadeIn_0.8s_ease-out_forwards] items-center gap-3 text-xs font-black tracking-[0.2em] uppercase motion-reduce:animate-none">
+            <span className="bg-accent size-2.5 rounded-full" />
+            Your profile, your space
+          </p>
           <Text
+            id="home-hero-title"
             variant="h1"
-            className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_forwards] motion-reduce:animate-none"
+            className="isolate max-w-xl animate-[blurFadeIn_0.8s_ease-out_0.08s_forwards] text-[clamp(2.75rem,5.5vw,4.25rem)] leading-[0.98] tracking-[-0.055em] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
           >
-            Finally, your decentralized link&nbsp;in&nbsp;bio.
+            Finally, your{' '}
+            <span className="after:bg-accent relative inline-block after:absolute after:bottom-[0.04em] after:left-0 after:-z-10 after:h-[0.16em] after:w-full after:rounded-full after:content-['']">
+              decentralized
+            </span>{' '}
+            link&nbsp;in&nbsp;bio.
           </Text>
-          <Text className="max-w-97 animate-[blurFadeIn_0.8s_ease-out_0.15s_forwards] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100">
+          <Text className="max-w-lg animate-[blurFadeIn_0.8s_ease-out_0.18s_forwards] text-base leading-7 opacity-0 motion-reduce:animate-none motion-reduce:opacity-100 sm:text-lg">
             Turn your Lens profile into a link&nbsp;in&nbsp;bio page you can
             customize and share. 3bio is{' '}
             <a
@@ -31,14 +43,7 @@ export const HeroSection = () => {
           </Text>
           <ProfileCheckingForm />
         </div>
-        <Image
-          src={heroImages.homepageHero}
-          loading="eager"
-          fetchPriority="high"
-          alt=""
-          aria-hidden="true"
-          className="animate-[blurFadeIn_0.8s_ease-out_0.45s_forwards] rounded-4xl opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"
-        />
+        <HeroVisual />
       </div>
     </section>
   );

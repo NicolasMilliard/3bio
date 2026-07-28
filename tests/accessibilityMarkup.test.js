@@ -3,7 +3,41 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { SpinnerScreen } from '../src/components/ui/SpinnerScreen.tsx';
+import { HeroSection } from '../src/features/homepage/components/HeroSection.tsx';
 import { ProfileCheckingForm } from '../src/features/homepage/components/ProfileCheckingForm.tsx';
+import { ProfileLayout } from '../src/features/profile/components/ProfileLayout.tsx';
+
+test('homepage hero labels its content and keeps the visual decorative', () => {
+  const markup = renderToStaticMarkup(createElement(HeroSection));
+
+  expect(markup).toContain('aria-labelledby="home-hero-title"');
+  expect(markup).toContain('id="home-hero-title"');
+  expect(markup).toContain('aria-hidden="true" data-hero-visual="true"');
+  expect(markup).not.toContain('<img');
+  expect(markup).not.toContain('@miravale');
+  expect(markup).toContain('data-hero-layer="socials"');
+  expect(markup).toContain('data-hero-layer="link-3"');
+});
+
+test('profile links use the branded canvas without changing link semantics', () => {
+  const markup = renderToStaticMarkup(
+    createElement(ProfileLayout, {
+      lensHandle: 'miravale',
+      profile: {
+        name: 'Mira Vale',
+        links: [{ key: 'portfolio', value: 'https://example.com/work' }],
+      },
+      displayStatistics: false,
+      displayBranding: false,
+      mode: 'preview',
+    }),
+  );
+
+  expect(markup).toContain('aria-label="Profile links"');
+  expect(markup).toContain('profile-links-canvas');
+  expect(markup).toContain('focus-visible:ring-name-text');
+  expect(markup).toContain('aria-label="External links"');
+});
 
 test('homepage profile form exposes a real label and new-tab notice', () => {
   const markup = renderToStaticMarkup(createElement(ProfileCheckingForm));

@@ -96,10 +96,12 @@ export const ProfileLayout = ({
           <section
             ref={contentPanelRef}
             aria-label="Profile links"
-            className="profile-links-panel profile-content-scroll bg-content-background min-h-48 w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] rounded-4xl px-5 py-6 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:animate-none sm:px-8"
+            className="profile-links-panel profile-links-canvas profile-content-scroll bg-content-background focus-visible:ring-name-text focus-visible:ring-offset-background relative isolate min-h-48 w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] rounded-4xl px-5 py-6 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:animate-none sm:px-8"
             tabIndex={profile.links?.length ? 0 : undefined}
           >
-            <Links links={profile.links} interactive={isInteractive} />
+            <div className="relative z-10">
+              <Links links={profile.links} interactive={isInteractive} />
+            </div>
           </section>
 
           {displayBranding && (
