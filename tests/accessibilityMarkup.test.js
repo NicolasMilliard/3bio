@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -56,6 +57,23 @@ test('creator rights reveal preserves the section and list semantics', () => {
   expect(markup).toContain('data-creator-rights-row="3"');
   expect(markup.match(/data-creator-rights-motion="row"/g)).toHaveLength(3);
   expect(markup).toContain('<ol');
+});
+
+test('pricing reveal keeps its heading and complete plan card together', () => {
+  const source = readFileSync(
+    new URL(
+      '../src/features/homepage/components/PricingSection.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+
+  expect(source).toContain('aria-labelledby="pricing-title"');
+  expect(source).toContain('id="pricing-title"');
+  expect(source).toContain('data-pricing-reveal');
+  expect(source).toContain('data-pricing-motion="header"');
+  expect(source).toContain('data-pricing-motion="card"');
+  expect(source).not.toContain('data-pricing-motion="feature"');
 });
 
 test('profile links use the branded canvas without changing link semantics', () => {

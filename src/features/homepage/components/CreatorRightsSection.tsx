@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-
 import { Text } from '@/components/ui';
 import { Fingerprint, Globe2, ShieldCheck } from 'lucide-react';
+
+import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
 
 const CREATOR_RIGHTS = [
   {
@@ -28,43 +28,9 @@ const CREATOR_RIGHTS = [
 ];
 
 export const CreatorRightsSection = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) {
-      return;
-    }
-
-    const revealSection = () => {
-      section.dataset.creatorRightsVisible = 'true';
-    };
-
-    if (!('IntersectionObserver' in window)) {
-      revealSection();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) {
-          return;
-        }
-
-        revealSection();
-        observer.disconnect();
-      },
-      {
-        rootMargin: '0px 0px -10% 0px',
-        threshold: 0.18,
-      },
-    );
-
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, []);
+  const sectionRef = useRevealOnScroll<HTMLElement>(
+    'data-creator-rights-visible',
+  );
 
   return (
     <section

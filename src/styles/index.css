@@ -434,6 +434,50 @@
 }
 
 /* =========================================================
+   Pricing entrance
+========================================================= */
+[data-pricing-reveal] [data-pricing-motion] {
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-pricing-motion='header'] {
+  opacity: 0;
+  transform: translate3d(0, 1rem, 0);
+  transition-duration: 520ms;
+}
+
+[data-pricing-motion='card'] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0) scale(0.985);
+  transition-delay: 120ms;
+  transition-duration: 680ms;
+}
+
+[data-pricing-visible='true'] [data-pricing-motion='header'],
+[data-pricing-visible='true'] [data-pricing-motion='card'] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pricing-reveal] [data-pricing-motion] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-pricing-reveal] [data-pricing-motion='content'] {
+    opacity: 0;
+    transition: opacity 180ms ease-out;
+  }
+
+  [data-pricing-visible='true'] [data-pricing-motion='content'] {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
    Profile themes
 ========================================================= */
 [data-theme='classic'] {
