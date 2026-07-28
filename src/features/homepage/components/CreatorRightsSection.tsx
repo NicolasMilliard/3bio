@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 import { Text } from '@/components/ui';
 import { Fingerprint, Globe2, ShieldCheck } from 'lucide-react';
 
@@ -26,18 +28,63 @@ const CREATOR_RIGHTS = [
 ];
 
 export const CreatorRightsSection = () => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) {
+      return;
+    }
+
+    const revealSection = () => {
+      section.dataset.creatorRightsVisible = 'true';
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      revealSection();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        revealSection();
+        observer.disconnect();
+      },
+      {
+        rootMargin: '0px 0px -10% 0px',
+        threshold: 0.18,
+      },
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="creator-rights-title"
+      data-creator-rights-reveal
       className="mx-auto w-full max-w-6xl px-4"
     >
-      <div className="bg-primary text-primary-foreground relative isolate overflow-hidden rounded-[2.5rem] sm:rounded-[3rem]">
+      <div
+        data-creator-rights-motion="panel"
+        className="bg-primary text-primary-foreground relative isolate overflow-hidden rounded-[2.5rem] sm:rounded-[3rem]"
+      >
         <div
           aria-hidden="true"
+          data-creator-rights-motion="orbit"
           className="border-accent/10 pointer-events-none absolute -top-28 -right-24 size-80 rounded-full border-52"
         />
         <span
           aria-hidden="true"
+          data-creator-rights-motion="wordmark"
           className="text-accent/10 pointer-events-none absolute -right-6 -bottom-16 hidden text-[11rem] leading-none font-black tracking-[-0.08em] select-none sm:block lg:text-[15rem]"
         >
           YOURS
@@ -46,6 +93,7 @@ export const CreatorRightsSection = () => {
         <div className="grid lg:grid-cols-[6.5rem_minmax(0,1fr)]">
           <div
             aria-hidden="true"
+            data-creator-rights-motion="rail"
             className="bg-accent text-accent-foreground hidden flex-col items-center justify-between py-10 lg:flex"
           >
             <span className="rotate-180 text-xs font-bold tracking-[0.35em] [writing-mode:vertical-rl]">
@@ -56,7 +104,7 @@ export const CreatorRightsSection = () => {
 
           <div className="relative z-10 p-6 sm:p-10 lg:p-14">
             <div className="flex items-start justify-between gap-8">
-              <div className="max-w-3xl">
+              <div data-creator-rights-motion="header" className="max-w-3xl">
                 <p className="text-accent mb-4 text-xs font-bold tracking-[0.22em] uppercase lg:hidden">
                   Creator rights
                 </p>
@@ -79,7 +127,8 @@ export const CreatorRightsSection = () => {
 
               <div
                 aria-hidden="true"
-                className="border-accent text-accent hidden shrink-0 rotate-6 rounded-full border-2 px-5 py-3 text-center text-[0.65rem] leading-4 font-black tracking-[0.16em] uppercase sm:block"
+                data-creator-rights-motion="stamp"
+                className="border-accent text-accent hidden shrink-0 rounded-full border-2 px-5 py-3 text-center text-[0.65rem] leading-4 font-black tracking-[0.16em] uppercase sm:block"
               >
                 Creator
                 <br />
@@ -87,11 +136,16 @@ export const CreatorRightsSection = () => {
               </div>
             </div>
 
-            <ol className="border-primary-foreground/20 mt-10 border-y">
+            <ol
+              data-creator-rights-motion="list"
+              className="border-primary-foreground/20 mt-10 border-y"
+            >
               {CREATOR_RIGHTS.map(
                 ({ action, title, description, icon: Icon }, index) => (
                   <li
                     key={title}
+                    data-creator-rights-motion="row"
+                    data-creator-rights-row={index + 1}
                     className="border-primary-foreground/20 grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t py-7 first:border-t-0 lg:grid-cols-[4rem_3rem_14rem_minmax(0,1fr)] lg:items-start lg:gap-x-6"
                   >
                     <span

@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { SpinnerScreen } from '../src/components/ui/SpinnerScreen.tsx';
+import { CreatorRightsSection } from '../src/features/homepage/components/CreatorRightsSection.tsx';
 import { HeroSection } from '../src/features/homepage/components/HeroSection.tsx';
 import { calculateHeroTilt } from '../src/features/homepage/components/heroMotion.ts';
 import { ProfileCheckingForm } from '../src/features/homepage/components/ProfileCheckingForm.tsx';
@@ -42,6 +43,19 @@ test('hero card tilt is neutral at center and capped at its corners', () => {
     rotateX: 0,
     rotateY: 0,
   });
+});
+
+test('creator rights reveal preserves the section and list semantics', () => {
+  const markup = renderToStaticMarkup(createElement(CreatorRightsSection));
+
+  expect(markup).toContain('aria-labelledby="creator-rights-title"');
+  expect(markup).toContain('id="creator-rights-title"');
+  expect(markup).toContain('data-creator-rights-reveal="true"');
+  expect(markup).toContain('data-creator-rights-motion="panel"');
+  expect(markup).toContain('data-creator-rights-motion="header"');
+  expect(markup).toContain('data-creator-rights-row="3"');
+  expect(markup.match(/data-creator-rights-motion="row"/g)).toHaveLength(3);
+  expect(markup).toContain('<ol');
 });
 
 test('profile links use the branded canvas without changing link semantics', () => {
