@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { GithubIcon, InstagramIcon, YouTubeIcon } from '@/components/icons';
 import { ExternalLink, Link2, ShieldCheck, Sparkles } from 'lucide-react';
@@ -153,7 +153,7 @@ export const HeroVisual = () => {
               <div data-hero-tilt className="hero-profile-tilt">
                 <div
                   data-theme="classic"
-                  className="bg-primary-foreground relative -rotate-1 rounded-[1.75rem] p-3 shadow-[0_2rem_4.5rem_rgba(4,2,59,0.34)] [transform-style:preserve-3d] sm:rounded-[2.25rem] sm:p-5"
+                  className="bg-primary-foreground relative -rotate-1 rounded-[1.75rem] p-3 shadow-[0_2rem_4.5rem_rgba(4,2,59,0.34)] transform-3d sm:rounded-[2.25rem] sm:p-5"
                 >
                   <div
                     data-hero-layer="identity"
