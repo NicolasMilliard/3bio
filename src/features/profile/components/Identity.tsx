@@ -33,7 +33,7 @@ export const Identity = ({
           {name ?? `@${lensHandle}`}
         </Text>
         {bio && (
-          <Text className="text-bio-text mt-4 max-w-97 leading-[1.3]">
+          <Text className="text-bio-text mt-4 max-w-97 whitespace-pre-line leading-[1.3]">
             {bio}
           </Text>
         )}
