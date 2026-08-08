@@ -4,6 +4,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarTrigger,
   Text,
 } from '@/components/ui';
 import { Link } from '@tanstack/react-router';
@@ -32,6 +33,10 @@ export const SidebarEditor = () => {
       variant="floating"
       className="**:data-[slot=sidebar-inner]:shadow-none"
     >
+      <SidebarTrigger
+        type="button"
+        className="bg-card/90 absolute top-4 left-full z-30 ml-4 shadow-sm backdrop-blur"
+      />
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
           to="/dashboard"

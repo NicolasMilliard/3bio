@@ -139,6 +139,31 @@ test('editor links use a distinct surface without moving the external icon', () 
   expect(markup).not.toContain('transition-transform');
 });
 
+test('editor sidebar toggle follows the sidebar and reopens from the mobile preview', () => {
+  const editorScreen = readFileSync(
+    new URL(
+      '../src/features/editor/components/EditorScreen.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+  const sidebarEditor = readFileSync(
+    new URL(
+      '../src/features/editor/components/SidebarEditor.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+
+  expect(sidebarEditor).toContain('absolute top-4 left-full');
+  expect(sidebarEditor).toContain(' ml-4');
+  expect(sidebarEditor).not.toContain('md:ml-4');
+  expect(editorScreen).toContain('!openMobile');
+  expect(editorScreen).toContain('fixed top-4 left-4');
+  expect(editorScreen).toContain('md:hidden');
+  expect(editorScreen).not.toContain('right-4');
+});
+
 test('homepage profile form exposes a real label and new-tab notice', () => {
   const markup = renderToStaticMarkup(createElement(ProfileCheckingForm));
   const label = markup.match(
