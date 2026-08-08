@@ -96,6 +96,29 @@ test('profile links use the branded canvas without changing link semantics', () 
   expect(markup).toContain('aria-label="External links"');
 });
 
+test('preview and public profiles preserve multiline bios as plain text', () => {
+  for (const mode of ['preview', 'public']) {
+    const markup = renderToStaticMarkup(
+      createElement(ProfileLayout, {
+        lensHandle: 'miravale',
+        profile: {
+          name: 'Mira Vale',
+          bio: 'First line\nSecond line <strong>not bold</strong>',
+        },
+        displayStatistics: false,
+        displayBranding: false,
+        mode,
+      }),
+    );
+
+    expect(markup).toContain('whitespace-pre-line');
+    expect(markup).toContain(
+      'First line\nSecond line &lt;strong&gt;not bold&lt;/strong&gt;',
+    );
+    expect(markup).not.toContain('<strong>not bold</strong>');
+  }
+});
+
 test('editor links use a distinct surface without moving the external icon', () => {
   const markup = renderToStaticMarkup(
     createElement(LinkButton, {
