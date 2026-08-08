@@ -106,7 +106,11 @@ test('editor links use a distinct surface without moving the external icon', () 
   );
 
   expect(markup).toContain('bg-sidebar-accent');
-  expect(markup).toContain('bg-accent');
+  expect(markup).toContain('bg-links-icon-background');
+  expect(markup).toContain('text-links-icon');
+  expect(markup.match(/bg-links-icon-background/g)).toHaveLength(2);
+  expect(markup).not.toContain('bg-accent');
+  expect(markup).not.toContain('<img');
   expect(markup).toContain('focus-visible:ring-sidebar-ring');
   expect(markup).not.toContain('group-hover:translate-x');
   expect(markup).not.toContain('transition-transform');

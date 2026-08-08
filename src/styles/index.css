@@ -102,6 +102,8 @@
   --sidebar-ring: oklch(0.45 0.3 266); /* #1710F7 */
 
   --avatar-foreground: var(--foreground);
+  --links-icon-background: oklch(0.88531 0 0); /* neutral icon chip */
+  --links-icon: oklch(0.16833 0.10425 269.45 / 60%);
 }
 
 @layer base {
