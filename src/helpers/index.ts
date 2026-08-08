@@ -4,6 +4,7 @@ export * from './formatMetadataBeforeUpload';
 export * from './formatSocialLink';
 export * from './formatToThreeBioMetadata';
 export * from './formatUrlLabel';
+export * from './getFaviconCandidates';
 export * from './getHostname';
 export * from './getThreeBioProfile';
 export * from './isSocialProfileUrl';

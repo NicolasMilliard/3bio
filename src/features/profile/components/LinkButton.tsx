@@ -1,4 +1,4 @@
-import { getHostname } from '@/helpers';
+import { getFaviconCandidates, getNextFaviconCandidate } from '@/helpers';
 import { cn } from '@/lib/utils';
 import {
   forwardRef,
@@ -48,32 +48,34 @@ export const LinkButton = forwardRef<
   },
   ref,
 ) {
-  const hostname = getHostname(href);
-  const primaryFavicon =
-    loadFavicon && hostname ? `https://${hostname}/favicon.ico` : null;
+  const faviconCandidates = loadFavicon ? getFaviconCandidates(href) : [];
+  const faviconKey = faviconCandidates.join('|');
+  const primaryFavicon = faviconCandidates[0] ?? null;
   const [favicon, setFavicon] = useState({
-    hostname,
+    key: faviconKey,
     src: primaryFavicon,
+    loaded: false,
   });
-  const imgSrc = favicon.hostname === hostname ? favicon.src : primaryFavicon;
-
-  const fallbackFavicon =
-    loadFavicon && hostname
-      ? `https://www.google.com/s2/favicons?domain=${hostname}`
-      : null;
+  const activeFavicon =
+    favicon.key === faviconKey
+      ? favicon
+      : { key: faviconKey, src: primaryFavicon, loaded: false };
+  const imgSrc = activeFavicon.src;
 
   const handleImageError = () => {
-    if (imgSrc && imgSrc !== fallbackFavicon) {
-      setFavicon({ hostname, src: fallbackFavicon });
-      return;
-    }
+    setFavicon({
+      key: faviconKey,
+      src: getNextFaviconCandidate(faviconCandidates, imgSrc),
+      loaded: false,
+    });
+  };
+  const handleImageLoad = () => {
+    if (!imgSrc) return;
 
-    setFavicon({ hostname, src: null });
+    setFavicon({ key: faviconKey, src: imgSrc, loaded: true });
   };
   const isEditorSurface = surface === 'editor';
-  const iconSurfaceClassName = isEditorSurface
-    ? 'bg-accent text-accent-foreground'
-    : 'bg-links-icon-background text-links-icon';
+  const iconSurfaceClassName = 'bg-links-icon-background text-links-icon';
   const linkSurfaceClassName = isEditorSurface
     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
     : 'bg-links-background text-links-text';
@@ -85,8 +87,8 @@ export const LinkButton = forwardRef<
     <>
       <span
         className={cn(
-          'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full',
-          iconSurfaceClassName,
+          'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full transition-colors',
+          activeFavicon.loaded ? 'bg-transparent' : iconSurfaceClassName,
         )}
       >
         {imgSrc ? (
@@ -97,6 +99,7 @@ export const LinkButton = forwardRef<
             referrerPolicy="no-referrer"
             className="size-3.5 rounded-sm"
             onError={handleImageError}
+            onLoad={handleImageLoad}
           />
         ) : (
           <Link2 aria-hidden="true" className="size-3.5" />
