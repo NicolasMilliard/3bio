@@ -1,4 +1,5 @@
 import { ALL_SOCIAL_PLATFORMS, type PlatformName } from '@/constants';
+import { activateSocialLink } from '@/features/editor/helpers/socialLinkOrdering';
 import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -57,17 +58,15 @@ export const AddSocialIconLink = () => {
       return;
     }
 
-    const index = socialLinks.findIndex(
-      (link) => link.platform === pendingPlatformName,
+    setValue(
+      'socialLinks',
+      activateSocialLink(socialLinks, pendingPlatformName, normalizedUrl),
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      },
     );
-
-    if (index === -1) return;
-
-    setValue(`socialLinks.${index}.url`, normalizedUrl, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
 
     handleClose();
   };
@@ -81,8 +80,13 @@ export const AddSocialIconLink = () => {
       }}
     >
       <DialogTrigger asChild>
-        <Button type="button" variant="outline" size="icon">
-          <Plus size={16} />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Add a social link"
+        >
+          <Plus aria-hidden="true" size={16} />
         </Button>
       </DialogTrigger>
 
