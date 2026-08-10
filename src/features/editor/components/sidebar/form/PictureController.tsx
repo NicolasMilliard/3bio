@@ -1,5 +1,6 @@
 import {
   IMAGE_UPLOAD_ACCEPT,
+  IMAGE_UPLOAD_DIMENSION_HELP_TEXT,
   IMAGE_UPLOAD_HELP_TEXT,
   validateImageUpload,
 } from '@/features/editor/schemas/imageUpload.schema';
@@ -9,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -19,10 +21,10 @@ import {
   Label,
   Text,
 } from '@/components/ui';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, InfoIcon } from 'lucide-react';
 
 type PictureControllerProps = {
-  formValue: 'coverPicture' | 'avatar';
+  formValue: 'coverPicture' | 'linksPanelBackground' | 'avatar';
   label: string;
   description?: string;
 };
@@ -42,16 +44,18 @@ export const PictureController = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const validationRequestRef = useRef(0);
   const [isValidating, setIsValidating] = useState(false);
+  const [isGuidanceOpen, setIsGuidanceOpen] = useState(false);
   const currentPicture = useWatch({ control, name: formValue })?.preview;
   const imageError = errors[formValue]?.file ?? errors[formValue]?.preview;
   const normalizedLabel = label.toLowerCase();
   const inputId = `${formValue}-image`;
   const validationField = `_imageValidation.${formValue}` as const;
-  const descriptionId = `${inputId}-description`;
+  const requirementsId = `${inputId}-requirements`;
+  const guidanceId = `${inputId}-guidance`;
   const errorId = imageError ? `${inputId}-error` : undefined;
-  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ');
+  const describedBy = [requirementsId, errorId].filter(Boolean).join(' ');
   const previewClassName =
-    formValue === 'avatar' ? 'size-8 rounded-full' : 'h-8 w-12 rounded-md';
+    formValue === 'avatar' ? 'size-8 rounded-full' : 'h-8 w-12 rounded-sm';
 
   useEffect(
     () => () => {
@@ -137,7 +141,52 @@ export const PictureController = ({
 
   return (
     <FieldSet className="gap-2">
-      <Label htmlFor={inputId}>{label}</Label>
+      <div className="flex flex-col">
+        <div className="flex min-h-8 items-center gap-1.5">
+          <Label htmlFor={inputId}>{label}</Label>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Image guidance for ${normalizedLabel}`}
+            aria-controls={guidanceId}
+            aria-expanded={isGuidanceOpen}
+            className="text-muted-foreground/80 hover:border-border/80 hover:bg-background hover:text-foreground size-7 rounded-md transition-[color,background-color,border-color,box-shadow] duration-150 ease-out hover:shadow-xs active:translate-y-0 aria-expanded:border-border aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:shadow-xs"
+            onClick={() => setIsGuidanceOpen((open) => !open)}
+          >
+            <InfoIcon
+              aria-hidden="true"
+              className="size-3.5"
+              strokeWidth={1.75}
+            />
+          </Button>
+        </div>
+
+        <div
+          id={guidanceId}
+          aria-hidden={!isGuidanceOpen}
+          data-state={isGuidanceOpen ? 'open' : 'closed'}
+          className={cn(
+            'grid transition-[grid-template-rows,opacity,transform,margin-top,margin-bottom] motion-reduce:transform-none motion-reduce:transition-none',
+            isGuidanceOpen
+              ? 'mt-2.5 mb-1 grid-rows-[1fr] translate-y-0 opacity-100 duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]'
+              : 'pointer-events-none mt-0 mb-0 grid-rows-[0fr] -translate-y-1 opacity-0 duration-150 ease-out',
+          )}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="border-border/80 bg-muted/20 flex flex-col rounded-xl border px-3 py-2.5">
+              {description && (
+                <Text className="text-muted-foreground text-xs leading-relaxed">
+                  {description}
+                </Text>
+              )}
+              <Text className="border-border/70 text-foreground/80 mt-2 border-t pt-2 text-xs leading-snug font-medium">
+                {IMAGE_UPLOAD_DIMENSION_HELP_TEXT}
+              </Text>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -147,7 +196,7 @@ export const PictureController = ({
             aria-describedby={describedBy}
             aria-invalid={Boolean(imageError)}
             disabled={isValidating}
-            className="bg-input/50 hover:bg-input/70 focus-visible:border-ring focus-visible:ring-ring/30 flex h-10 w-full items-center gap-3 rounded-3xl border border-transparent px-3 text-left text-sm transition-[color,box-shadow,background-color] outline-none select-none focus-visible:ring-3"
+            className="bg-input/50 hover:bg-input/70 focus-visible:border-ring focus-visible:ring-ring/30 flex h-10 w-full items-center gap-3 rounded-lg border border-transparent px-3 text-left text-sm transition-[color,box-shadow,background-color] outline-none select-none focus-visible:ring-3"
           >
             <span
               className={cn(
@@ -172,12 +221,13 @@ export const PictureController = ({
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent>
-          <DropdownMenuItem onSelect={openFilePicker}>
+        <DropdownMenuContent className="rounded-xl">
+          <DropdownMenuItem className="rounded-md" onSelect={openFilePicker}>
             {currentPicture ? 'Change' : 'Upload'} {normalizedLabel}
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
+            className="rounded-md"
             disabled={!currentPicture}
             onSelect={removePicture}
           >
@@ -187,10 +237,10 @@ export const PictureController = ({
       </DropdownMenu>
 
       <Text
-        id={descriptionId}
+        id={requirementsId}
         className="text-muted-foreground text-xs leading-snug"
       >
-        {[description, IMAGE_UPLOAD_HELP_TEXT].filter(Boolean).join(' ')}
+        {IMAGE_UPLOAD_HELP_TEXT}
       </Text>
 
       <FieldError id={errorId} errors={[imageError]} />

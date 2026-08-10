@@ -70,12 +70,12 @@ export const AddButtonLink = () => {
       }}
     >
       <DialogTrigger asChild>
-        <Button type="button" variant="outline">
+        <Button type="button" variant="outline" className="rounded-lg">
           Add link <Plus size={16} />
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="rounded-xl **:data-[slot=button]:rounded-lg **:data-[size=icon-sm]:rounded-md **:data-[slot=input]:rounded-lg **:data-[slot=input-group]:rounded-lg">
         <DialogHeader>
           <DialogTitle>Add link</DialogTitle>
           <DialogDescription>
@@ -107,7 +107,12 @@ export const AddButtonLink = () => {
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline" onClick={reset}>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-lg"
+              onClick={reset}
+            >
               Cancel
             </Button>
           </DialogClose>

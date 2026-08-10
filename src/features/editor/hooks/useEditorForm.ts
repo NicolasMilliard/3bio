@@ -49,9 +49,13 @@ function buildDefaultValues(
     _imageValidation: {
       avatar: false,
       coverPicture: false,
+      linksPanelBackground: false,
     },
     avatar: { preview: profile?.avatar ?? null },
     coverPicture: { preview: profile?.coverPicture ?? null },
+    linksPanelBackground: {
+      preview: profile?.linksPanelBackground ?? null,
+    },
     name: profile?.name ?? '',
     bio: profile?.bio ?? '',
     socialLinks: hydrateSocialLinks(profile?.socialLinks),
@@ -150,7 +154,9 @@ export function useEditorForm(
 
   const onSubmit = async (values: MetadataFormValues) => {
     const isImageValidationPending =
-      values._imageValidation.avatar || values._imageValidation.coverPicture;
+      values._imageValidation.avatar ||
+      values._imageValidation.coverPicture ||
+      values._imageValidation.linksPanelBackground;
 
     if (
       saveInFlight.current ||
@@ -173,6 +179,7 @@ export function useEditorForm(
       const imageFields = [
         ['avatar', values.avatar.file],
         ['coverPicture', values.coverPicture.file],
+        ['linksPanelBackground', values.linksPanelBackground.file],
       ] as const;
       const imageErrors: Array<{
         field: (typeof imageFields)[number][0];
@@ -219,7 +226,9 @@ export function useEditorForm(
           ? 'Uploading avatar...'
           : values.coverPicture.file
             ? 'Uploading social image...'
-            : 'Saving profile...',
+            : values.linksPanelBackground.file
+              ? 'Uploading panel background...'
+              : 'Saving profile...',
       );
 
       // Step 1: Upload avatar if a new file was selected
@@ -259,7 +268,26 @@ export function useEditorForm(
         );
       }
 
-      // Step 3: Build and upload metadata JSON
+      // Step 3: Upload the links panel background if a new file was selected
+      let linksPanelBackgroundUri = values.linksPanelBackground.preview;
+
+      if (values.linksPanelBackground.file) {
+        saveStage = 'uploading-links-panel-background';
+        toast.loading('Uploading panel background...', { id: toastId });
+        const linksPanelBackgroundUpload = await storageClient.uploadFile(
+          values.linksPanelBackground.file,
+          { acl },
+        );
+        linksPanelBackgroundUri = linksPanelBackgroundUpload.gatewayUrl;
+
+        methods.setValue(
+          'linksPanelBackground',
+          { preview: linksPanelBackgroundUri },
+          { shouldDirty: true, shouldValidate: true },
+        );
+      }
+
+      // Step 4: Build and upload metadata JSON
       saveStage = 'uploading-profile-data';
       toast.loading('Uploading profile data...', { id: toastId });
 
@@ -268,6 +296,7 @@ export function useEditorForm(
         values,
         avatarUri,
         coverPictureUri,
+        linksPanelBackgroundUri,
       });
 
       const metadataKey = getMetadataUploadCacheKey(
@@ -289,7 +318,7 @@ export function useEditorForm(
         };
       }
 
-      // Step 4: Submit on-chain
+      // Step 5: Submit on-chain
       saveStage = 'submitting-transaction';
       toast.loading('Waiting for transaction...', { id: toastId });
 
@@ -492,6 +521,9 @@ export function useEditorForm(
         ...values,
         avatar: { preview: avatarUri ?? null },
         coverPicture: { preview: coverPictureUri ?? null },
+        linksPanelBackground: {
+          preview: linksPanelBackgroundUri ?? null,
+        },
       });
       metadataUploadCache.current = null;
       toast.success('Profile saved!', {

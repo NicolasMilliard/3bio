@@ -4,6 +4,7 @@ import { THREE_BIO_DEFAULT_THEME } from '../src/constants/themes.ts';
 import { buildPersistedThreeBioMetadata } from '../src/features/editor/helpers/buildPersistedThreeBioMetadata.ts';
 import { getTransactionFailureReason } from '../src/features/editor/helpers/getTransactionFailureReason.ts';
 import { toLinkAttributes } from '../src/features/editor/helpers/metadataAttributes.ts';
+import { formatToThreeBioMetadata } from '../src/helpers/formatToThreeBioMetadata.ts';
 import { parseThreeBioMetadata } from '../src/helpers/parseThreeBioMetadata.ts';
 
 test('only TransactionWillFail is treated as an immediate Lens failure', () => {
@@ -74,8 +75,13 @@ test('editor output round-trips through the persisted metadata reader', () => {
     values,
     avatarUri: 'https://images.example/avatar.png',
     coverPictureUri: null,
+    linksPanelBackgroundUri:
+      'https://images.example/links-panel-background.webp',
   });
 
+  expect(metadata.profile?.linksPanelBackground).toBe(
+    'https://images.example/links-panel-background.webp',
+  );
   expect(parseThreeBioMetadata(JSON.stringify(metadata))).toEqual(metadata);
 
   for (const avatarUri of [
@@ -90,7 +96,55 @@ test('editor output round-trips through the persisted metadata reader', () => {
         values,
         avatarUri,
         coverPictureUri: null,
+        linksPanelBackgroundUri: null,
       }),
     ).toThrow();
   }
+
+  expect(() =>
+    buildPersistedThreeBioMetadata({
+      current: {},
+      values,
+      avatarUri: null,
+      coverPictureUri: null,
+      linksPanelBackgroundUri: 'javascript:alert(1)',
+    }),
+  ).toThrow();
+});
+
+test('removing a links panel background omits it from persisted metadata', () => {
+  const metadata = buildPersistedThreeBioMetadata({
+    current: {
+      profile: {
+        linksPanelBackground: 'https://images.example/old-panel.webp',
+      },
+    },
+    values: {
+      theme: THREE_BIO_DEFAULT_THEME,
+      displayStatistics: true,
+      displayBranding: true,
+    },
+    avatarUri: null,
+    coverPictureUri: null,
+    linksPanelBackgroundUri: null,
+  });
+
+  expect(metadata.profile?.linksPanelBackground).toBeUndefined();
+});
+
+test('stored links panel backgrounds hydrate into the profile view model', () => {
+  const linksPanelBackground =
+    'https://images.example/links-panel-background.webp';
+  const metadata = formatToThreeBioMetadata({
+    metadata: {
+      attributes: [
+        {
+          key: '3bio',
+          value: JSON.stringify({ profile: { linksPanelBackground } }),
+        },
+      ],
+    },
+  });
+
+  expect(metadata.profile.linksPanelBackground).toBe(linksPanelBackground);
 });

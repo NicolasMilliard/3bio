@@ -153,7 +153,7 @@ export const SortableEditableSocialIconLink = ({
             size="icon"
             aria-label={buttonLabel}
             onKeyDown={handleTriggerKeyDown}
-            className={`text-foreground hover:text-primary transition will-change-transform hover:bg-transparent active:shadow-inner ${
+            className={`text-foreground hover:text-primary rounded-md transition will-change-transform hover:bg-transparent active:shadow-inner ${
               canReorder ? 'cursor-grab touch-none active:cursor-grabbing' : ''
             } ${isDragging ? 'ring-ring/40 scale-105 shadow-sm ring-2' : ''}`}
           >
@@ -161,7 +161,7 @@ export const SortableEditableSocialIconLink = ({
           </Button>
         </DialogTrigger>
 
-        <DialogContent>
+        <DialogContent className="rounded-xl **:data-[slot=button]:rounded-lg **:data-[size=icon-sm]:rounded-md **:data-[slot=input]:rounded-lg **:data-[slot=input-group]:rounded-lg">
           <DialogHeader>
             <DialogTitle>Edit your {label} link:</DialogTitle>
 

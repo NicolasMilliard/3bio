@@ -85,12 +85,13 @@ export const AddSocialIconLink = () => {
           variant="outline"
           size="icon"
           aria-label="Add a social link"
+          className="rounded-md"
         >
           <Plus aria-hidden="true" size={16} />
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="rounded-xl **:data-[slot=button]:rounded-lg **:data-[size=icon-sm]:rounded-md **:data-[slot=input]:rounded-lg **:data-[slot=input-group]:rounded-lg">
         <DialogHeader>
           <DialogTitle>
             {pendingPlatformName

@@ -62,9 +62,13 @@ test('image form values cannot persist non-HTTP URLs', () => {
     _imageValidation: {
       avatar: false,
       coverPicture: false,
+      linksPanelBackground: false,
     },
     avatar: { preview: 'https://images.example/avatar.png' },
     coverPicture: { preview: null },
+    linksPanelBackground: {
+      preview: 'https://images.example/links-panel.webp',
+    },
     theme: THREE_BIO_DEFAULT_THEME,
   };
 
@@ -100,6 +104,31 @@ test('image form values cannot persist non-HTTP URLs', () => {
       avatar: { preview: localPreview },
     }).success,
   ).toBe(false);
+
+  expect(
+    metadataFormSchema.safeParse({
+      ...formValues,
+      linksPanelBackground: { file: localFile, preview: localPreview },
+    }).success,
+  ).toBe(true);
+  expect(
+    metadataFormSchema.safeParse({
+      ...formValues,
+      linksPanelBackground: { preview: localPreview },
+    }).success,
+  ).toBe(false);
+
+  for (const preview of [
+    'ipfs://example/panel.webp',
+    'javascript:alert(1)',
+  ]) {
+    expect(
+      metadataFormSchema.safeParse({
+        ...formValues,
+        linksPanelBackground: { preview },
+      }).success,
+    ).toBe(false);
+  }
 });
 
 test('social links accept canonical host variants and reject mismatched hosts', () => {
@@ -160,6 +189,14 @@ test('malformed stored metadata is discarded instead of crashing a route', () =>
 
   expect(() => parseThreeBioMetadata(invalidMetadata)).not.toThrow();
   expect(parseThreeBioMetadata(invalidMetadata)).toBeUndefined();
+
+  expect(
+    parseThreeBioMetadata(
+      JSON.stringify({
+        profile: { linksPanelBackground: 'javascript:alert(1)' },
+      }),
+    ),
+  ).toBeUndefined();
 
   const validMetadata = {
     profile: {

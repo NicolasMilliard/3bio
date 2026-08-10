@@ -36,7 +36,7 @@ export const MenuSocialIcon = ({
   };
 
   return (
-    <Command>
+    <Command className="rounded-lg">
       <CommandInput placeholder="Search platforms..." className="h-9" />
       <CommandEmpty>No platform found.</CommandEmpty>
       <div className="max-h-[min(400px,40dvh)] overflow-y-auto">
@@ -47,7 +47,7 @@ export const MenuSocialIcon = ({
                 key={value}
                 value={label}
                 onSelect={() => handleSelect(value)}
-                className="gap-2"
+                className="gap-2 rounded-md in-data-[slot=dialog-content]:rounded-md"
               >
                 <Icon className="text-primary size-4 shrink-0" />
                 <span className="flex-1 text-sm">{label}</span>
@@ -64,7 +64,7 @@ export const MenuSocialIcon = ({
                   key={value}
                   value={label}
                   onSelect={() => handleSelect(value)}
-                  className="gap-2"
+                  className="gap-2 rounded-md in-data-[slot=dialog-content]:rounded-md"
                 >
                   <Icon className="text-primary size-4 shrink-0" />
                   <span className="flex-1 text-sm">{label}</span>

@@ -2,6 +2,7 @@ export type SaveStage =
   | 'validating-images'
   | 'uploading-avatar'
   | 'uploading-social-image'
+  | 'uploading-links-panel-background'
   | 'uploading-profile-data'
   | 'submitting-transaction'
   | 'confirming-transaction';
@@ -22,6 +23,12 @@ export const getSaveErrorFeedback = (stage: SaveStage): SaveErrorFeedback => {
     case 'uploading-social-image':
       return {
         title: 'Social image upload failed',
+        description:
+          'Your draft is still here. Check your connection and try again.',
+      };
+    case 'uploading-links-panel-background':
+      return {
+        title: 'Panel background upload failed',
         description:
           'Your draft is still here. Check your connection and try again.',
       };

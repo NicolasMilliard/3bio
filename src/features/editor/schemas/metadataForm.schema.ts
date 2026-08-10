@@ -58,9 +58,11 @@ export const metadataFormSchema = z.object({
   _imageValidation: z.object({
     avatar: z.boolean(),
     coverPicture: z.boolean(),
+    linksPanelBackground: z.boolean(),
   }),
   avatar: imageFormValueSchema,
   coverPicture: imageFormValueSchema,
+  linksPanelBackground: imageFormValueSchema,
   name: z.string().optional(),
   bio: z.string().optional(),
   socialLinks: z.array(socialLinkSchema).optional(),

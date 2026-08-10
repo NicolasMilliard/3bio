@@ -22,6 +22,7 @@ export type LensLink = z.infer<typeof linkSchema>;
 
 export const profileSchema = z.object({
   coverPicture: httpUrlSchema.optional(),
+  linksPanelBackground: httpUrlSchema.optional(),
   avatar: httpUrlSchema.optional(),
   name: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),

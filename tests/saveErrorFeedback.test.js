@@ -15,6 +15,14 @@ test('reports the failed upload stage instead of inspecting error text', () => {
   );
 });
 
+test('reports a dedicated links panel background upload failure', () => {
+  expect(getSaveErrorFeedback('uploading-links-panel-background')).toEqual({
+    title: 'Panel background upload failed',
+    description:
+      'Your draft is still here. Check your connection and try again.',
+  });
+});
+
 test('warns that an interrupted confirmation may already be live', () => {
   expect(getSaveErrorFeedback('confirming-transaction').description).toContain(
     'Check your public profile before trying again',
