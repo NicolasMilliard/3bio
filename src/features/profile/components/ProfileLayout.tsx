@@ -20,7 +20,7 @@ type ProfileSocialLink = ProfileLink & { platform?: PlatformName };
 
 export type ProfileViewModel = Pick<
   ThreeBioProfile,
-  'avatar' | 'name' | 'bio'
+  'avatar' | 'name' | 'bio' | 'linksPanelBackground'
 > & {
   socialLinks?: ProfileSocialLink[];
   links?: ProfileLink[];
@@ -97,6 +97,16 @@ export const ProfileLayout = ({
             ref={contentPanelRef}
             aria-label="Profile links"
             className="profile-links-panel profile-links-canvas profile-content-scroll bg-content-background focus-visible:ring-name-text focus-visible:ring-offset-background relative isolate min-h-48 w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] rounded-4xl px-5 py-6 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:animate-none sm:px-8"
+            style={
+              profile.linksPanelBackground
+                ? {
+                    backgroundImage: `url(${JSON.stringify(profile.linksPanelBackground)})`,
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                  }
+                : undefined
+            }
             tabIndex={profile.links?.length ? 0 : undefined}
           >
             <div className="relative z-10">

@@ -25,7 +25,9 @@ export const EditorForm = ({
   } = methods;
   const imageValidation = methods.watch('_imageValidation');
   const isCheckingImage =
-    imageValidation.avatar || imageValidation.coverPicture;
+    imageValidation.avatar ||
+    imageValidation.coverPicture ||
+    imageValidation.linksPanelBackground;
   const navigation = usePreventNavigation({
     enabled: isDirty || isSubmitting || isCheckingImage,
     message: isSubmitting

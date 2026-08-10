@@ -4,7 +4,9 @@ export const IMAGE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 export const IMAGE_UPLOAD_MAX_DIMENSION = 4096;
 export const IMAGE_UPLOAD_ACCEPT = 'image/jpeg,image/png,image/webp,image/avif';
 export const IMAGE_UPLOAD_HELP_TEXT =
-  'JPEG, PNG, WebP, or AVIF. Max 5 MB and 4096 × 4096 px.';
+  'JPEG, PNG, WebP, or AVIF. Max 5 MB.';
+export const IMAGE_UPLOAD_DIMENSION_HELP_TEXT =
+  'Maximum dimensions: 4096 × 4096 px.';
 
 const supportedImageTypes = new Set(IMAGE_UPLOAD_ACCEPT.split(','));
 const unsupportedAppleImageTypes = new Set([

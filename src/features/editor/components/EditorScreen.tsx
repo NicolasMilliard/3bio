@@ -31,7 +31,7 @@ export const EditorScreen = ({
           {!openMobile && (
             <SidebarTrigger
               type="button"
-              className="bg-card/90 fixed top-4 left-4 z-30 shadow-sm backdrop-blur md:hidden"
+              className="bg-card/90 fixed top-4 left-4 z-30 rounded-md shadow-sm backdrop-blur md:hidden"
             />
           )}
           <EditorProfilePreview

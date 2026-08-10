@@ -75,49 +75,56 @@ export const LinkButton = forwardRef<
     setFavicon({ key: faviconKey, src: imgSrc, loaded: true });
   };
   const isEditorSurface = surface === 'editor';
+  const linkRadiusClassName = isEditorSurface
+    ? 'rounded-lg'
+    : 'rounded-2xl';
   const iconSurfaceClassName = 'bg-links-icon-background text-links-icon';
   const linkSurfaceClassName = isEditorSurface
-    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+    ? 'bg-input/50 text-foreground'
     : 'bg-links-background text-links-text';
   const interactiveSurfaceClassName = isEditorSurface
-    ? 'hover:bg-sidebar-accent/75 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar'
+    ? 'hover:bg-input/70 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar'
     : 'hover:bg-links-background/90 focus-visible:ring-links-text';
 
   const content = (
     <>
-      <span
-        className={cn(
-          'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full transition-colors',
-          activeFavicon.loaded ? 'bg-transparent' : iconSurfaceClassName,
-        )}
-      >
-        {imgSrc ? (
-          <Image
-            src={imgSrc}
-            alt=""
-            aria-hidden="true"
-            referrerPolicy="no-referrer"
-            className="size-3.5 rounded-sm"
-            onError={handleImageError}
-            onLoad={handleImageLoad}
-          />
-        ) : (
-          <Link2 aria-hidden="true" className="size-3.5" />
-        )}
-      </span>
+      {!isEditorSurface && (
+        <span
+          className={cn(
+            'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full transition-colors',
+            activeFavicon.loaded ? 'bg-transparent' : iconSurfaceClassName,
+          )}
+        >
+          {imgSrc ? (
+            <Image
+              src={imgSrc}
+              alt=""
+              aria-hidden="true"
+              referrerPolicy="no-referrer"
+              className="size-3.5 rounded-sm"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+            />
+          ) : (
+            <Link2 aria-hidden="true" className="size-3.5" />
+          )}
+        </span>
+      )}
 
       <span className="flex-1 truncate text-left" title={label}>
         {label}
       </span>
 
-      <span
-        className={cn(
-          'flex size-6 shrink-0 items-center justify-center rounded-full',
-          iconSurfaceClassName,
-        )}
-      >
-        <ExternalLink aria-hidden="true" className="size-3.5" />
-      </span>
+      {!isEditorSurface && (
+        <span
+          className={cn(
+            'flex size-6 shrink-0 items-center justify-center rounded-full',
+            iconSurfaceClassName,
+          )}
+        >
+          <ExternalLink aria-hidden="true" className="size-3.5" />
+        </span>
+      )}
     </>
   );
 
@@ -126,7 +133,8 @@ export const LinkButton = forwardRef<
       {!interactive ? (
         <div
           className={cn(
-            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal',
+            'group flex w-full items-center gap-2 px-3 py-3 text-base font-normal',
+            linkRadiusClassName,
             linkSurfaceClassName,
           )}
         >
@@ -138,7 +146,8 @@ export const LinkButton = forwardRef<
           ref={ref as Ref<HTMLButtonElement>}
           type="button"
           className={cn(
-            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            'group flex w-full items-center gap-2 px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            linkRadiusClassName,
             linkSurfaceClassName,
             interactiveSurfaceClassName,
           )}
@@ -153,7 +162,8 @@ export const LinkButton = forwardRef<
           target="_blank"
           rel="ugc noopener noreferrer"
           className={cn(
-            'group flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            'group flex w-full items-center gap-2 px-3 py-3 text-base font-normal transition-all duration-150 will-change-transform focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] active:shadow-inner',
+            linkRadiusClassName,
             linkSurfaceClassName,
             interactiveSurfaceClassName,
           )}

@@ -18,7 +18,11 @@ export const IdentityGroup = () => {
         Identity
       </SidebarGroupLabel>
       <div className="flex flex-col gap-4">
-        <PictureController formValue="avatar" label="Avatar" />
+        <PictureController
+          formValue="avatar"
+          label="Avatar"
+          description="Shown with your profile details and cropped to a circle. A square image with the subject centered works best."
+        />
         <NameInput />
         <BioInput />
       </div>
@@ -32,7 +36,12 @@ const NameInput = () => {
   return (
     <FieldSet className="gap-2">
       <Label htmlFor="name">Name</Label>
-      <Input id="name" {...register('name')} placeholder="Your name" />
+      <Input
+        id="name"
+        {...register('name')}
+        className="rounded-lg"
+        placeholder="Your name"
+      />
     </FieldSet>
   );
 };
@@ -46,6 +55,7 @@ const BioInput = () => {
       <Textarea
         id="bio"
         {...register('bio')}
+        className="rounded-lg"
         rows={1}
         placeholder="Write something about yourself in your bio to let people know more about you."
       />

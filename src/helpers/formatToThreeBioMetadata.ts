@@ -25,6 +25,7 @@ export const formatToThreeBioMetadata = (account: Account) => {
 
   const profile = {
     coverPicture: threeBioProfile?.coverPicture ?? metadata?.coverPicture,
+    linksPanelBackground: threeBioProfile?.linksPanelBackground,
     avatar: threeBioProfile?.avatar ?? metadata?.picture,
     name: threeBioProfile?.name ?? metadata?.name,
     bio: threeBioProfile?.bio ?? metadata?.bio,

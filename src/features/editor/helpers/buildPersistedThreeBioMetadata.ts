@@ -21,17 +21,22 @@ export const buildPersistedThreeBioMetadata = ({
   values,
   avatarUri,
   coverPictureUri,
+  linksPanelBackgroundUri,
 }: {
   current: ThreeBioMetadata;
   values: PersistedProfileFormValues;
   avatarUri: string | null | undefined;
   coverPictureUri: string | null | undefined;
+  linksPanelBackgroundUri: string | null | undefined;
 }): ThreeBioMetadata =>
   threeBioMetadataSchema.parse({
     ...current,
     profile: {
       ...(avatarUri == null ? {} : { avatar: avatarUri }),
       ...(coverPictureUri == null ? {} : { coverPicture: coverPictureUri }),
+      ...(linksPanelBackgroundUri == null
+        ? {}
+        : { linksPanelBackground: linksPanelBackgroundUri }),
       ...(values.name === undefined ? {} : { name: values.name }),
       ...(values.bio === undefined ? {} : { bio: values.bio }),
       socialLinks: toSocialLinkAttributes(values.socialLinks),

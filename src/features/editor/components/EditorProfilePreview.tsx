@@ -29,6 +29,7 @@ export const EditorProfilePreview = ({
     theme,
     displayStatistics,
     displayBranding,
+    linksPanelBackground,
   ] = useWatch({
     control,
     name: [
@@ -40,11 +41,13 @@ export const EditorProfilePreview = ({
       'theme',
       'displayStatistics',
       'displayBranding',
+      'linksPanelBackground',
     ],
   });
 
   const profile = {
     avatar: avatar?.preview || undefined,
+    linksPanelBackground: linksPanelBackground?.preview || undefined,
     name,
     bio,
     socialLinks: (socialLinks ?? []).flatMap(({ platform, url }) => {
