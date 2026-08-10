@@ -2,14 +2,26 @@ import { expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { SpinnerScreen } from '../src/components/ui/SpinnerScreen.tsx';
+import { EditableSocialLinks } from '../src/features/editor/components/sidebar/form/social-links/EditableSocialIconLinks.tsx';
 import { CreatorRightsSection } from '../src/features/homepage/components/CreatorRightsSection.tsx';
 import { HeroSection } from '../src/features/homepage/components/HeroSection.tsx';
 import { calculateHeroTilt } from '../src/features/homepage/components/heroMotion.ts';
 import { ProfileCheckingForm } from '../src/features/homepage/components/ProfileCheckingForm.tsx';
 import { LinkButton } from '../src/features/profile/components/LinkButton.tsx';
 import { ProfileLayout } from '../src/features/profile/components/ProfileLayout.tsx';
+
+const EditorSocialLinksHarness = ({ socialLinks }) => {
+  const methods = useForm({ defaultValues: { socialLinks } });
+
+  return createElement(
+    FormProvider,
+    methods,
+    createElement(EditableSocialLinks),
+  );
+};
 
 test('homepage hero labels its content and keeps the visual decorative', () => {
   const markup = renderToStaticMarkup(createElement(HeroSection));
@@ -137,6 +149,52 @@ test('editor links use a distinct surface without moving the external icon', () 
   expect(markup).toContain('focus-visible:ring-sidebar-ring');
   expect(markup).not.toContain('group-hover:translate-x');
   expect(markup).not.toContain('transition-transform');
+});
+
+test('editor social icons expose sortable keyboard and screen reader semantics', () => {
+  const markup = renderToStaticMarkup(
+    createElement(EditorSocialLinksHarness, {
+      socialLinks: [
+        { platform: 'github', url: 'https://github.com/alice' },
+        { platform: 'youtube', url: 'https://youtube.com/@alice' },
+        { platform: 'twitter', url: undefined },
+      ],
+    }),
+  );
+
+  expect(markup).toContain('aria-label="Active social links"');
+  expect(markup).toContain('data-social-platform="github"');
+  expect(markup).toContain(
+    'aria-label="Edit or reorder GitHub social link, position 1 of 2"',
+  );
+  expect(markup).toContain('aria-roledescription="sortable"');
+  expect(markup).toContain('touch-none');
+  expect(markup).not.toContain('data-social-platform="twitter"');
+
+  const source = readFileSync(
+    new URL(
+      '../src/features/editor/components/sidebar/form/social-links/EditableSocialIconLinks.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+
+  expect(source).toContain('Press Enter to edit this social link.');
+  expect(source).toContain('use the arrow keys to move it');
+});
+
+test('a single active social icon remains an explicitly named edit control', () => {
+  const markup = renderToStaticMarkup(
+    createElement(EditorSocialLinksHarness, {
+      socialLinks: [
+        { platform: 'github', url: 'https://github.com/alice' },
+        { platform: 'youtube', url: undefined },
+      ],
+    }),
+  );
+
+  expect(markup).toContain('aria-label="Edit GitHub social link"');
+  expect(markup).not.toContain('aria-roledescription="sortable"');
 });
 
 test('editor sidebar toggle follows the sidebar and reopens from the mobile preview', () => {

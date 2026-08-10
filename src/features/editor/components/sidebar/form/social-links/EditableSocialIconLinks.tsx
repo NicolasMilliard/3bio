@@ -1,169 +1,141 @@
-import { type PlatformName, SOCIAL_MAP } from '@/constants';
-import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
-import { useState } from 'react';
+import {
+  DndContext,
+  KeyboardCode,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  type Announcements,
+  type DragEndEvent,
+  type UniqueIdentifier,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Input,
-} from '@/components/ui';
-import { Trash2 } from 'lucide-react';
+import { type PlatformName, SOCIAL_MAP } from '@/constants';
+import { reorderActiveSocialLinks } from '@/features/editor/helpers/socialLinkOrdering';
+import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
+import { SortableEditableSocialIconLink } from './SortableEditableSocialIconLink';
+
+const keyboardCodes = {
+  start: [KeyboardCode.Space],
+  cancel: [KeyboardCode.Esc],
+  end: [KeyboardCode.Space],
+};
+
+const screenReaderInstructions = {
+  draggable:
+    'Press Enter to edit this social link. To reorder it, press Space to pick it up, use the arrow keys to move it, then press Space again to drop it. Press Escape to cancel.',
+};
 
 export const EditableSocialLinks = () => {
-  const { control } = useFormContext<MetadataFormValues>();
+  const { control, setValue } = useFormContext<MetadataFormValues>();
   const socialLinks = useWatch({ control, name: 'socialLinks' });
+  const activeSocialLinks = (socialLinks ?? []).flatMap((link) => {
+    const platformName = link.platform as PlatformName;
+    const platform = SOCIAL_MAP[platformName];
 
-  if (!socialLinks?.length) return null;
-
-  return (
-    <div className="flex max-w-prose flex-wrap items-center">
-      {socialLinks.map((link, index) => {
-        if (!link.url) return null;
-
-        const platformName = link.platform as PlatformName;
-        const platform = SOCIAL_MAP[platformName];
-
-        if (!platform) return null;
-
-        return (
-          <EditableSocialLink
-            key={link.platform}
-            index={index}
-            platform={platformName}
-            currentUrl={link.url}
-            label={platform.label}
-            icon={<platform.Icon className="size-6" />}
-          />
-        );
-      })}
-    </div>
+    return link.url && platform
+      ? [
+          {
+            currentUrl: link.url,
+            label: platform.label,
+            platform: platformName,
+            Icon: platform.Icon,
+          },
+        ]
+      : [];
+  });
+  const canReorder = activeSocialLinks.length > 1;
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+      keyboardCodes,
+    }),
   );
-};
 
-type EditableSocialLinkProps = {
-  index: number;
-  platform: PlatformName;
-  currentUrl: string;
-  label: string;
-  icon: React.ReactNode;
-};
+  if (activeSocialLinks.length === 0) return null;
 
-const EditableSocialLink = ({
-  index,
-  platform,
-  currentUrl,
-  label,
-  icon,
-}: EditableSocialLinkProps) => {
-  const [open, setOpen] = useState(false);
-  const [draftUrl, setDraftUrl] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const { setValue } = useFormContext<MetadataFormValues>();
+  const getPosition = (id: UniqueIdentifier) =>
+    activeSocialLinks.findIndex(({ platform }) => platform === id) + 1;
+  const getLabel = (id: UniqueIdentifier) =>
+    SOCIAL_MAP[id as PlatformName]?.label ?? String(id);
+  const announcements: Announcements = {
+    onDragStart({ active }) {
+      return `${getLabel(active.id)} picked up. Position ${getPosition(active.id)} of ${activeSocialLinks.length}.`;
+    },
+    onDragOver({ active, over }) {
+      if (!over) return undefined;
 
-  const closeDialog = () => {
-    setOpen(false);
-    setDraftUrl('');
-    setError(null);
+      return `${getLabel(active.id)} is now over position ${getPosition(over.id)} of ${activeSocialLinks.length}.`;
+    },
+    onDragEnd({ active, over }) {
+      if (!over) return `${getLabel(active.id)} was not moved.`;
+
+      return `${getLabel(active.id)} dropped at position ${getPosition(over.id)} of ${activeSocialLinks.length}.`;
+    },
+    onDragCancel({ active }) {
+      return `Reordering ${getLabel(active.id)} was cancelled.`;
+    },
   };
 
-  const handleSave = () => {
-    const normalizedUrl = draftUrl.trim();
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id || !socialLinks) return;
 
-    if (!SOCIAL_MAP[platform].validateUrl(normalizedUrl)) {
-      setError(`Please enter a valid ${label} URL.`);
-      return;
-    }
-
-    setValue(`socialLinks.${index}.url`, normalizedUrl, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
-    closeDialog();
-  };
-
-  const handleRemove = () => {
-    setValue(`socialLinks.${index}.url`, '', {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
-    closeDialog();
+    setValue(
+      'socialLinks',
+      reorderActiveSocialLinks(
+        socialLinks,
+        active.id as PlatformName,
+        over.id as PlatformName,
+      ),
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      },
+    );
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(nextOpen) => {
-        if (nextOpen) {
-          setDraftUrl(currentUrl);
-          setError(null);
-          setOpen(true);
-          return;
-        }
-
-        closeDialog();
-      }}
+    <DndContext
+      accessibility={{ announcements, screenReaderInstructions }}
+      collisionDetection={closestCenter}
+      sensors={sensors}
+      onDragEnd={handleDragEnd}
     >
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="text-foreground hover:text-primary transition will-change-transform hover:bg-transparent active:scale-[0.98] active:shadow-inner"
+      <SortableContext
+        items={activeSocialLinks.map(({ platform }) => platform)}
+        strategy={rectSortingStrategy}
+      >
+        <ul
+          aria-label="Active social links"
+          className="flex max-w-prose flex-wrap items-center"
         >
-          {icon}
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit your {label} link:</DialogTitle>
-
-          <DialogDescription>
-            Changes are saved locally. Submit the profile form to publish them.
-          </DialogDescription>
-        </DialogHeader>
-
-        <Input
-          type="url"
-          placeholder={`Enter your ${label} URL`}
-          value={draftUrl}
-          onChange={(event) => {
-            setDraftUrl(event.target.value);
-            if (error) setError(null);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              handleSave();
-            }
-          }}
-        />
-
-        {error && <p className="text-destructive text-sm">{error}</p>}
-
-        <DialogFooter>
-          <Button type="button" variant="destructive" onClick={handleRemove}>
-            <Trash2 />
-            Remove
-          </Button>
-          <Button
-            type="button"
-            onClick={handleSave}
-            disabled={!draftUrl.trim()}
-          >
-            Done
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          {activeSocialLinks.map(
+            ({ currentUrl, label, platform, Icon }, index) => (
+              <SortableEditableSocialIconLink
+                key={platform}
+                canReorder={canReorder}
+                currentUrl={currentUrl}
+                Icon={Icon}
+                label={label}
+                platform={platform}
+                position={index + 1}
+                total={activeSocialLinks.length}
+              />
+            ),
+          )}
+        </ul>
+      </SortableContext>
+    </DndContext>
   );
 };

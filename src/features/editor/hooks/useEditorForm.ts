@@ -9,12 +9,12 @@ import { uri, type Account } from '@lens-protocol/react';
 import { getConnection, getWalletClient, switchChain } from '@wagmi/core';
 import { useConfig } from 'wagmi';
 
-import { SOCIAL_MAP, THREE_BIO_DEFAULT_THEME } from '@/constants';
+import { THREE_BIO_DEFAULT_THEME } from '@/constants';
 import {
   resolveAccountSessionBinding,
   type AccountSessionBindingState,
 } from '@/features/auth/sessionBinding';
-import { formatMetadataBeforeUpload, formatSocialLink } from '@/helpers';
+import { formatMetadataBeforeUpload } from '@/helpers';
 import { client } from '@/lib';
 import type { ThreeBioMetadata } from '@/schemas/threeBioMetadata.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { buildPersistedThreeBioMetadata } from '../helpers/buildPersistedThreeBioMetadata';
 import { getTransactionFailureReason } from '../helpers/getTransactionFailureReason';
 import { getMetadataUploadCacheKey } from '../helpers/metadataUploadCache';
+import { hydrateSocialLinks } from '../helpers/socialLinkOrdering';
 import {
   getSaveErrorFeedback,
   type SaveStage,
@@ -37,9 +38,6 @@ import {
 // Singleton: intentionally created once at module level to avoid
 // re-instantiating the storage client on every render.
 const storageClient = StorageClient.create();
-
-// Stable ordered list of social platforms delivered from SOCIAL_MAP.
-const SOCIAL_PLATFORMS = Array.from(Object.keys(SOCIAL_MAP));
 
 function buildDefaultValues(
   threeBioMetadata: ThreeBioMetadata,
@@ -56,12 +54,7 @@ function buildDefaultValues(
     coverPicture: { preview: profile?.coverPicture ?? null },
     name: profile?.name ?? '',
     bio: profile?.bio ?? '',
-    socialLinks: SOCIAL_PLATFORMS.map((key) => {
-      const existing = profile?.socialLinks?.find(
-        (socialLink) => formatSocialLink(socialLink).platform === key,
-      );
-      return { platform: key, url: existing?.value };
-    }),
+    socialLinks: hydrateSocialLinks(profile?.socialLinks),
     links: profile?.links?.map((link) => link.value) ?? [],
     theme: theme?.name ?? THREE_BIO_DEFAULT_THEME,
     displayStatistics: theme?.displayStatistics ?? true,
