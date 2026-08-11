@@ -20,12 +20,15 @@ redeploy.
 
 Cloudflare Pages automatically applies the SPA fallback because the build does
 not contain a top-level `404.html`. It also deploys the root `functions`
-directory, whose profile route adds crawler-visible Lens profile metadata to
-social-preview responses. `public/_routes.json` keeps static assets and private
-app routes out of that Function.
+directory, whose catch-all route adds crawler-visible Lens profile metadata,
+returns real noindex `404` responses for unknown paths, and serves private app
+routes with an `X-Robots-Tag` noindex header. The exact `/app` path remains a
+public profile handle; only its nested dashboard and editor paths are internal.
+`public/_routes.json` keeps the homepage and static assets out of that Function.
 
-The rules in `public/_headers` keep preview domains and private app routes out
-of search results and apply production security and caching headers. No Wrangler
+The Function's response headers, mirrored by the fallback rules in
+`public/_headers`, keep preview domains and private app routes out of search
+results while applying production security and caching headers. No Wrangler
 configuration or additional runtime environment variable is required for this
 Git-integrated Pages deployment.
 

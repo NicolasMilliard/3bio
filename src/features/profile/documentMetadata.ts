@@ -6,6 +6,10 @@ export const HOME_DESCRIPTION =
 export const DEFAULT_SOCIAL_IMAGE_PATH = '/og.png';
 export const DEFAULT_SOCIAL_IMAGE_ALT =
   '3bio — decentralized link in bio for Lens';
+export const PAGE_NOT_FOUND_TITLE = 'Page not found | 3bio';
+export const PAGE_NOT_FOUND_DESCRIPTION =
+  "The page you're looking for could not be found.";
+export const NOINDEX_ROBOTS = 'noindex, nofollow';
 
 export type ProfileMetadataStatus = 'loading' | 'ready' | 'not-found' | 'error';
 
@@ -191,7 +195,7 @@ export const buildProfileDocumentMetadata = ({
     normalizedHandle,
     robots: isIndexable
       ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-      : 'noindex, nofollow',
+      : NOINDEX_ROBOTS,
     socialImageAlt,
     socialImageKind,
     socialImageUrl,
@@ -267,3 +271,10 @@ export const renderProfileDocumentHead = (
 
   return tags.join('\n    ');
 };
+
+export const renderPageNotFoundDocumentHead = () =>
+  [
+    `<title ${metadataAttribute}>${escapeHtml(PAGE_NOT_FOUND_TITLE)}</title>`,
+    meta('name', 'description', PAGE_NOT_FOUND_DESCRIPTION),
+    meta('name', 'robots', NOINDEX_ROBOTS),
+  ].join('\n    ');

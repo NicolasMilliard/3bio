@@ -24,7 +24,7 @@ export const AnalyticsSection = () => {
             converting your audience.
           </Text>
           <Button asChild variant="secondary" className="w-fit">
-            <Link to="/dashboard">Launch App</Link>
+            <Link to="/app/dashboard">Launch App</Link>
           </Button>
         </div>
       </div>

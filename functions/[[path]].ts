@@ -1,5 +1,7 @@
 import {
   buildProfileDocumentMetadata,
+  NOINDEX_ROBOTS,
+  renderPageNotFoundDocumentHead,
   renderProfileDocumentHead,
   type ProfileMetadataProfile,
   type ProfileMetadataStatus,
@@ -10,9 +12,8 @@ const THREE_BIO_ATTRIBUTE_KEY = '3bio';
 const METADATA_START = '<!-- 3bio-metadata:start -->';
 const METADATA_END = '<!-- 3bio-metadata:end -->';
 const PROFILE_HANDLE_PATTERN = /^[a-zA-Z0-9._-]+$/;
+const INTERNAL_APP_PATHS = new Set(['/app/dashboard', '/app/edit']);
 const RESERVED_PATHS = new Set([
-  'dashboard',
-  'edit',
   'favicon.ico',
   'favicon.svg',
   'index.html',
@@ -45,7 +46,7 @@ const ACCOUNT_QUERY = `
 type PagesContext = {
   request: Request;
   params: {
-    pageId?: string | string[];
+    path?: string | string[];
   };
   next: () => Promise<Response>;
 };
@@ -217,6 +218,12 @@ const getPublicOrigin = (url: URL) =>
     ? 'https://3bio.social'
     : url.origin;
 
+const applySecurityHeaders = (headers: Headers) => {
+  for (const [name, value] of Object.entries(securityHeaders)) {
+    headers.set(name, value);
+  }
+};
+
 const buildHtmlResponse = async ({
   response,
   request,
@@ -243,9 +250,7 @@ const buildHtmlResponse = async ({
     defaultSocialImageUrl: `${origin}/og.png`,
   });
 
-  for (const [name, value] of Object.entries(securityHeaders)) {
-    headers.set(name, value);
-  }
+  applySecurityHeaders(headers);
 
   headers.delete('Content-Length');
   headers.delete('ETag');
@@ -258,7 +263,7 @@ const buildHtmlResponse = async ({
   );
 
   if (status !== 'ready' || requestUrl.hostname.endsWith('.pages.dev')) {
-    headers.set('X-Robots-Tag', 'noindex, nofollow');
+    headers.set('X-Robots-Tag', NOINDEX_ROBOTS);
   } else {
     headers.delete('X-Robots-Tag');
   }
@@ -276,17 +281,42 @@ const buildHtmlResponse = async ({
   });
 };
 
-const passThrough = async (context: PagesContext) => {
+const buildPageNotFoundResponse = async (context: PagesContext) => {
+  const response = await context.next();
+  const headers = new Headers(response.headers);
+
+  applySecurityHeaders(headers);
+
+  headers.delete('Content-Length');
+  headers.delete('ETag');
+  headers.set('Content-Type', 'text/html; charset=UTF-8');
+  headers.set(
+    'Cache-Control',
+    'public, max-age=60, s-maxage=300, stale-while-revalidate=3600',
+  );
+  headers.set('X-Robots-Tag', NOINDEX_ROBOTS);
+
+  const sourceHtml = await response.text();
+  const html = replaceMetadataBlock(
+    sourceHtml,
+    renderPageNotFoundDocumentHead(),
+  );
+
+  return new Response(context.request.method === 'HEAD' ? null : html, {
+    status: 404,
+    headers,
+  });
+};
+
+const passThrough = async (context: PagesContext, noIndex = false) => {
   const response = await context.next();
   const headers = new Headers(response.headers);
   const requestUrl = new URL(context.request.url);
 
-  for (const [name, value] of Object.entries(securityHeaders)) {
-    headers.set(name, value);
-  }
+  applySecurityHeaders(headers);
 
-  if (requestUrl.hostname.endsWith('.pages.dev')) {
-    headers.set('X-Robots-Tag', 'noindex, nofollow');
+  if (noIndex || requestUrl.hostname.endsWith('.pages.dev')) {
+    headers.set('X-Robots-Tag', NOINDEX_ROBOTS);
   }
 
   return new Response(response.body, {
@@ -296,31 +326,44 @@ const passThrough = async (context: PagesContext) => {
   });
 };
 
+const decodePathSegments = (path: string | string[] | undefined) => {
+  if (path === undefined) return undefined;
+
+  const rawSegments = Array.isArray(path) ? path : path.split('/');
+
+  try {
+    return rawSegments.map((segment) => decodeURIComponent(segment));
+  } catch {
+    return undefined;
+  }
+};
+
 export const onRequest = async (context: PagesContext) => {
   if (context.request.method !== 'GET' && context.request.method !== 'HEAD') {
     return passThrough(context);
   }
 
-  const pageId = context.params.pageId;
+  const requestUrl = new URL(context.request.url);
+  const normalizedRequestPath =
+    requestUrl.pathname.replace(/\/+$/, '') || '/';
 
-  if (typeof pageId !== 'string') {
-    return passThrough(context);
+  if (INTERNAL_APP_PATHS.has(normalizedRequestPath)) {
+    return passThrough(context, true);
   }
 
-  let decodedPageId: string;
+  const pathSegments = decodePathSegments(context.params.path);
 
-  try {
-    decodedPageId = decodeURIComponent(pageId);
-  } catch {
-    return passThrough(context);
+  if (!pathSegments || pathSegments.length !== 1) {
+    return buildPageNotFoundResponse(context);
   }
+
+  const [decodedPageId] = pathSegments;
 
   if (!isProfilePageId(decodedPageId)) {
-    return passThrough(context);
+    return buildPageNotFoundResponse(context);
   }
 
   const normalizedHandle = decodedPageId.toLowerCase();
-  const requestUrl = new URL(context.request.url);
   const canonicalOrigin = getPublicOrigin(requestUrl);
   const canonicalPath = `/${encodeURIComponent(normalizedHandle)}`;
 
@@ -337,7 +380,7 @@ export const onRequest = async (context: PagesContext) => {
         ...securityHeaders,
         Location: canonicalUrl.toString(),
         ...(requestUrl.hostname.endsWith('.pages.dev')
-          ? { 'X-Robots-Tag': 'noindex, nofollow' }
+          ? { 'X-Robots-Tag': NOINDEX_ROBOTS }
           : {}),
       },
     });

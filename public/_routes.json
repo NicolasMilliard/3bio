@@ -4,10 +4,6 @@
   "exclude": [
     "/",
     "/assets/*",
-    "/dashboard",
-    "/dashboard/*",
-    "/edit",
-    "/edit/*",
     "/favicon.ico",
     "/favicon.svg",
     "/index.html",

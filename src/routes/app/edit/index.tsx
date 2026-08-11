@@ -13,7 +13,7 @@ import { AuthGuard } from '@/features/auth/components';
 import { EditorScreen } from '@/features/editor/components/EditorScreen';
 import { NotFoundScreen } from '@/features/profile/components';
 
-export const Route = createFileRoute('/edit/')({
+export const Route = createFileRoute('/app/edit/')({
   component: EditorPage,
 });
 
@@ -46,7 +46,7 @@ function EditorContent({ onRetry }: { onRetry: () => void }) {
         onRetry={onRetry}
       >
         <Button asChild variant="outline">
-          <Link to="/dashboard">Back to dashboard</Link>
+          <Link to="/app/dashboard">Back to dashboard</Link>
         </Button>
       </ErrorScreen>
     );

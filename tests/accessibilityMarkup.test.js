@@ -320,8 +320,15 @@ test('editor sidebar toggle follows the sidebar and reopens from the mobile prev
   expect(editorScreen).not.toContain('right-4');
 });
 
-test('homepage profile form exposes a real label and new-tab notice', () => {
+test('homepage profile form exposes a real label and uses same-tab navigation', () => {
   const markup = renderToStaticMarkup(createElement(ProfileCheckingForm));
+  const source = readFileSync(
+    new URL(
+      '../src/features/homepage/components/ProfileCheckingForm.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
   const label = markup.match(
     /<label for="([^"]+)" class="sr-only">Lens profile handle<\/label>/,
   );
@@ -329,8 +336,10 @@ test('homepage profile form exposes a real label and new-tab notice', () => {
   expect(label).not.toBeNull();
   expect(markup).toContain(`id="${label?.[1]}"`);
   expect(markup).toContain('aria-describedby=');
-  expect(markup).toContain('(opens in a new tab)');
+  expect(markup).not.toContain('(opens in a new tab)');
   expect(markup).toContain('motion-reduce:opacity-100');
+  expect(source).toContain('window.location.assign(profilePath)');
+  expect(source).not.toContain('window.open(');
 });
 
 test('full-page loading state provides one specific live status landmark', () => {

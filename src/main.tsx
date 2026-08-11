@@ -12,7 +12,7 @@ import { AuthProvider } from './providers/AuthProvider.tsx';
 
 import './styles/index.css';
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, notFoundMode: 'root' });
 const queryClient = new QueryClient();
 
 // Register the router instance for type safety

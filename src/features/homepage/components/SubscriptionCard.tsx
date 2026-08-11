@@ -50,7 +50,7 @@ export const SubscriptionCard = ({
     </CardContent>
     <CardFooter className="mx-auto pb-6">
       <Button asChild variant={variant === 'free' ? 'outline' : 'default'}>
-        <Link to="/dashboard">Get started</Link>
+        <Link to="/app/dashboard">Get started</Link>
       </Button>
     </CardFooter>
   </Card>
