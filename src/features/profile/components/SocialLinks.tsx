@@ -29,7 +29,7 @@ export const SocialLinks = ({
           return (
             <span
               key={`${socialLink.key}-${index}`}
-              className="text-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_backwards] items-center justify-center rounded-full motion-reduce:animate-none"
+              className="text-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_backwards] items-center justify-center rounded-md motion-reduce:animate-none"
               role="img"
               aria-label={platform.label}
             >
@@ -45,7 +45,7 @@ export const SocialLinks = ({
                 href={socialLink.value}
                 target="_blank"
                 rel="ugc noopener noreferrer"
-                className="text-icons hover:text-icons/60 focus-visible:ring-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_backwards] items-center justify-center rounded-full transition focus-visible:ring-2 focus-visible:outline-none motion-reduce:animate-none"
+                className="text-icons hover:text-icons/60 focus-visible:ring-icons flex size-10 animate-[blurFadeIn_0.4s_ease-out_0.60s_backwards] items-center justify-center rounded-md transition focus-visible:ring-2 focus-visible:outline-none motion-reduce:animate-none"
                 aria-label={`${platform.label} (opens in a new tab)`}
               >
                 <platform.Icon aria-hidden="true" className="size-6" />

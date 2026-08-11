@@ -75,9 +75,7 @@ export const LinkButton = forwardRef<
     setFavicon({ key: faviconKey, src: imgSrc, loaded: true });
   };
   const isEditorSurface = surface === 'editor';
-  const linkRadiusClassName = isEditorSurface
-    ? 'rounded-lg'
-    : 'rounded-2xl';
+  const linkRadiusClassName = 'rounded-lg';
   const iconSurfaceClassName = 'bg-links-icon-background text-links-icon';
   const linkSurfaceClassName = isEditorSurface
     ? 'bg-input/50 text-foreground'
@@ -91,7 +89,7 @@ export const LinkButton = forwardRef<
       {!isEditorSurface && (
         <span
           className={cn(
-            'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full transition-colors',
+            'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md transition-colors',
             activeFavicon.loaded ? 'bg-transparent' : iconSurfaceClassName,
           )}
         >
@@ -118,7 +116,7 @@ export const LinkButton = forwardRef<
       {!isEditorSurface && (
         <span
           className={cn(
-            'flex size-6 shrink-0 items-center justify-center rounded-full',
+            'flex size-6 shrink-0 items-center justify-center rounded-md',
             iconSurfaceClassName,
           )}
         >

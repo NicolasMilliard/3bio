@@ -39,7 +39,6 @@ const NameInput = () => {
       <Input
         id="name"
         {...register('name')}
-        className="rounded-lg"
         placeholder="Your name"
       />
     </FieldSet>
@@ -55,7 +54,6 @@ const BioInput = () => {
       <Textarea
         id="bio"
         {...register('bio')}
-        className="rounded-lg"
         rows={1}
         placeholder="Write something about yourself in your bio to let people know more about you."
       />

@@ -96,7 +96,7 @@ export const HeroVisual = () => {
       data-hero-visual
       className="hero-visual-enter mx-auto w-full max-w-136 lg:mx-0 lg:justify-self-end"
     >
-      <div className="bg-primary relative isolate h-[clamp(25rem,122vw,37rem)] overflow-hidden rounded-[2.5rem] sm:aspect-10/11 sm:h-auto sm:rounded-[3rem]">
+      <div className="bg-primary relative isolate h-[clamp(25rem,122vw,37rem)] overflow-hidden rounded-xl sm:aspect-10/11 sm:h-auto">
         <div
           data-hero-layer="orbit"
           data-hero-motion="ambient"
@@ -153,7 +153,7 @@ export const HeroVisual = () => {
               <div data-hero-tilt className="hero-profile-tilt">
                 <div
                   data-theme="classic"
-                  className="bg-primary-foreground relative -rotate-1 rounded-[1.75rem] p-3 shadow-[0_2rem_4.5rem_rgba(4,2,59,0.34)] transform-3d sm:rounded-[2.25rem] sm:p-5"
+                  className="bg-primary-foreground relative -rotate-1 rounded-xl p-3 shadow-[0_2rem_4.5rem_rgba(4,2,59,0.34)] transform-3d sm:p-5"
                 >
                   <div
                     data-hero-layer="identity"
@@ -184,7 +184,7 @@ export const HeroVisual = () => {
                       ].map(({ label, Icon }) => (
                         <span
                           key={label}
-                          className="flex size-7 items-center justify-center rounded-full sm:size-9"
+                          className="flex size-7 items-center justify-center rounded-md sm:size-9"
                         >
                           <Icon
                             aria-hidden="true"
@@ -197,22 +197,22 @@ export const HeroVisual = () => {
 
                   <div
                     data-hero-depth="middle"
-                    className="profile-links-canvas bg-content-background relative isolate mt-3 overflow-hidden rounded-[1.25rem] p-2 sm:mt-4 sm:rounded-3xl sm:p-3"
+                    className="profile-links-canvas bg-content-background relative isolate mt-3 overflow-hidden rounded-xl p-2 sm:mt-4 sm:p-3"
                   >
                     <div className="relative z-10 space-y-2">
                       {PROFILE_LINKS.map((label, index) => (
                         <div
                           key={label}
                           data-hero-layer={`link-${index + 1}`}
-                          className="hero-link-enter bg-links-background text-links-text flex items-center gap-2 rounded-xl p-1.5 sm:gap-3 sm:rounded-2xl sm:p-2"
+                          className="hero-link-enter bg-links-background text-links-text flex items-center gap-2 rounded-lg p-1.5 sm:gap-3 sm:p-2"
                         >
-                          <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-full sm:size-7">
+                          <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-md sm:size-7">
                             <Link2 className="size-3.5 sm:size-4" />
                           </span>
                           <span className="min-w-0 flex-1 truncate text-[0.58rem] font-bold sm:text-[0.68rem]">
                             {label}
                           </span>
-                          <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-full sm:size-7">
+                          <span className="bg-links-icon-background text-links-icon flex size-6 shrink-0 items-center justify-center rounded-md sm:size-7">
                             <ExternalLink className="size-3.5 sm:size-4" />
                           </span>
                         </div>

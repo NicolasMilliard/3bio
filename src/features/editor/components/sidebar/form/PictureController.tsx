@@ -151,7 +151,7 @@ export const PictureController = ({
             aria-label={`Image guidance for ${normalizedLabel}`}
             aria-controls={guidanceId}
             aria-expanded={isGuidanceOpen}
-            className="text-muted-foreground/80 hover:border-border/80 hover:bg-background hover:text-foreground size-7 rounded-md transition-[color,background-color,border-color,box-shadow] duration-150 ease-out hover:shadow-xs active:translate-y-0 aria-expanded:border-border aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:shadow-xs"
+            className="text-muted-foreground/80 hover:border-border/80 hover:bg-background hover:text-foreground size-7 transition-[color,background-color,border-color,box-shadow] duration-150 ease-out hover:shadow-xs active:translate-y-0 aria-expanded:border-border aria-expanded:bg-background aria-expanded:text-foreground aria-expanded:shadow-xs"
             onClick={() => setIsGuidanceOpen((open) => !open)}
           >
             <InfoIcon
@@ -221,13 +221,12 @@ export const PictureController = ({
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="rounded-xl">
-          <DropdownMenuItem className="rounded-md" onSelect={openFilePicker}>
+        <DropdownMenuContent>
+          <DropdownMenuItem onSelect={openFilePicker}>
             {currentPicture ? 'Change' : 'Upload'} {normalizedLabel}
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
-            className="rounded-md"
             disabled={!currentPicture}
             onSelect={removePicture}
           >

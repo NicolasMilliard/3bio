@@ -95,7 +95,7 @@ export const EditableButtonLinks = () => {
             />
           </DialogTrigger>
 
-          <DialogContent className="rounded-xl **:data-[slot=button]:rounded-lg **:data-[size=icon-sm]:rounded-md **:data-[slot=input]:rounded-lg **:data-[slot=input-group]:rounded-lg">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit link</DialogTitle>
               <DialogDescription>

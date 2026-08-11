@@ -25,7 +25,7 @@ export const Image = ({
       {showSkeleton && !isSettled && (
         <div
           className={cn(
-            'bg-muted absolute inset-0 animate-pulse rounded-4xl',
+            'bg-muted absolute inset-0 animate-pulse rounded-lg',
             skeletonClassName,
           )}
         />
