@@ -28,7 +28,7 @@ export const AppHeader = () => {
         <nav aria-label="Primary" className="flex items-center gap-2">
           {isHome ? (
             <Button asChild>
-              <Link to="/dashboard">Launch App</Link>
+              <Link to="/app/dashboard">Launch App</Link>
             </Button>
           ) : (
             <AuthButton />

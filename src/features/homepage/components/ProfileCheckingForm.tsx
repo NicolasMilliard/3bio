@@ -14,7 +14,6 @@ import {
   InputGroupInput,
   Text,
 } from '@/components/ui';
-import { ExternalLink } from 'lucide-react';
 
 export const ProfileCheckingForm = () => {
   const inputId = useId();
@@ -34,7 +33,7 @@ export const ProfileCheckingForm = () => {
 
   const onSubmit = (values: ProfileCheckingFormValues) => {
     const profilePath = `/${encodeURIComponent(values.link)}`;
-    window.open(profilePath, '_blank', 'noopener noreferrer');
+    window.location.assign(profilePath);
   };
 
   return (
@@ -70,8 +69,6 @@ export const ProfileCheckingForm = () => {
           </InputGroup>
           <Button type="submit" size="lg" className="w-full sm:w-auto">
             Check my Profile
-            <span className="sr-only"> (opens in a new tab)</span>
-            <ExternalLink aria-hidden="true" />
           </Button>
         </div>
         {errors.link?.message ? (

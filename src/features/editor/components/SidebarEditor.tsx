@@ -41,7 +41,7 @@ export const SidebarEditor = () => {
       />
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
-          to="/dashboard"
+          to="/app/dashboard"
           aria-disabled={isBusy}
           onClick={(event) => {
             if (isBusy) event.preventDefault();

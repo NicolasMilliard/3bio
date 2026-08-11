@@ -1,5 +1,12 @@
-import { ErrorScreen, Toaster, TooltipProvider } from '@/components/ui';
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { Button, ErrorScreen, Toaster, TooltipProvider } from '@/components/ui';
+import {
+  NOINDEX_ROBOTS,
+  PAGE_NOT_FOUND_DESCRIPTION,
+  PAGE_NOT_FOUND_TITLE,
+} from '@/features/profile/documentMetadata';
+import { useClearServerMetadata } from '@/hooks/useClearServerMetadata';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 const RootErrorScreen = () => (
@@ -15,6 +22,27 @@ const RootErrorScreen = () => (
   />
 );
 
+const RootNotFoundScreen = () => {
+  useClearServerMetadata();
+  useDocumentTitle(PAGE_NOT_FOUND_TITLE);
+
+  return (
+    <>
+      <title>{PAGE_NOT_FOUND_TITLE}</title>
+      <meta name="description" content={PAGE_NOT_FOUND_DESCRIPTION} />
+      <meta name="robots" content={NOINDEX_ROBOTS} />
+      <ErrorScreen
+        title="Page not found."
+        description={PAGE_NOT_FOUND_DESCRIPTION}
+      >
+        <Button asChild variant="outline">
+          <Link to="/">Go back home</Link>
+        </Button>
+      </ErrorScreen>
+    </>
+  );
+};
+
 const RootLayout = () => (
   <>
     <TooltipProvider>
@@ -28,4 +56,5 @@ const RootLayout = () => (
 export const Route = createRootRoute({
   component: RootLayout,
   errorComponent: RootErrorScreen,
+  notFoundComponent: RootNotFoundScreen,
 });

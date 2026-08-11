@@ -14,7 +14,7 @@ export const DashboardScreen = () => {
           description="Update your identity, links and public data."
           footer={
             <Button asChild>
-              <Link to="/edit">Edit profile</Link>
+              <Link to="/app/edit">Edit profile</Link>
             </Button>
           }
           className="animate-[blurFadeIn_0.5s_ease-out_forwards] opacity-0 motion-reduce:animate-none motion-reduce:opacity-100"

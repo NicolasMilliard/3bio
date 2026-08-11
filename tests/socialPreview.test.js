@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 
 import {
   buildProfileDocumentMetadata,
+  NOINDEX_ROBOTS,
+  PAGE_NOT_FOUND_TITLE,
+  renderPageNotFoundDocumentHead,
   renderProfileDocumentHead,
 } from '../src/features/profile/documentMetadata.ts';
 import {
@@ -10,9 +13,14 @@ import {
   isProfilePageId,
   onRequest,
   replaceMetadataBlock,
-} from '../functions/[pageId].ts';
+} from '../functions/[[path]].ts';
 
 const origin = 'https://3bio.social';
+const shellHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const createShellResponse = () =>
+  new Response(shellHtml, {
+    headers: { 'Content-Type': 'text/html; charset=UTF-8' },
+  });
 
 test('homepage ships complete crawler-visible social metadata and a 1200 × 630 image', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -91,7 +99,13 @@ test('only ready profiles are indexable and user text is normalized and escaped'
     lensHandle: 'alice',
     status: 'error',
   });
+  const notFound = buildProfileDocumentMetadata({
+    origin,
+    lensHandle: 'alice',
+    status: 'not-found',
+  });
   const head = renderProfileDocumentHead(ready);
+  const notFoundHead = renderProfileDocumentHead(notFound);
 
   expect(ready.canonicalUrl).toBe('https://3bio.social/alice');
   expect(ready.description).toBe('A profile with normalized spacing.');
@@ -99,8 +113,24 @@ test('only ready profiles are indexable and user text is normalized and escaped'
   expect(loading.robots).toBe('noindex, nofollow');
   expect(loading.isIndexable).toBe(false);
   expect(error.robots).toBe('noindex, nofollow');
+  expect(notFound.robots).toBe(NOINDEX_ROBOTS);
+  expect(notFound.isIndexable).toBe(false);
+  expect(notFoundHead).not.toContain('rel="canonical"');
+  expect(notFoundHead).not.toContain('property="og:');
+  expect(notFoundHead).not.toContain('application/ld+json');
   expect(head).toContain('Alice &lt;Creator&gt; (@alice) | 3bio');
   expect(head).not.toContain('Alice <Creator>');
+});
+
+test('generic not-found metadata is crawler-visible and never indexable', () => {
+  const head = renderPageNotFoundDocumentHead();
+
+  expect(head).toContain(PAGE_NOT_FOUND_TITLE);
+  expect(head).toContain('name="description"');
+  expect(head).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
+  expect(head).not.toContain('rel="canonical"');
+  expect(head).not.toContain('property="og:');
+  expect(head).not.toContain('application/ld+json');
 });
 
 test('edge profile parsing preserves native Lens fields and valid 3bio overrides', () => {
@@ -168,9 +198,12 @@ test('edge rewriting replaces only the marked metadata block', () => {
   expect(rewritten).toContain('<body>App</body>');
 });
 
-test('edge routing accepts dotted Lens handles but skips static files', () => {
+test('edge routing accepts released and dotted Lens handles but skips reserved paths and static files', () => {
   expect(isProfilePageId('alice.lens')).toBe(true);
   expect(isProfilePageId('alice_creator-1')).toBe(true);
+  expect(isProfilePageId('app')).toBe(true);
+  expect(isProfilePageId('dashboard')).toBe(true);
+  expect(isProfilePageId('edit')).toBe(true);
   expect(isProfilePageId('favicon.ico')).toBe(false);
   expect(isProfilePageId('favicon.svg')).toBe(false);
   expect(isProfilePageId('og.png')).toBe(false);
@@ -180,7 +213,7 @@ test('edge routing accepts dotted Lens handles but skips static files', () => {
 test('edge routing canonicalizes host, handle casing, and trailing slashes', async () => {
   const response = await onRequest({
     request: new Request('https://www.3bio.social/ALICE/?ref=share'),
-    params: { pageId: 'ALICE' },
+    params: { path: ['ALICE'] },
     next: () => {
       throw new Error('Canonical redirects must not fetch the app shell.');
     },
@@ -190,4 +223,156 @@ test('edge routing canonicalizes host, handle casing, and trailing slashes', asy
   expect(response.headers.get('location')).toBe(
     'https://3bio.social/alice?ref=share',
   );
+});
+
+test('edge routing returns a generic HTML 404 with noindex for invalid and multi-segment paths', async () => {
+  const requests = [
+    {
+      url: 'https://3bio.social/---',
+      path: ['---'],
+    },
+    {
+      url: 'https://3bio.social/unknown/extra',
+      path: ['unknown', 'extra'],
+    },
+    {
+      url: 'https://3bio.social/app/unknown',
+      path: ['app', 'unknown'],
+    },
+  ];
+
+  for (const { url, path } of requests) {
+    const response = await onRequest({
+      request: new Request(url),
+      params: { path },
+      next: async () => createShellResponse(),
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
+    expect(html).toContain(PAGE_NOT_FOUND_TITLE);
+    expect(html).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
+    expect(html).not.toContain('rel="canonical"');
+    expect(html).not.toContain('property="og:title"');
+  }
+});
+
+test('generic edge 404 responses honor HEAD semantics', async () => {
+  const response = await onRequest({
+    request: new Request('https://3bio.social/unknown/extra', {
+      method: 'HEAD',
+    }),
+    params: { path: ['unknown', 'extra'] },
+    next: async () => createShellResponse(),
+  });
+
+  expect(response.status).toBe(404);
+  expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
+  expect(await response.text()).toBe('');
+});
+
+test('known internal app routes pass through with an HTTP noindex header', async () => {
+  const internalRoutes = [
+    { url: 'https://3bio.social/app/dashboard', path: ['app', 'dashboard'] },
+    { url: 'https://3bio.social/app/edit', path: ['app', 'edit'] },
+  ];
+
+  for (const internalRoute of internalRoutes) {
+    const response = await onRequest({
+      request: new Request(internalRoute.url),
+      params: { path: internalRoute.path },
+      next: async () => createShellResponse(),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
+  }
+});
+
+test('missing profiles return a real 404 with profile-specific noindex metadata', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ data: { account: null } }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+  try {
+    const response = await onRequest({
+      request: new Request('https://3bio.social/missing'),
+      params: { path: ['missing'] },
+      next: async () => createShellResponse(),
+    });
+    const html = await response.text();
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
+    expect(html).toContain('Profile not found | 3bio');
+    expect(html).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
+    expect(html).not.toContain('rel="canonical"');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('app, dashboard, and edit handles use the profile edge pipeline', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_request, options) => {
+    const body = JSON.parse(options.body);
+    const localName = body.variables.request.username.localName;
+
+    return new Response(
+      JSON.stringify({
+        data: {
+          account: {
+            username: { localName },
+            metadata: { name: `${localName} profile`, attributes: [] },
+          },
+        },
+      }),
+      { headers: { 'Content-Type': 'application/json' } },
+    );
+  };
+
+  try {
+    for (const handle of ['app', 'dashboard', 'edit']) {
+      const response = await onRequest({
+        request: new Request(`https://3bio.social/${handle}`),
+        params: { path: [handle] },
+        next: async () => createShellResponse(),
+      });
+      const html = await response.text();
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('x-robots-tag')).toBeNull();
+      expect(html).toContain(`rel="canonical" href="${origin}/${handle}"`);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('deployment routing sends dynamic URLs through the catch-all and noindexes app pages', () => {
+  const routes = JSON.parse(
+    readFileSync(new URL('../public/_routes.json', import.meta.url), 'utf8'),
+  );
+  const headers = readFileSync(
+    new URL('../public/_headers', import.meta.url),
+    'utf8',
+  );
+  const robots = readFileSync(
+    new URL('../public/robots.txt', import.meta.url),
+    'utf8',
+  );
+
+  expect(routes.include).toEqual(['/*']);
+  expect(routes.exclude).not.toContain('/dashboard');
+  expect(routes.exclude).not.toContain('/dashboard/*');
+  expect(routes.exclude).not.toContain('/edit');
+  expect(routes.exclude).not.toContain('/edit/*');
+  expect(routes.exclude).not.toContain('/app');
+  expect(routes.exclude).not.toContain('/app/*');
+  expect(headers).not.toMatch(/^\/app\n  X-Robots-Tag: noindex, nofollow$/m);
+  expect(headers).toMatch(/^\/app\/\*\n  X-Robots-Tag: noindex, nofollow$/m);
+  expect(robots).not.toContain('Disallow:');
 });

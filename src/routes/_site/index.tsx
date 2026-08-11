@@ -7,7 +7,7 @@ import {
   PricingSection,
 } from '@/features/homepage/components';
 
-export const Route = createFileRoute('/_app/')({
+export const Route = createFileRoute('/_site/')({
   component: HomePage,
 });
 
