@@ -41,7 +41,7 @@ export const CreatorRightsSection = () => {
     >
       <div
         data-creator-rights-motion="panel"
-        className="bg-primary text-primary-foreground relative isolate overflow-hidden rounded-[2.5rem] sm:rounded-[3rem]"
+        className="bg-primary text-primary-foreground relative isolate overflow-hidden rounded-xl"
       >
         <div
           aria-hidden="true"

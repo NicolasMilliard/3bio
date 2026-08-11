@@ -31,7 +31,7 @@ export const ProfileCard = ({
   onSelect,
 }: ProfileCardProps) => {
   return (
-    <Card className="bg-background ring-muted w-full max-w-97 overflow-hidden rounded-4xl p-0 text-center shadow-none ring-1">
+    <Card className="bg-background ring-muted w-full max-w-97 overflow-hidden p-0 text-center shadow-none ring-1">
       <div
         className="bg-accent h-32 w-full bg-cover bg-center"
         style={

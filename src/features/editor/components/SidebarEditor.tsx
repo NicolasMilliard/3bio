@@ -33,11 +33,11 @@ export const SidebarEditor = () => {
   return (
     <Sidebar
       variant="floating"
-      className="**:data-[slot=sidebar-inner]:rounded-xl **:data-[slot=sidebar-inner]:shadow-none"
+      className="**:data-[slot=sidebar-inner]:shadow-none"
     >
       <SidebarTrigger
         type="button"
-        className="bg-card/90 absolute top-4 left-full z-30 ml-4 rounded-md shadow-sm backdrop-blur"
+        className="bg-card/90 absolute top-4 left-full z-30 ml-4 shadow-sm backdrop-blur"
       />
       <SidebarHeader className="text-foreground/70 border-foreground/40 items-start border-b">
         <Link
@@ -66,7 +66,6 @@ export const SidebarEditor = () => {
           type="submit"
           form="profile-editor-form"
           disabled={!isDirty || isBusy}
-          className="rounded-lg"
         >
           {isSubmitting
             ? 'Saving...'

@@ -83,7 +83,7 @@ const ProfileSelectionQuery = ({
 
       {!loading && error && (
         <div
-          className="border-destructive/30 bg-destructive/5 flex max-w-md flex-col items-center gap-4 rounded-3xl border p-6"
+          className="border-destructive/30 bg-destructive/5 flex max-w-md flex-col items-center gap-4 rounded-xl border p-6"
           role="alert"
         >
           <div className="space-y-1">

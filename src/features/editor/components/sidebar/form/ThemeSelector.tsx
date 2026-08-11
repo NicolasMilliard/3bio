@@ -37,17 +37,13 @@ export const ThemeSelector = () => {
         });
       }}
     >
-      <SelectTrigger className="w-full rounded-lg">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="Theme" />
       </SelectTrigger>
-      <SelectContent className="rounded-xl">
+      <SelectContent>
         <SelectGroup>
           {THREE_BIO_THEME_NAMES.map((themeName) => (
-            <SelectItem
-              key={themeName}
-              value={themeName}
-              className="rounded-md"
-            >
+            <SelectItem key={themeName} value={themeName}>
               {formatThemeLabel(themeName)}
             </SelectItem>
           ))}
