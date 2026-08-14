@@ -8,12 +8,11 @@ import {
   renderPageNotFoundDocumentHead,
   renderProfileDocumentHead,
 } from '../src/features/profile/documentMetadata.ts';
-import {
-  extractProfileFromLensAccount,
-  isProfilePageId,
-  onRequest,
-  replaceMetadataBlock,
-} from '../functions/[[path]].ts';
+import { onRequest } from '../functions/[[path]].ts';
+import { LENS_METADATA_RESPONSE_MAX_BYTES } from '../src/constants/metadata.ts';
+import { replaceMetadataBlock } from '../src/features/profile/edge/htmlResponse.ts';
+import { extractProfileFromLensAccount } from '../src/features/profile/edge/lensAccount.ts';
+import { isProfilePageId } from '../src/features/profile/edge/routing.ts';
 
 const origin = 'https://3bio.social';
 const shellHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -310,6 +309,28 @@ test('missing profiles return a real 404 with profile-specific noindex metadata'
     expect(html).toContain('Profile not found | 3bio');
     expect(html).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
     expect(html).not.toContain('rel="canonical"');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('oversized Lens responses fail closed before metadata parsing', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response('x'.repeat(LENS_METADATA_RESPONSE_MAX_BYTES + 1), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+  try {
+    const response = await onRequest({
+      request: new Request('https://3bio.social/alice'),
+      params: { path: ['alice'] },
+      next: async () => createShellResponse(),
+    });
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
   } finally {
     globalThis.fetch = originalFetch;
   }

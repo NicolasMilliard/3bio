@@ -1,36 +1,42 @@
-import { THREEBIO_ATTRIBUTE_KEY } from '@/constants';
 import { type Account } from '@lens-protocol/react';
-import { parseThreeBioMetadata } from './parseThreeBioMetadata';
-
-function findAttribute<T extends string, V>(
-  attributes: { key: string; value: unknown }[] | undefined,
-  key: T,
-): V | undefined {
-  return attributes?.find((a) => a.key === key)?.value as V | undefined;
-}
+import {
+  hasThreeBioMetadataTombstone,
+  parseThreeBioMetadataAttributes,
+} from './parseThreeBioMetadata';
 
 export const formatToThreeBioMetadata = (account: Account) => {
   const metadata = account.metadata;
   const attributes = metadata?.attributes;
 
-  const rawThreeBioMetadata = findAttribute<
-    typeof THREEBIO_ATTRIBUTE_KEY,
-    unknown
-  >(attributes, THREEBIO_ATTRIBUTE_KEY);
-  const threeBioMetadata = parseThreeBioMetadata(rawThreeBioMetadata);
+  const threeBioMetadata = parseThreeBioMetadataAttributes(attributes);
 
   const threeBioProfile = threeBioMetadata?.profile;
   const threeBioTheme = threeBioMetadata?.theme;
   const threeBioSettings = threeBioMetadata?.settings;
+  const hasTombstone = (
+    path: Parameters<typeof hasThreeBioMetadataTombstone>[1],
+  ) => hasThreeBioMetadataTombstone(threeBioMetadata, path);
 
   const profile = {
-    coverPicture: threeBioProfile?.coverPicture ?? metadata?.coverPicture,
-    linksPanelBackground: threeBioProfile?.linksPanelBackground,
-    avatar: threeBioProfile?.avatar ?? metadata?.picture,
-    name: threeBioProfile?.name ?? metadata?.name,
-    bio: threeBioProfile?.bio ?? metadata?.bio,
-    socialLinks: threeBioProfile?.socialLinks,
-    links: threeBioProfile?.links,
+    coverPicture: hasTombstone('profile.coverPicture')
+      ? undefined
+      : (threeBioProfile?.coverPicture ?? metadata?.coverPicture),
+    linksPanelBackground: hasTombstone('profile.linksPanelBackground')
+      ? undefined
+      : threeBioProfile?.linksPanelBackground,
+    avatar: hasTombstone('profile.avatar')
+      ? undefined
+      : (threeBioProfile?.avatar ?? metadata?.picture),
+    name: hasTombstone('profile.name')
+      ? null
+      : (threeBioProfile?.name ?? metadata?.name),
+    bio: hasTombstone('profile.bio')
+      ? null
+      : (threeBioProfile?.bio ?? metadata?.bio),
+    socialLinks: hasTombstone('profile.socialLinks')
+      ? undefined
+      : threeBioProfile?.socialLinks,
+    links: hasTombstone('profile.links') ? undefined : threeBioProfile?.links,
   };
 
   return {

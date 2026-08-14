@@ -1,4 +1,8 @@
-import { THREEBIO_ATTRIBUTE_KEY } from '@/constants';
+import {
+  LENS_METADATA_MAX_ATTRIBUTES,
+  THREEBIO_ATTRIBUTE_KEY,
+  THREE_BIO_METADATA_MAX_BYTES,
+} from '@/constants';
 import type { ThreeBioMetadata } from '@/schemas/threeBioMetadata.schema';
 import {
   account as createMetadata,
@@ -51,15 +55,40 @@ export const formatMetadataBeforeUpload = (
   threeBioMetadata: ThreeBioMetadata,
 ) => {
   const prevMetadata = account.metadata;
-  const nextAttributes = (prevMetadata?.attributes ?? [])
+  const previousAttributes = prevMetadata?.attributes ?? [];
+
+  if (previousAttributes.length > LENS_METADATA_MAX_ATTRIBUTES) {
+    throw new RangeError(
+      `Account metadata cannot contain more than ${LENS_METADATA_MAX_ATTRIBUTES} attributes.`,
+    );
+  }
+
+  const serializedThreeBioMetadata = JSON.stringify(threeBioMetadata);
+
+  if (
+    new TextEncoder().encode(serializedThreeBioMetadata).byteLength >
+    THREE_BIO_METADATA_MAX_BYTES
+  ) {
+    throw new RangeError(
+      `3bio metadata cannot exceed ${THREE_BIO_METADATA_MAX_BYTES} bytes.`,
+    );
+  }
+
+  const nextAttributes = previousAttributes
     .filter(({ key }) => key !== THREEBIO_ATTRIBUTE_KEY)
     .map(normalizeAttribute);
 
   nextAttributes.push({
     key: THREEBIO_ATTRIBUTE_KEY,
     type: MetadataAttributeType.JSON,
-    value: JSON.stringify(threeBioMetadata),
+    value: serializedThreeBioMetadata,
   } satisfies JsonAttribute);
+
+  if (nextAttributes.length > LENS_METADATA_MAX_ATTRIBUTES) {
+    throw new RangeError(
+      `Account metadata cannot contain more than ${LENS_METADATA_MAX_ATTRIBUTES} attributes.`,
+    );
+  }
 
   // This is a new metadata document, so the composer generates a fresh id.
   return createMetadata({

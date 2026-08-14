@@ -4,8 +4,13 @@ import type { Account } from '@lens-protocol/react';
 export const getMetadataUploadCacheKey = (
   previousMetadata: Account['metadata'],
   nextThreeBioMetadata: ThreeBioMetadata,
-) =>
-  JSON.stringify({
+) => {
+  const stableThreeBioMetadata = { ...nextThreeBioMetadata };
+
+  delete (stableThreeBioMetadata as { updatedAt?: unknown }).updatedAt;
+
+  return JSON.stringify({
     previousMetadata,
-    nextThreeBioMetadata,
+    nextThreeBioMetadata: stableThreeBioMetadata,
   });
+};

@@ -1,4 +1,4 @@
-import { formatAddress, getThreeBioProfile } from '@/helpers';
+import { formatAddress, formatToThreeBioMetadata } from '@/helpers';
 import type { AccountAvailable } from '@lens-protocol/react';
 import {
   useAccountsAvailable,
@@ -37,17 +37,15 @@ export const useLensProfiles = () => {
   const profiles: LensProfile[] =
     accounts?.items.map((item) => {
       const account = item.account;
-      const threeBioProfile = getThreeBioProfile(account.metadata?.attributes);
+      const profile = formatToThreeBioMetadata(account).profile;
 
       const address = account.address.toLowerCase();
       const isActive = activeAddress === address;
 
       const displayName =
-        threeBioProfile?.name ??
-        account.username?.localName ??
-        formatAddress(address);
+        profile.name ?? account.username?.localName ?? formatAddress(address);
 
-      const avatar = threeBioProfile?.avatar ?? account.metadata?.picture;
+      const avatar = profile.avatar;
 
       return { accountAvailable: item, address, displayName, avatar, isActive };
     }) ?? [];

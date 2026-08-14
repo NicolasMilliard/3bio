@@ -1,5 +1,4 @@
-import { getThreeBioProfile } from '@/helpers';
-import type { ThreeBioProfile } from '@/schemas/threeBioMetadata.schema';
+import { formatToThreeBioMetadata } from '@/helpers';
 import {
   useAccountsAvailable,
   type AccountAvailable,
@@ -135,17 +134,11 @@ const ProfileSelectionQuery = ({
       {!loading && !error && accounts?.items.length ? (
         <div className="grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.items.map((item) => {
-            const threeBioProfile: ThreeBioProfile | undefined =
-              getThreeBioProfile(item.account.metadata?.attributes);
+            const profile = formatToThreeBioMetadata(item.account).profile;
             const name =
-              threeBioProfile?.name ??
-              item.account.username?.localName ??
-              'Unnamed';
-            const avatar =
-              threeBioProfile?.avatar ?? item.account.metadata?.picture;
-            const coverPicture =
-              threeBioProfile?.coverPicture ??
-              item.account.metadata?.coverPicture;
+              profile.name ?? item.account.username?.localName ?? 'Unnamed';
+            const avatar = profile.avatar;
+            const coverPicture = profile.coverPicture;
             const avatarFallback =
               item.account.username?.localName?.[0]?.toUpperCase() ??
               name[0]?.toUpperCase() ??
