@@ -63,18 +63,22 @@ point to `https://3bio.social`.
 ## 2. Keep or change metadata compatibility
 
 3bio stores its presentation settings inside a JSON Lens account-metadata
-attribute named `3bio`. The key is defined in both:
+attribute named `3bio`. The key is defined in:
 
 - `src/constants/attributes.ts`
-- `functions/[[path]].ts`
 
 Keep this key unchanged if your fork should read and update existing
-3bio-compatible profiles. Changing it creates a separate metadata namespace;
-existing 3bio settings will not migrate automatically, and both definitions and
-their tests must change together.
+3bio-compatible profiles. The shared browser and edge parser reads legacy
+unversioned payloads and the current versioned format. Changing the key creates
+a separate metadata namespace; existing 3bio settings will not migrate
+automatically.
 
-The editor preserves native Lens fields and non-3bio metadata attributes when it
-saves a new metadata document.
+Current payloads include `schemaVersion`, `updatedAt`, and explicit tombstones
+for removed overrides. The parser merges bounded duplicate candidates by their
+timestamps, then the editor compacts the result back to one attribute. Keep the
+shared parser, limits, and schema in sync if you extend this format. The editor
+also reloads the Lens account before saving so it preserves the latest native
+fields, non-3bio attributes, and settings it does not edit.
 
 ## 3. Rebrand the fork
 
