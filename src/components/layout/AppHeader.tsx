@@ -3,6 +3,7 @@ import { useMatchRoute } from '@tanstack/react-router';
 import { AuthButton } from '@/features/auth/components';
 import { Link } from '@tanstack/react-router';
 import { Logo } from '../icons/Logo';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
 export const AppHeader = () => {
@@ -21,9 +22,17 @@ export const AppHeader = () => {
       />
 
       <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
-        <Link to="/" aria-label="3bio home">
-          <Logo isAtTop />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/" aria-label="3bio home">
+            <Logo isAtTop />
+          </Link>
+          <Badge
+            variant="outline"
+            className="border-primary/20 bg-background/90 text-primary font-bold tracking-[0.12em] uppercase"
+          >
+            Alpha
+          </Badge>
+        </div>
 
         <nav aria-label="Primary" className="flex items-center gap-2">
           {isHome ? (

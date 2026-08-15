@@ -2,6 +2,10 @@
 
 A customizable, open-source link-in-bio for Lens profiles.
 
+> [!NOTE]
+> **Alpha status:** 3bio is ready for early testing, but rough edges are
+> expected. Editor saves publish real metadata to Lens mainnet.
+
 [Visit 3bio](https://3bio.social) ·
 [Open the dashboard](https://3bio.social/app/dashboard) ·
 [Run locally](#local-development) · [Self-host 3bio](./docs/self-hosting.md)
