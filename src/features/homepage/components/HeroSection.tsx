@@ -42,6 +42,9 @@ export const HeroSection = () => {
             and built on Lens.
           </Text>
           <ProfileCheckingForm />
+          <p className="text-muted-foreground -mt-4 text-sm leading-6">
+            Early alpha&mdash;expect rough edges and please share feedback.
+          </p>
         </div>
         <HeroVisual />
       </div>

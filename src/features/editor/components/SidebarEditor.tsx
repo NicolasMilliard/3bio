@@ -62,6 +62,17 @@ export const SidebarEditor = () => {
         <DisplayGroup />
       </SidebarContent>
       <SidebarFooter className="border-foreground/40 border-t py-3">
+        <div
+          role="note"
+          aria-label="Alpha release notice"
+          className="border-accent bg-accent/20 rounded-lg border px-3 py-2 text-xs leading-5"
+        >
+          <p className="font-semibold">Alpha software</p>
+          <p className="text-foreground/70">
+            Saving publishes real metadata to Lens mainnet. If confirmation
+            times out, check your profile before trying again.
+          </p>
+        </div>
         <Button
           type="submit"
           form="profile-editor-form"

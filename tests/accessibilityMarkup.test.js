@@ -62,6 +62,29 @@ test('homepage hero labels its content and keeps the visual decorative', () => {
   expect(markup).toContain('data-hero-tilt="true"');
   expect(markup).toContain('hero-visual-enter');
   expect(markup).toContain('hero-profile-tilt');
+  expect(markup).toContain(
+    'Early alpha—expect rough edges and please share feedback.',
+  );
+});
+
+test('alpha status is visible globally and the editor explains mainnet saves', () => {
+  const appHeader = readFileSync(
+    new URL('../src/components/layout/AppHeader.tsx', import.meta.url),
+    'utf8',
+  );
+  const sidebarEditor = readFileSync(
+    new URL(
+      '../src/features/editor/components/SidebarEditor.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+
+  expect(appHeader).toContain('Alpha');
+  expect(sidebarEditor).toContain('role="note"');
+  expect(sidebarEditor).toContain('Alpha release notice');
+  expect(sidebarEditor).toContain('Saving publishes real metadata to Lens');
+  expect(sidebarEditor).toContain('check your profile before trying again');
 });
 
 test('hero card tilt is neutral at center and capped at its corners', () => {
