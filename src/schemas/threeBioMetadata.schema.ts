@@ -57,6 +57,20 @@ const themeSchema = z.object({
 
 export type ThreeBioTheme = z.infer<typeof themeSchema>;
 
+export const threeBioPublicationStatusSchema = z.enum([
+  'public',
+  'opted-out',
+  'deleted',
+]);
+
+export type ThreeBioPublicationStatus = z.infer<
+  typeof threeBioPublicationStatusSchema
+>;
+
+const publicationSchema = z.object({
+  status: threeBioPublicationStatusSchema,
+});
+
 const settingsSchema = z.object({
   subscription: z.object({
     id: z.string().max(THREE_BIO_SETTINGS_ID_MAX_LENGTH).optional(),
@@ -76,6 +90,7 @@ const metadataStateShape = {
   profile: profileSchema.optional(),
   theme: themeSchema.optional(),
   settings: settingsSchema.optional(),
+  publication: publicationSchema.optional(),
   tombstones: tombstonesSchema.optional(),
 };
 

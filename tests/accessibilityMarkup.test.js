@@ -167,7 +167,8 @@ test('custom links panel backgrounds responsively center-crop without tiling', (
       lensHandle: 'miravale',
       profile: {
         name: 'Mira Vale',
-        linksPanelBackground: 'https://images.example/links-panel.webp',
+        linksPanelBackground:
+          'https://api.grove.storage/links-panel.webp',
         links: [{ key: 'portfolio', value: 'https://example.com/work' }],
       },
       displayStatistics: false,
@@ -181,12 +182,29 @@ test('custom links panel backgrounds responsively center-crop without tiling', (
 
   expect(panel).toBeDefined();
   expect(panel).toContain(
-    'background-image:url(&quot;https://images.example/links-panel.webp&quot;)',
+    'background-image:url(&quot;https://api.grove.storage/links-panel.webp&quot;)',
   );
   expect(panel).toContain('background-position:center');
   expect(panel).toContain('background-repeat:no-repeat');
   expect(panel).toContain('background-size:cover');
   expect(panel).toContain('bg-content-background');
+});
+
+test('profile canvases do not render media from arbitrary origins', () => {
+  const markup = renderToStaticMarkup(
+    createElement(ProfileLayout, {
+      lensHandle: 'miravale',
+      profile: {
+        avatar: 'https://tracker.example/avatar.png',
+        linksPanelBackground: 'https://tracker.example/pixel.gif',
+      },
+      displayStatistics: false,
+      displayBranding: false,
+    }),
+  );
+
+  expect(markup).not.toContain('tracker.example');
+  expect(markup).not.toContain('background-image');
 });
 
 test('image upload guidance uses an accessible inline disclosure', () => {

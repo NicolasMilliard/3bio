@@ -10,7 +10,10 @@ import {
 } from '../src/features/profile/documentMetadata.ts';
 import { onRequest } from '../functions/[[path]].ts';
 import { LENS_METADATA_RESPONSE_MAX_BYTES } from '../src/constants/metadata.ts';
-import { replaceMetadataBlock } from '../src/features/profile/edge/htmlResponse.ts';
+import {
+  CONTENT_SECURITY_POLICY,
+  replaceMetadataBlock,
+} from '../src/features/profile/edge/htmlResponse.ts';
 import { extractProfileFromLensAccount } from '../src/features/profile/edge/lensAccount.ts';
 import { isProfilePageId } from '../src/features/profile/edge/routing.ts';
 
@@ -44,8 +47,8 @@ test('profile metadata uses cover, avatar, and branded fallback images in order'
     lensHandle: 'Alice',
     profile: {
       name: 'Alice',
-      coverPicture: 'https://images.example/cover.png',
-      avatar: 'https://images.example/avatar.png',
+      coverPicture: 'https://api.grove.storage/cover.png',
+      avatar: 'https://api.grove.storage/avatar.png',
     },
     status: 'ready',
   });
@@ -54,7 +57,7 @@ test('profile metadata uses cover, avatar, and branded fallback images in order'
     lensHandle: 'Alice',
     profile: {
       coverPicture: 'http://insecure.example/cover.png',
-      avatar: 'https://images.example/avatar.png',
+      avatar: 'https://api.grove.storage/avatar.png',
     },
     status: 'ready',
   });
@@ -69,7 +72,9 @@ test('profile metadata uses cover, avatar, and branded fallback images in order'
   });
 
   expect(withCover.socialImageKind).toBe('cover');
-  expect(withCover.socialImageUrl).toBe('https://images.example/cover.png');
+  expect(withCover.socialImageUrl).toBe(
+    'https://api.grove.storage/cover.png',
+  );
   expect(withCover.twitterCard).toBe('summary_large_image');
   expect(withAvatar.socialImageKind).toBe('avatar');
   expect(withAvatar.twitterCard).toBe('summary');
@@ -249,6 +254,9 @@ test('edge routing returns a generic HTML 404 with noindex for invalid and multi
     const html = await response.text();
 
     expect(response.status).toBe(404);
+    expect(response.headers.get('cache-control')).toBe(
+      'public, max-age=60, s-maxage=300, stale-while-revalidate=3600',
+    );
     expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
     expect(html).toContain(PAGE_NOT_FOUND_TITLE);
     expect(html).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
@@ -305,10 +313,59 @@ test('missing profiles return a real 404 with profile-specific noindex metadata'
     const html = await response.text();
 
     expect(response.status).toBe(404);
+    expect(response.headers.get('cache-control')).toBe('no-store');
     expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
     expect(html).toContain('Profile not found | 3bio');
     expect(html).toContain(`name="robots" content="${NOINDEX_ROBOTS}"`);
     expect(html).not.toContain('rel="canonical"');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('self-opted-out and deleted profiles are indistinguishable from missing profiles at the edge', async () => {
+  const originalFetch = globalThis.fetch;
+
+  try {
+    for (const status of ['opted-out', 'deleted']) {
+      globalThis.fetch = async () =>
+        new Response(
+          JSON.stringify({
+            data: {
+              account: {
+                address: '0x1234',
+                username: { localName: 'alice' },
+                metadata: {
+                  attributes: [
+                    {
+                      key: '3bio',
+                      value: JSON.stringify({
+                        schemaVersion: 1,
+                        updatedAt: '2026-08-17T10:00:00.000Z',
+                        publication: { status },
+                      }),
+                    },
+                  ],
+                },
+              },
+            },
+          }),
+          { headers: { 'Content-Type': 'application/json' } },
+        );
+
+      const response = await onRequest({
+        request: new Request('https://3bio.social/alice'),
+        params: { path: ['alice'] },
+        next: async () => createShellResponse(),
+      });
+      const html = await response.text();
+
+      expect(response.status).toBe(404);
+      expect(response.headers.get('cache-control')).toBe('no-store');
+      expect(response.headers.get('x-robots-tag')).toBe(NOINDEX_ROBOTS);
+      expect(html).toContain('Profile not found | 3bio');
+      expect(html).not.toContain('rel="canonical"');
+    }
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -365,6 +422,7 @@ test('app, dashboard, and edit handles use the profile edge pipeline', async () 
       const html = await response.text();
 
       expect(response.status).toBe(200);
+      expect(response.headers.get('cache-control')).toBe('no-store');
       expect(response.headers.get('x-robots-tag')).toBeNull();
       expect(html).toContain(`rel="canonical" href="${origin}/${handle}"`);
     }
@@ -395,5 +453,23 @@ test('deployment routing sends dynamic URLs through the catch-all and noindexes 
   expect(routes.exclude).not.toContain('/app/*');
   expect(headers).not.toMatch(/^\/app\n  X-Robots-Tag: noindex, nofollow$/m);
   expect(headers).toMatch(/^\/app\/\*\n  X-Robots-Tag: noindex, nofollow$/m);
+  expect(headers).toContain(
+    `Content-Security-Policy: ${CONTENT_SECURITY_POLICY}`,
+  );
+  const connectSources = CONTENT_SECURITY_POLICY.split('; ').find((directive) =>
+    directive.startsWith('connect-src '),
+  );
+  const imageSources = CONTENT_SECURITY_POLICY.split('; ').find((directive) =>
+    directive.startsWith('img-src '),
+  );
+
+  expect(connectSources?.split(' ')).not.toContain('https:');
+  expect(connectSources?.split(' ')).not.toContain('wss:');
+  expect(imageSources?.split(' ')).not.toContain('https:');
+  expect(imageSources?.split(' ')).not.toContain('data:');
+  expect(CONTENT_SECURITY_POLICY).toContain(
+    "img-src 'self' blob: https://api.grove.storage",
+  );
+  expect(CONTENT_SECURITY_POLICY).toContain("media-src 'none'");
   expect(robots).not.toContain('Disallow:');
 });

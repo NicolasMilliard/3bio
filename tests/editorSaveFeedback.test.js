@@ -67,6 +67,11 @@ describe('getMetadataPreparationFailureFeedback', () => {
       'Profile metadata is from a newer version',
       'Update 3bio before saving this profile.',
     ],
+    [
+      { kind: 'publication-deleted' },
+      'Make this profile public before editing',
+      'Open Privacy & data on the dashboard and make this profile public before saving new details.',
+    ],
   ];
 
   test.each(cases)('maps $kind', (failure, title, description) => {
@@ -136,6 +141,19 @@ describe('getMetadataUpdateFailureFeedback', () => {
       title: 'Profile confirmation interrupted',
       description:
         'The transaction was submitted, but Lens could not confirm it. Check your public profile before trying again.',
+    });
+  });
+
+  test('qualifies an ambiguous self-funded submission', () => {
+    expect(
+      getMetadataUpdateFailureFeedback({
+        kind: 'submission-unknown',
+        error: new Error('receipt polling failed'),
+      }),
+    ).toEqual({
+      title: 'Profile submission interrupted',
+      description:
+        'Your wallet may have submitted the transaction, but 3bio could not verify it. Check your public profile before trying again.',
     });
   });
 });

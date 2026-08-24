@@ -2,6 +2,11 @@ import { expect, test } from 'bun:test';
 
 import { THREE_BIO_DEFAULT_THEME } from '../src/constants/themes.ts';
 import { buildPersistedThreeBioMetadata } from '../src/features/editor/helpers/buildPersistedThreeBioMetadata.ts';
+import {
+  isDefinitiveMetadataUpdateFailure,
+  recordEditorGroveUpload,
+  shouldOrphanEditorUploadsAfterThrow,
+} from '../src/features/editor/helpers/editorGroveLifecycle.ts';
 import { getTransactionFailureReason } from '../src/features/editor/helpers/getTransactionFailureReason.ts';
 import { toLinkAttributes } from '../src/features/editor/helpers/metadataAttributes.ts';
 import { formatToThreeBioMetadata } from '../src/helpers/formatToThreeBioMetadata.ts';
@@ -32,6 +37,72 @@ test('only TransactionWillFail is treated as an immediate Lens failure', () => {
   expect(
     getTransactionFailureReason({
       __typename: 'SetAccountMetadataResponse',
+    }),
+  ).toBeNull();
+});
+
+test('only definitive save failures orphan uploads from the current attempt', () => {
+  expect(
+    isDefinitiveMetadataUpdateFailure({
+      kind: 'transaction-failed',
+      description: 'Simulation reverted',
+    }),
+  ).toBe(true);
+  expect(
+    isDefinitiveMetadataUpdateFailure({
+      kind: 'session-changed',
+    }),
+  ).toBe(true);
+  expect(
+    isDefinitiveMetadataUpdateFailure({
+      kind: 'confirmation-failed',
+      error: new Error('timeout'),
+    }),
+  ).toBe(false);
+  expect(
+    isDefinitiveMetadataUpdateFailure({
+      kind: 'submission-unknown',
+      error: new Error('receipt polling failed'),
+    }),
+  ).toBe(false);
+
+  expect(shouldOrphanEditorUploadsAfterThrow('uploading-profile-data')).toBe(
+    true,
+  );
+  expect(shouldOrphanEditorUploadsAfterThrow('submitting-transaction')).toBe(
+    false,
+  );
+  expect(shouldOrphanEditorUploadsAfterThrow('confirming-transaction')).toBe(
+    false,
+  );
+});
+
+test('a local manifest failure never turns a completed upload into a save error', () => {
+  const input = {
+    accountAddress: '0x1111111111111111111111111111111111111111',
+    storageKey: 'uploaded-image',
+    kind: 'image',
+  };
+
+  expect(
+    recordEditorGroveUpload({
+      ...input,
+      dependencies: {
+        recordManagedResources: () => ({
+          ok: false,
+          reason: 'storage-write-failed',
+        }),
+      },
+    }),
+  ).toBeNull();
+  expect(
+    recordEditorGroveUpload({
+      ...input,
+      dependencies: {
+        recordManagedResources: () => {
+          throw new Error('localStorage is blocked');
+        },
+      },
     }),
   ).toBeNull();
 });

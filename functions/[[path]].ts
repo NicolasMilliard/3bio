@@ -14,6 +14,10 @@ import {
   isInternalAppPath,
   isProfilePageId,
 } from '../src/features/profile/edge/routing';
+import {
+  getProfilePublicationDecision,
+  readProfilePublicationState,
+} from '../src/features/profile/publication';
 
 type PagesContext = {
   request: Request;
@@ -55,23 +59,48 @@ export const onRequest = async (context: PagesContext) => {
 
   const shellResponse = await context.next();
 
+  const buildUnavailableProfileResponse = () =>
+    buildProfileHtmlResponse({
+      response: shellResponse,
+      request: context.request,
+      lensHandle: normalizedHandle,
+      status: 'not-found',
+      responseStatus: 404,
+    });
+
   try {
+    if (
+      !getProfilePublicationDecision({ lensHandle: normalizedHandle }).isPublic
+    ) {
+      return buildUnavailableProfileResponse();
+    }
+
     const account = await fetchLensAccount(normalizedHandle);
 
     if (!account) {
-      return buildProfileHtmlResponse({
-        response: shellResponse,
-        request: context.request,
-        lensHandle: normalizedHandle,
-        status: 'not-found',
-        responseStatus: 404,
-      });
+      return buildUnavailableProfileResponse();
+    }
+
+    const accountHandle = account.username?.localName ?? normalizedHandle;
+    const publicationState = readProfilePublicationState(
+      account.metadata?.attributes,
+    );
+    const publicationDecision = getProfilePublicationDecision({
+      accountAddress: account.address,
+      hasUnsupportedSchemaVersion:
+        publicationState.hasUnsupportedSchemaVersion,
+      lensHandle: accountHandle,
+      publicationStatus: publicationState.status,
+    });
+
+    if (!publicationDecision.isPublic) {
+      return buildUnavailableProfileResponse();
     }
 
     return buildProfileHtmlResponse({
       response: shellResponse,
       request: context.request,
-      lensHandle: account.username?.localName ?? normalizedHandle,
+      lensHandle: accountHandle,
       profile: extractProfileFromLensAccount(account),
       status: 'ready',
     });

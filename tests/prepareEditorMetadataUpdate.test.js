@@ -61,10 +61,14 @@ const account = ({
   address = ACCOUNT_ADDRESS,
   attributes = [],
   name = 'Native name',
+  picture,
+  coverPicture,
 } = {}) => ({
   address,
   metadata: {
     name,
+    picture,
+    coverPicture,
     attributes,
   },
 });
@@ -83,6 +87,7 @@ const prepare = ({
   latestAccount = account(),
   fetchResult,
   draftValues = values,
+  onUploaded,
   uploadAsJson,
 } = {}) => {
   let uploads = 0;
@@ -90,7 +95,10 @@ const prepare = ({
     uploadAsJson ??
     (async () => {
       uploads += 1;
-      return { uri: 'lens://metadata/new' };
+      return {
+        storageKey: 'metadata-new',
+        uri: 'lens://metadata-new',
+      };
     });
 
   return {
@@ -103,6 +111,7 @@ const prepare = ({
       imageUris,
       sessionClient: SESSION_CLIENT,
       values: draftValues,
+      onUploaded,
       dependencies: {
         fetchAccount: async () => fetchResult ?? ok(latestAccount),
         uploadAsJson: upload,
@@ -113,9 +122,15 @@ const prepare = ({
 
 test('prepares metadata from the latest account while preserving clean remote fields', async () => {
   const latestAccount = account({
+    picture: 'https://api.grove.storage/native-picture',
+    coverPicture: 'https://images.example/native-cover',
     attributes: [
       threeBioAttribute({
-        profile: { name: 'Remote name', bio: 'Remote bio' },
+        profile: {
+          name: 'Remote name',
+          bio: 'Remote bio',
+          avatar: 'https://api.grove.storage/threebio-avatar',
+        },
         theme: {
           name: 'midnight',
           displayStatistics: false,
@@ -125,11 +140,16 @@ test('prepares metadata from the latest account while preserving clean remote fi
     ],
   });
   const uploaded = [];
+  const recorded = [];
   const { result } = prepare({
     latestAccount,
+    onUploaded: (resource) => recorded.push(resource),
     uploadAsJson: async (data, options) => {
       uploaded.push({ data, options });
-      return { uri: 'lens://metadata/latest' };
+      return {
+        storageKey: 'metadata-latest',
+        uri: 'lens://metadata-latest',
+      };
     },
   });
 
@@ -145,7 +165,20 @@ test('prepares metadata from the latest account while preserving clean remote fi
     displayStatistics: false,
     displayBranding: false,
   });
-  expect(prepared.metadataUri).toBe('lens://metadata/latest');
+  expect(prepared.metadataUri).toBe('lens://metadata-latest');
+  expect(prepared.metadataResource).toEqual({
+    storageKey: 'metadata-latest',
+    uri: 'lens://metadata-latest',
+  });
+  expect(prepared.metadataReferenceKeys).toEqual([
+    'native-picture',
+    'threebio-avatar',
+  ]);
+  expect(prepared.cacheEntry.referenceKeys).toEqual([
+    'native-picture',
+    'threebio-avatar',
+  ]);
+  expect(recorded).toEqual([prepared.metadataResource]);
   expect(uploaded).toHaveLength(1);
   expect(uploaded[0].options).toEqual({ acl: ACL });
   expect(prepared.cacheEntry.accountAddress).toBe(
@@ -164,11 +197,17 @@ test('reuses a matching account-scoped metadata cache entry', async () => {
   const retry = prepare({
     latestAccount,
     cacheEntry: firstResult.cacheEntry,
+    onUploaded: () => {
+      throw new Error(
+        'A cached resource must not be recorded as a new upload.',
+      );
+    },
   });
   const retryResult = await retry.result;
 
   expect(retryResult.ok).toBe(true);
   expect(retryResult.metadataUri).toBe(firstResult.metadataUri);
+  expect(retryResult.metadataResource).toEqual(firstResult.metadataResource);
   expect(retry.getUploads()).toBe(0);
 
   const anotherAccountCache = {
@@ -247,4 +286,34 @@ test('blocks unsupported future metadata before merging or uploading', async () 
     failure: { kind: 'unsupported-schema-version' },
   });
   expect(future.getUploads()).toBe(0);
+});
+
+test('blocks deleted publications before reusing or uploading metadata', async () => {
+  let recordedUpload = false;
+  const deleted = prepare({
+    latestAccount: account({
+      attributes: [
+        threeBioAttribute({
+          publication: { status: 'deleted' },
+        }),
+      ],
+    }),
+    cacheEntry: {
+      accountAddress: ACCOUNT_ADDRESS.toLowerCase(),
+      key: 'cached-key',
+      referenceKeys: [],
+      storageKey: 'cached-metadata',
+      uri: 'lens://cached-metadata',
+    },
+    onUploaded: () => {
+      recordedUpload = true;
+    },
+  });
+
+  expect(await deleted.result).toEqual({
+    ok: false,
+    failure: { kind: 'publication-deleted' },
+  });
+  expect(deleted.getUploads()).toBe(0);
+  expect(recordedUpload).toBe(false);
 });

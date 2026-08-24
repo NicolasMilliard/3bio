@@ -55,7 +55,10 @@ test('uploading with no selected files performs no uploads and keeps previews', 
     dependencies: {
       uploadFile: async () => {
         uploadCalls += 1;
-        return { gatewayUrl: 'https://images.example/unexpected.png' };
+        return {
+          gatewayUrl: 'https://images.example/unexpected.png',
+          storageKey: 'unexpected',
+        };
       },
     },
   });
@@ -80,12 +83,18 @@ test('selected images upload sequentially with immediate progress callbacks', as
     }),
     acl,
     onUploadStart: (field) => events.push(`start:${field}`),
-    onUploaded: (field, uri) => events.push(`uploaded:${field}:${uri}`),
+    onUploaded: (field, resource) =>
+      events.push(
+        `uploaded:${field}:${resource.gatewayUrl}:${resource.storageKey}`,
+      ),
     dependencies: {
       uploadFile: async (file, options) => {
         events.push(`upload:${file.name}`);
         expect(options).toEqual({ acl });
-        return { gatewayUrl: `https://gateway.example/${file.name}` };
+        return {
+          gatewayUrl: `https://gateway.example/${file.name}`,
+          storageKey: `${file.name}-key`,
+        };
       },
     },
   });
@@ -93,10 +102,10 @@ test('selected images upload sequentially with immediate progress callbacks', as
   expect(events).toEqual([
     'start:avatar',
     'upload:avatar.png',
-    'uploaded:avatar:https://gateway.example/avatar.png',
+    'uploaded:avatar:https://gateway.example/avatar.png:avatar.png-key',
     'start:coverPicture',
     'upload:cover.png',
-    'uploaded:coverPicture:https://gateway.example/cover.png',
+    'uploaded:coverPicture:https://gateway.example/cover.png:cover.png-key',
   ]);
   expect(result).toEqual({
     avatarUri: 'https://gateway.example/avatar.png',

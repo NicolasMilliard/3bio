@@ -7,16 +7,18 @@ import {
   EditorProfilePreview,
   SidebarEditor,
 } from '@/features/editor/components';
+import { DeletedProfileEditorScreen } from './DeletedProfileEditorScreen';
 
-export const EditorScreen = ({
+const ActiveEditorScreen = ({
   account,
   stats,
+  threeBioMetadata,
 }: {
   account: Account;
   stats?: AccountStats;
+  threeBioMetadata: ReturnType<typeof formatToThreeBioMetadata>;
 }) => {
   const { openMobile } = useSidebar();
-  const threeBioMetadata = formatToThreeBioMetadata(account);
   const statsData = {
     followers: stats?.graphFollowStats?.followers,
     following: stats?.graphFollowStats?.following,
@@ -41,5 +43,27 @@ export const EditorScreen = ({
         </main>
       </div>
     </EditorForm>
+  );
+};
+
+export const EditorScreen = ({
+  account,
+  stats,
+}: {
+  account: Account;
+  stats?: AccountStats;
+}) => {
+  const threeBioMetadata = formatToThreeBioMetadata(account);
+
+  if (threeBioMetadata.publication?.status === 'deleted') {
+    return <DeletedProfileEditorScreen />;
+  }
+
+  return (
+    <ActiveEditorScreen
+      account={account}
+      stats={stats}
+      threeBioMetadata={threeBioMetadata}
+    />
   );
 };

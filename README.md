@@ -2,13 +2,13 @@
 
 A customizable, open-source link-in-bio for Lens profiles.
 
-> [!NOTE]
-> **Alpha status:** 3bio is ready for early testing, but rough edges are
+> [!NOTE] **Alpha status:** 3bio is ready for early testing, but rough edges are
 > expected. Editor saves publish real metadata to Lens mainnet.
 
 [Visit 3bio](https://3bio.social) ·
 [Open the dashboard](https://3bio.social/app/dashboard) ·
-[Run locally](#local-development) · [Self-host 3bio](./docs/self-hosting.md)
+[Run locally](#local-development) · [Self-host 3bio](./docs/self-hosting.md) ·
+[Privacy and deletion](./docs/privacy-moderation.md)
 
 ![3bio — a decentralized link-in-bio for Lens profiles](./public/og.png)
 
@@ -47,6 +47,21 @@ signing in. To create or update a page:
 2. Select a Lens profile that wallet owns or manages.
 3. Customize the page, preview the result, and save the metadata through Lens.
 4. Share the public `3bio.social/{handle}` URL anywhere.
+
+## Privacy and deletion
+
+Profile owners can hide their 3bio page without discarding its settings, make it
+public again, or replace the current 3bio settings with a deletion marker.
+Eligible app-managed Grove images can be removed on a best-effort basis using
+the current browser's local resource manifest. Grove metadata documents and
+ambiguous pending uploads are retained. These controls do not erase Lens or
+on-chain history, existing caches, or third-party copies.
+
+Public pages do not fetch favicons from linked websites, profile media is
+limited to trusted origins, and dynamic profile HTML is served with `no-store`
+so conforming caches do not retain a ready page after a later privacy decision.
+See [Privacy, moderation, and deletion](./docs/privacy-moderation.md) for the
+exact behavior and limitations.
 
 ## Local development
 

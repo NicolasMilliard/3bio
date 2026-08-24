@@ -1,3 +1,5 @@
+import { getTrustedMediaUrl } from '../../lib/trustedMedia';
+
 const DESCRIPTION_MAX_LENGTH = 160;
 
 export const HOME_TITLE = '3bio | Decentralized link in bio for Lens';
@@ -79,12 +81,6 @@ const asPublicUrl = (value?: string | null) => {
   }
 };
 
-const asHttpsUrl = (value?: string | null) => {
-  const url = asPublicUrl(value);
-
-  return url?.startsWith('https://') ? url : undefined;
-};
-
 const interactionCounter = (interactionType: string, count?: number) =>
   Number.isFinite(count)
     ? {
@@ -126,9 +122,15 @@ export const buildProfileDocumentMetadata = ({
         : normalizedBio
           ? truncateText(normalizedBio, DESCRIPTION_MAX_LENGTH)
           : `Explore @${normalizedHandle}'s profile and links on 3bio, built on Lens.`;
-  const avatarUrl = asHttpsUrl(profile?.avatar);
-  const coverPictureUrl = asHttpsUrl(profile?.coverPicture);
-  const fallbackImageUrl = asHttpsUrl(defaultSocialImageUrl);
+  const avatarUrl = getTrustedMediaUrl(profile?.avatar, {
+    siteOrigin: origin,
+  });
+  const coverPictureUrl = getTrustedMediaUrl(profile?.coverPicture, {
+    siteOrigin: origin,
+  });
+  const fallbackImageUrl = getTrustedMediaUrl(defaultSocialImageUrl, {
+    siteOrigin: origin,
+  });
   const socialImageKind: SocialImageKind | undefined = coverPictureUrl
     ? 'cover'
     : avatarUrl

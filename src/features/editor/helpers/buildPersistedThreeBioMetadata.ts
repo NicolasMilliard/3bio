@@ -123,6 +123,9 @@ export const buildPersistedThreeBioMetadata = ({
     profile: nextProfile,
     ...(Object.keys(nextTheme).length === 0 ? {} : { theme: nextTheme }),
     ...(current.settings === undefined ? {} : { settings: current.settings }),
+    ...(current.publication === undefined
+      ? {}
+      : { publication: current.publication }),
     tombstones: [...tombstones],
   });
 };

@@ -13,6 +13,11 @@ import {
   getSessionErrorFeedback,
 } from '../helpers/editorSaveFeedback';
 import {
+  isDefinitiveMetadataUpdateFailure,
+  recordEditorGroveUpload,
+  shouldOrphanEditorUploadsAfterThrow,
+} from '../helpers/editorGroveLifecycle';
+import {
   buildSavedEditorFormValues,
   getPersistedThreeBioDirtyFields,
 } from '../helpers/editorFormValues';
@@ -23,6 +28,11 @@ import {
 import type { MetadataFormValues } from '../schemas/metadataForm.schema';
 import { getEditorSessionSnapshot } from '../services/getEditorSessionSnapshot';
 import {
+  markGrovePublicationConfirmed,
+  markManagedGroveResourcesOrphaned,
+  type GroveManagedResourceRecord,
+} from '../services/groveManagedResourceManifest';
+import {
   uploadEditorImages,
   validateEditorImages,
   type EditorImageField,
@@ -32,6 +42,7 @@ import {
   type MetadataUploadCacheEntry,
 } from '../services/prepareEditorMetadataUpdate';
 import { submitMetadataUpdate } from '../services/submitMetadataUpdate';
+import { withGroveAccountLock } from '../services/withGroveAccountLock';
 
 type UseEditorSaveInput = {
   account: Account;
@@ -63,12 +74,13 @@ const showFeedback = (
 export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
   const config = useConfig();
   const saveInFlight = useRef(false);
+  const lockRequestInFlight = useRef(false);
   const metadataUploadCache = useRef<MetadataUploadCacheEntry | null>(null);
   const acl = lensAccountOnly(account.address, chains.mainnet.id);
   const getCurrentEditorSession = () =>
     getEditorSessionSnapshot(config, account.address);
 
-  const onSubmit = async (values: MetadataFormValues) => {
+  const onSubmitWithLockHeld = async (values: MetadataFormValues) => {
     const isImageValidationPending =
       values._imageValidation.avatar ||
       values._imageValidation.coverPicture ||
@@ -90,6 +102,37 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
     saveInFlight.current = true;
     let saveStage: SaveStage = 'validating-images';
     let toastId: string | number | undefined;
+    const attemptResources: GroveManagedResourceRecord[] = [];
+    const recordUpload = (storageKey: string, kind: 'image' | 'metadata') => {
+      const resource = recordEditorGroveUpload({
+        accountAddress: account.address,
+        storageKey,
+        kind,
+      });
+
+      if (!resource) {
+        console.warn(
+          '[useEditorSave] Could not record a Grove upload for later cleanup.',
+        );
+        return;
+      }
+
+      attemptResources.push(resource);
+    };
+    const orphanAttemptResources = () => {
+      if (attemptResources.length === 0) return;
+
+      const result = markManagedGroveResourcesOrphaned({
+        accountAddress: account.address,
+        resources: attemptResources,
+      });
+
+      if (!result.ok) {
+        console.warn(
+          '[useEditorSave] Could not update the local Grove cleanup record.',
+        );
+      }
+    };
 
     try {
       const imageErrors = await validateEditorImages(values);
@@ -142,10 +185,11 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
           saveStage = imageUploadStage[field];
           toast.loading(imageUploadMessage[field], { id: toastId });
         },
-        onUploaded: (field, imageUri) => {
+        onUploaded: (field, resource) => {
+          recordUpload(resource.storageKey, 'image');
           methods.setValue(
             field,
-            { preview: imageUri },
+            { preview: resource.gatewayUrl },
             { shouldDirty: true, shouldValidate: true },
           );
         },
@@ -157,6 +201,7 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
       const latestAccountSession = getCurrentEditorSession();
 
       if (!latestAccountSession.sessionClient) {
+        orphanAttemptResources();
         showFeedback(
           getSessionErrorFeedback(latestAccountSession.state),
           toastId,
@@ -186,9 +231,14 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
         },
         sessionClient: latestAccountSession.sessionClient,
         values,
+        onUploaded: (resource) => {
+          recordUpload(resource.storageKey, 'metadata');
+        },
       });
 
       if (!metadataPreparation.ok) {
+        orphanAttemptResources();
+
         if (
           metadataPreparation.failure.kind === 'latest-account-fetch-failed'
         ) {
@@ -206,8 +256,13 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
       }
 
       metadataUploadCache.current = metadataPreparation.cacheEntry;
-      const { latestAccount, metadataUri, nextThreeBioMetadata } =
-        metadataPreparation;
+      const {
+        latestAccount,
+        metadataResource,
+        metadataReferenceKeys,
+        metadataUri,
+        nextThreeBioMetadata,
+      } = metadataPreparation;
 
       saveStage = 'submitting-transaction';
       toast.loading('Waiting for transaction...', { id: toastId });
@@ -229,9 +284,16 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
       });
 
       if (!transaction.ok) {
-        if (transaction.failure.kind === 'confirmation-failed') {
+        if (isDefinitiveMetadataUpdateFailure(transaction.failure)) {
+          orphanAttemptResources();
+        }
+
+        if (
+          transaction.failure.kind === 'confirmation-failed' ||
+          transaction.failure.kind === 'submission-unknown'
+        ) {
           console.warn(
-            '[useEditorSave] Lens could not confirm the submitted transaction:',
+            '[useEditorSave] Lens could not verify the transaction outcome:',
             transaction.failure.error,
           );
         }
@@ -241,6 +303,18 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
           toastId,
         );
         return;
+      }
+
+      const manifestConfirmation = markGrovePublicationConfirmed({
+        accountAddress: account.address,
+        metadataKey: metadataResource.storageKey,
+        referenceKeys: metadataReferenceKeys,
+      });
+
+      if (!manifestConfirmation.ok) {
+        console.warn(
+          '[useEditorSave] Profile saved, but the local Grove cleanup record could not be updated.',
+        );
       }
 
       const refreshResult = await fetchAccount(transaction.sessionClient, {
@@ -270,6 +344,10 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
         description: 'Your changes are now live.',
       });
     } catch {
+      if (shouldOrphanEditorUploadsAfterThrow(saveStage)) {
+        orphanAttemptResources();
+      }
+
       const feedback = getSaveErrorFeedback(saveStage);
 
       toast.error(feedback.title, {
@@ -278,6 +356,25 @@ export const useEditorSave = ({ account, methods }: UseEditorSaveInput) => {
       });
     } finally {
       saveInFlight.current = false;
+    }
+  };
+
+  const onSubmit = async (values: MetadataFormValues) => {
+    if (lockRequestInFlight.current) return;
+
+    lockRequestInFlight.current = true;
+
+    try {
+      await withGroveAccountLock(account.address, () =>
+        onSubmitWithLockHeld(values),
+      );
+    } catch {
+      toast.error('Could not start this save', {
+        description:
+          '3bio could not coordinate this profile with another browser tab. Try again.',
+      });
+    } finally {
+      lockRequestInFlight.current = false;
     }
   };
 

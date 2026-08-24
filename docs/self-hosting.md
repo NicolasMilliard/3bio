@@ -151,6 +151,10 @@ Cloudflare Pages automatically deploys the root `functions/` directory. This
 project does not require a Wrangler configuration, database, API key, or
 Cloudflare runtime binding for its current feature set.
 
+Moderation is a deploy-time source configuration rather than a backend service.
+Review [Privacy, moderation, and deletion](./privacy-moderation.md) before
+launching a public fork.
+
 Do not add a top-level `404.html` without redesigning the routing setup. The
 current deployment relies on Cloudflare Pages' SPA fallback so public profile
 and internal app routes can receive the Vite shell before the Function applies
@@ -189,6 +193,28 @@ deployment boilerplate:
   headers itself.
 - `public/robots.txt` and `public/sitemap.xml` describe the public production
   origin to crawlers.
+
+### Privacy, media, and moderation configuration
+
+Dynamic profile HTML is deliberately served with `Cache-Control: no-store` so
+a public page cannot remain in a conforming ready-page cache after opt-out,
+deletion, or moderation. Generic invalid routes keep a separate cache policy,
+and fingerprinted static assets remain long-lived.
+
+The media allowlist accepts the current site and the production Grove gateway.
+If a fork uses another storage gateway, update `src/lib/trustedMedia.ts`, the
+CSP in `public/_headers`, and `CONTENT_SECURITY_POLICY` in
+`src/features/profile/edge/htmlResponse.ts` together. Do not restore broad
+`img-src https:` or `connect-src https:` sources merely to make an unknown
+image host work.
+
+To hide a profile administratively, add its canonical handle or Lens account
+address to `src/constants/profileModeration.ts`, run the checks, and redeploy.
+The list is static and source-visible; there is no backend or admin UI, so do
+not put reports or moderation reasons in it. If an older deployment cached a
+profile response, also use the hosting provider's cache purge during urgent
+removal. The complete behavior and deletion limits are documented in
+[Privacy, moderation, and deletion](./privacy-moderation.md).
 
 The exact `/app` path remains available to the Lens handle `app`.
 `/app/dashboard` and `/app/edit` are the current internal routes and are served
@@ -237,8 +263,8 @@ Check the following behavior:
 | URL                                      | Expected result                                                                                        |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `/`                                      | HTTP 200 with your canonical homepage and social-image URLs in the raw HTML.                           |
-| `/{handle}` for an existing Lens profile | HTTP 200 with profile-specific title, canonical URL, and social tags before JavaScript runs.           |
-| A valid but missing handle               | HTTP 404 with `X-Robots-Tag: noindex, nofollow`.                                                       |
+| `/{handle}` for an existing Lens profile | HTTP 200 with profile-specific metadata and `Cache-Control: no-store`.                                 |
+| A valid but missing or hidden handle     | HTTP 404 with `X-Robots-Tag: noindex, nofollow` and `Cache-Control: no-store`.                          |
 | `/not/a/route`                           | HTTP 404 with generic noindex metadata.                                                                |
 | `/app/dashboard` and `/app/edit`         | The application shell with `X-Robots-Tag: noindex, nofollow`.                                          |
 | `/app`                                   | The public Lens profile for the handle `app`, or a profile-specific 404 if that handle does not exist. |

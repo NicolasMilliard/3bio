@@ -8,6 +8,7 @@ import {
   readThreeBioMetadataAttributes,
 } from '@/helpers';
 import type { PersistedThreeBioMetadata } from '@/schemas/threeBioMetadata.schema';
+import { collectGroveResourceReferences } from '../helpers/groveResources';
 import {
   buildPersistedThreeBioMetadata,
   type PersistedThreeBioDirtyFields,
@@ -20,6 +21,13 @@ const storageClient = StorageClient.create();
 export type MetadataUploadCacheEntry = {
   accountAddress: string;
   key: string;
+  referenceKeys: string[];
+  storageKey: string;
+  uri: string;
+};
+
+export type EditorMetadataUploadResource = {
+  storageKey: string;
   uri: string;
 };
 
@@ -36,6 +44,9 @@ export type PrepareEditorMetadataFailure =
     }
   | {
       kind: 'unsupported-schema-version';
+    }
+  | {
+      kind: 'publication-deleted';
     };
 
 export type PrepareEditorMetadataResult =
@@ -43,6 +54,8 @@ export type PrepareEditorMetadataResult =
       ok: true;
       cacheEntry: MetadataUploadCacheEntry;
       latestAccount: Account;
+      metadataResource: EditorMetadataUploadResource;
+      metadataReferenceKeys: string[];
       metadataUri: string;
       nextThreeBioMetadata: PersistedThreeBioMetadata;
     }
@@ -60,7 +73,7 @@ type EditorImageUris = {
 type UploadMetadataJson = (
   data: unknown,
   options: { acl: AclConfig },
-) => Promise<{ uri: string }>;
+) => Promise<EditorMetadataUploadResource>;
 
 type PrepareEditorMetadataDependencies = {
   fetchAccount: typeof fetchAccount;
@@ -80,6 +93,7 @@ type PrepareEditorMetadataInput = {
   imageUris: EditorImageUris;
   sessionClient: SessionClient;
   values: MetadataFormValues;
+  onUploaded?: (resource: EditorMetadataUploadResource) => void;
   dependencies?: PrepareEditorMetadataDependencies;
 };
 
@@ -91,6 +105,7 @@ export const prepareEditorMetadataUpdate = async ({
   imageUris,
   sessionClient,
   values,
+  onUploaded,
   dependencies = defaultDependencies,
 }: PrepareEditorMetadataInput): Promise<PrepareEditorMetadataResult> => {
   const latestAccountResult = await dependencies.fetchAccount(sessionClient, {
@@ -128,6 +143,13 @@ export const prepareEditorMetadataUpdate = async ({
     };
   }
 
+  if (latestThreeBioState.metadata?.publication?.status === 'deleted') {
+    return {
+      ok: false,
+      failure: { kind: 'publication-deleted' },
+    };
+  }
+
   const nextThreeBioMetadata = buildPersistedThreeBioMetadata({
     current: latestThreeBioState.metadata ?? {},
     values,
@@ -139,30 +161,53 @@ export const prepareEditorMetadataUpdate = async ({
     nextThreeBioMetadata,
   );
   const normalizedAccountAddress = accountAddress.toLowerCase();
-  let metadataUri =
+  const cachedUpload =
     cacheEntry?.accountAddress === normalizedAccountAddress &&
     cacheEntry.key === metadataKey
-      ? cacheEntry.uri
+      ? {
+          metadataResource: {
+            storageKey: cacheEntry.storageKey,
+            uri: cacheEntry.uri,
+          },
+          metadataReferenceKeys: cacheEntry.referenceKeys,
+        }
       : undefined;
+  let metadataResource = cachedUpload?.metadataResource;
+  let metadataReferenceKeys = cachedUpload?.metadataReferenceKeys;
 
-  if (!metadataUri) {
+  if (!metadataResource) {
     const data = formatMetadataBeforeUpload(
       latestAccount,
       nextThreeBioMetadata,
     );
-    const upload = await dependencies.uploadAsJson(data, { acl });
-    metadataUri = upload.uri;
+    metadataResource = await dependencies.uploadAsJson(data, { acl });
+    // Native Lens media remains structured in `data`, while 3bio is stored in
+    // a serialized JSON attribute. Inspect both representations so the active
+    // publication protects every managed resource referenced by the upload.
+    metadataReferenceKeys = [
+      ...new Set([
+        ...collectGroveResourceReferences(data),
+        ...collectGroveResourceReferences(nextThreeBioMetadata),
+      ]),
+    ].sort();
+    onUploaded?.(metadataResource);
   }
+
+  metadataReferenceKeys ??= [];
 
   return {
     ok: true,
     cacheEntry: {
       accountAddress: normalizedAccountAddress,
       key: metadataKey,
-      uri: metadataUri,
+      referenceKeys: metadataReferenceKeys,
+      storageKey: metadataResource.storageKey,
+      uri: metadataResource.uri,
     },
     latestAccount,
-    metadataUri,
+    metadataResource,
+    metadataReferenceKeys,
+    metadataUri: metadataResource.uri,
     nextThreeBioMetadata,
   };
 };

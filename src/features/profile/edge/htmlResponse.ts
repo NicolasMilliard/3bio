@@ -6,14 +6,16 @@ import {
   type ProfileMetadataProfile,
   type ProfileMetadataStatus,
 } from '../documentMetadata';
+import { GROVE_MEDIA_ORIGIN } from '../../../lib/trustedMedia';
 import { getPublicOrigin } from './routing';
 
 const METADATA_START = '<!-- 3bio-metadata:start -->';
 const METADATA_END = '<!-- 3bio-metadata:end -->';
 
+export const CONTENT_SECURITY_POLICY = `default-src 'self'; base-uri 'self'; connect-src 'self' ${GROVE_MEDIA_ORIGIN} https://api.lens.xyz https://cloudflareinsights.com https://rpc.lens.xyz; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; img-src 'self' blob: ${GROVE_MEDIA_ORIGIN}; manifest-src 'self'; media-src 'none'; object-src 'none'; script-src 'self' https://static.cloudflareinsights.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:`;
+
 const securityHeaders = {
-  'Content-Security-Policy':
-    "default-src 'self'; base-uri 'self'; connect-src 'self' https: wss:; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; img-src 'self' data: blob: https:; manifest-src 'self'; object-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:",
+  'Content-Security-Policy': CONTENT_SECURITY_POLICY,
   'Permissions-Policy': 'camera=(), geolocation=(), microphone=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
@@ -92,12 +94,9 @@ export const buildProfileHtmlResponse = async ({
   headers.delete('Content-Length');
   headers.delete('ETag');
   headers.set('Content-Type', 'text/html; charset=UTF-8');
-  headers.set(
-    'Cache-Control',
-    status === 'error'
-      ? 'no-store'
-      : 'public, max-age=60, s-maxage=300, stale-while-revalidate=3600',
-  );
+  // Visibility can change through opt-out, deletion, or deploy-time
+  // moderation. Never retain a ready profile page in browser or shared caches.
+  headers.set('Cache-Control', 'no-store');
 
   if (status !== 'ready' || requestUrl.hostname.endsWith('.pages.dev')) {
     headers.set('X-Robots-Tag', NOINDEX_ROBOTS);
