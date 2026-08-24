@@ -62,11 +62,7 @@ const createDependencies = (overrides = {}) => ({
   ...overrides,
 });
 
-const submit = ({
-  dependencies,
-  getCurrentEditorSession,
-  onProgress,
-}) =>
+const submit = ({ dependencies, getCurrentEditorSession, onProgress }) =>
   submitMetadataUpdate({
     config: {},
     accountAddress: ACCOUNT_ADDRESS,
@@ -154,6 +150,27 @@ test('a self-funded update switches to Lens, rechecks the session, signs, and co
   ]);
 });
 
+test('a self-funded adapter error remains ambiguous because broadcast may have happened', async () => {
+  const adapterError = new Error('receipt polling failed');
+  const sessionClient = { waitForTransaction: async () => ok(undefined) };
+  const bound = sessionSnapshot({ sessionClient });
+  const dependencies = createDependencies({
+    setAccountMetadata: async () =>
+      ok({ __typename: 'SelfFundedTransactionRequest' }),
+    handleOperation: async () => err(adapterError),
+  });
+
+  const result = await submit({
+    dependencies,
+    getCurrentEditorSession: sessionQueue(bound, bound, bound),
+  });
+
+  expect(result).toEqual({
+    ok: false,
+    failure: { kind: 'submission-unknown', error: adapterError },
+  });
+});
+
 test('a changed Lens authentication stops a self-funded update before signing', async () => {
   let signingCalls = 0;
   const sessionClient = { waitForTransaction: async () => ok(undefined) };
@@ -239,8 +256,38 @@ test('a final chain drift is caught after acquiring the wallet client', async ()
     ok: false,
     failure: {
       kind: 'network-required',
-      description:
-        'Switch your wallet back to the Lens network and try again.',
+      description: 'Switch your wallet back to the Lens network and try again.',
+    },
+  });
+  expect(signingCalls).toBe(0);
+});
+
+test('wallet-client acquisition fails definitively before self-funded broadcast', async () => {
+  let signingCalls = 0;
+  const sessionClient = { waitForTransaction: async () => ok(undefined) };
+  const bound = sessionSnapshot({ sessionClient });
+  const dependencies = createDependencies({
+    setAccountMetadata: async () =>
+      ok({ __typename: 'SelfFundedTransactionRequest' }),
+    getWalletClient: async () => {
+      throw new Error('Wallet request rejected');
+    },
+    handleOperation: async () => {
+      signingCalls += 1;
+      return ok('0xshould-not-run');
+    },
+  });
+
+  const result = await submit({
+    dependencies,
+    getCurrentEditorSession: sessionQueue(bound, bound),
+  });
+
+  expect(result).toEqual({
+    ok: false,
+    failure: {
+      kind: 'transaction-failed',
+      description: 'Wallet request rejected',
     },
   });
   expect(signingCalls).toBe(0);

@@ -43,5 +43,6 @@ export const formatToThreeBioMetadata = (account: Account) => {
     profile,
     theme: threeBioTheme,
     settings: threeBioSettings,
+    publication: threeBioMetadata?.publication,
   };
 };

@@ -12,6 +12,10 @@ import {
   ProfileDocumentMetadata,
   ProfileLayout,
 } from './components';
+import {
+  getProfilePublicationDecision,
+  readProfilePublicationState,
+} from './publication';
 
 const UserProfile = ({ lensHandle }: { lensHandle: string }) => {
   const [requestKey, setRequestKey] = useState(0);
@@ -38,13 +42,25 @@ const UserProfileContent = ({
     error,
   } = useAccount({ username: { localName: lensHandle } });
 
-  const { data: stats } = useAccountStats({
-    account: account?.address ?? '',
-  });
-
-  const threeBioMetadata = account
-    ? formatToThreeBioMetadata(account)
+  const publicationState = account
+    ? readProfilePublicationState(account.metadata?.attributes)
     : undefined;
+  const publicationDecision = account
+    ? getProfilePublicationDecision({
+        accountAddress: account.address,
+        hasUnsupportedSchemaVersion:
+          publicationState?.hasUnsupportedSchemaVersion,
+        lensHandle: account.username?.localName ?? lensHandle,
+        publicationStatus: publicationState?.status,
+      })
+    : undefined;
+  const isPublic = publicationDecision?.isPublic === true;
+  const { data: stats } = useAccountStats({
+    account: isPublic && account ? account.address : '',
+  });
+  const threeBioMetadata =
+    isPublic && account ? formatToThreeBioMetadata(account) : undefined;
+  const isUnavailable = !isPublic;
   const theme = threeBioMetadata?.theme;
   const themeName = theme?.name ?? THREE_BIO_DEFAULT_THEME;
   const profile: ThreeBioProfile = threeBioMetadata?.profile ?? {};
@@ -70,7 +86,7 @@ const UserProfileContent = ({
             ? 'loading'
             : error
               ? 'error'
-              : !account
+              : isUnavailable
                 ? 'not-found'
                 : 'ready'
         }
@@ -88,7 +104,7 @@ const UserProfileContent = ({
             <Link to="/">Go back home</Link>
           </Button>
         </ErrorScreen>
-      ) : !account ? (
+      ) : isUnavailable ? (
         <NotFoundScreen lensHandle={lensHandle} />
       ) : (
         <ProfileLayout

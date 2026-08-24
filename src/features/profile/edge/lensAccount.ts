@@ -30,6 +30,7 @@ const ACCOUNT_QUERY = `
 `;
 
 export type LensAccount = {
+  address?: string | null;
   username?: {
     localName?: string | null;
   } | null;

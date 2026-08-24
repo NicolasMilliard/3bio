@@ -7,6 +7,7 @@ import type {
   LensLink,
   ThreeBioProfile,
 } from '@/schemas/threeBioMetadata.schema';
+import { getTrustedMediaUrl } from '@/lib/trustedMedia';
 import { useRef, type WheelEvent } from 'react';
 
 import { Branding } from './Branding';
@@ -56,6 +57,14 @@ export const ProfileLayout = ({
 }: ProfileLayoutProps) => {
   const contentPanelRef = useRef<HTMLElement>(null);
   const isInteractive = mode === 'public';
+  const allowBlobMedia = mode === 'preview';
+  const avatar = getTrustedMediaUrl(profile.avatar, {
+    allowBlob: allowBlobMedia,
+  });
+  const linksPanelBackground = getTrustedMediaUrl(
+    profile.linksPanelBackground,
+    { allowBlob: allowBlobMedia },
+  );
 
   const handleWheel = (event: WheelEvent<HTMLElement>) => {
     const contentPanel = contentPanelRef.current;
@@ -86,7 +95,14 @@ export const ProfileLayout = ({
             aria-label="Profile summary"
             className="profile-summary flex min-w-0 flex-col gap-4"
           >
-            <Identity lensHandle={lensHandle} profile={profile} />
+            <Identity
+              lensHandle={lensHandle}
+              profile={{
+                avatar,
+                name: profile.name,
+                bio: profile.bio,
+              }}
+            />
             <SocialLinks
               socialLinks={profile.socialLinks}
               interactive={isInteractive}
@@ -99,9 +115,9 @@ export const ProfileLayout = ({
             aria-label="Profile links"
             className="profile-links-panel profile-links-canvas profile-content-scroll bg-content-background focus-visible:ring-name-text focus-visible:ring-offset-background relative isolate min-h-48 w-full animate-[blurFadeIn_0.4s_ease-out_0.75s_backwards] rounded-xl px-5 py-6 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:animate-none sm:px-8"
             style={
-              profile.linksPanelBackground
+              linksPanelBackground
                 ? {
-                    backgroundImage: `url(${JSON.stringify(profile.linksPanelBackground)})`,
+                    backgroundImage: `url(${JSON.stringify(linksPanelBackground)})`,
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover',

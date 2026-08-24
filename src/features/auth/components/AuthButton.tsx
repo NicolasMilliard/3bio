@@ -14,6 +14,7 @@ import {
   Image,
   Spinner,
 } from '@/components/ui';
+import { getTrustedMediaUrl } from '@/lib/trustedMedia';
 import { ChevronDownIcon } from 'lucide-react';
 
 export const AuthButton = () => {
@@ -31,6 +32,7 @@ export const AuthButton = () => {
     isDisconnecting,
     switchingProfileAddress,
   } = useAuthState();
+  const trustedActiveAvatar = getTrustedMediaUrl(activeAvatar);
 
   if (!isConnected) {
     return (
@@ -60,9 +62,9 @@ export const AuthButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button disabled={isDisconnecting || profileActionPending}>
-          {activeAvatar && (
+          {trustedActiveAvatar && (
             <Image
-              src={activeAvatar}
+              src={trustedActiveAvatar}
               alt={activeDisplayName}
               className="size-6 rounded-full object-cover"
             />
@@ -107,7 +109,10 @@ export const AuthButton = () => {
               }
             >
               <Avatar size="sm">
-                <AvatarImage src={p.avatar} alt={p.displayName} />
+                <AvatarImage
+                  src={getTrustedMediaUrl(p.avatar)}
+                  alt={p.displayName}
+                />
                 <AvatarFallback>
                   {p.displayName ? p.displayName[0].toUpperCase() : 'U'}
                 </AvatarFallback>

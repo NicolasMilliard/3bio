@@ -24,14 +24,22 @@ type UploadEditorImagesDependencies = {
   uploadFile: (
     file: File,
     options: { acl: AclConfig },
-  ) => Promise<{ gatewayUrl: string }>;
+  ) => Promise<EditorImageUploadResource>;
+};
+
+export type EditorImageUploadResource = {
+  gatewayUrl: string;
+  storageKey: string;
 };
 
 type UploadEditorImagesInput = {
   values: EditorImageValues;
   acl: AclConfig;
   onUploadStart?: (field: EditorImageField) => void;
-  onUploaded?: (field: EditorImageField, uri: string) => void;
+  onUploaded?: (
+    field: EditorImageField,
+    resource: EditorImageUploadResource,
+  ) => void;
   dependencies?: UploadEditorImagesDependencies;
 };
 
@@ -94,7 +102,7 @@ export const uploadEditorImages = async ({
     onUploadStart?.(field);
     const upload = await dependencies.uploadFile(file, { acl });
     uris[field] = upload.gatewayUrl;
-    onUploaded?.(field, upload.gatewayUrl);
+    onUploaded?.(field, upload);
   }
 
   return {

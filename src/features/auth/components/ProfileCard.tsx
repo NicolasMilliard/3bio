@@ -8,6 +8,7 @@ import {
   Text,
 } from '@/components/ui';
 import { formatAddress } from '@/helpers';
+import { getTrustedMediaUrl } from '@/lib/trustedMedia';
 
 type ProfileCardProps = {
   address: string;
@@ -30,18 +31,25 @@ export const ProfileCard = ({
   name,
   onSelect,
 }: ProfileCardProps) => {
+  const trustedAvatar = getTrustedMediaUrl(avatar);
+  const trustedCoverPicture = getTrustedMediaUrl(coverPicture);
+
   return (
     <Card className="bg-background ring-muted w-full max-w-97 overflow-hidden p-0 text-center shadow-none ring-1">
       <div
         className="bg-accent h-32 w-full bg-cover bg-center"
         style={
-          coverPicture ? { backgroundImage: `url(${coverPicture})` } : undefined
+          trustedCoverPicture
+            ? {
+                backgroundImage: `url(${JSON.stringify(trustedCoverPicture)})`,
+              }
+            : undefined
         }
       />
 
       <div className="-mt-20 flex flex-col items-center px-6 pb-6">
         <Avatar size="xl" className="border-4 border-white shadow-sm">
-          <AvatarImage src={avatar} alt={name} />
+          <AvatarImage src={trustedAvatar} alt={name} />
           <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
 

@@ -23,7 +23,6 @@ export const Links = ({
           href={link.value}
           label={formatUrlLabel(link.value)}
           interactive={interactive}
-          loadFavicon={interactive}
         />
       ))}
     </nav>

@@ -18,8 +18,7 @@ import { getTransactionFailureReason } from '../helpers/getTransactionFailureRea
 import type { EditorSessionSnapshot } from './getEditorSessionSnapshot';
 
 export type MetadataUpdateProgress =
-  | 'switching-network'
-  | 'confirming-transaction';
+  'switching-network' | 'confirming-transaction';
 
 export type MetadataUpdateFailure =
   | {
@@ -36,6 +35,10 @@ export type MetadataUpdateFailure =
   | {
       kind: 'transaction-failed';
       description: string;
+    }
+  | {
+      kind: 'submission-unknown';
+      error: unknown;
     }
   | {
       kind: 'confirmation-failed';
@@ -194,12 +197,27 @@ export const submitMetadataUpdate = async ({
       return { ok: false, failure: { kind: 'session-changed' } };
     }
 
-    const walletClient = await dependencies.getWalletClient(config, {
-      account: signingSession.connection.address,
-      assertChainId: true,
-      chainId: chains.mainnet.id,
-      connector: signingSession.connection.connector,
-    });
+    let walletClient: Awaited<ReturnType<typeof getWalletClient>>;
+
+    try {
+      walletClient = await dependencies.getWalletClient(config, {
+        account: signingSession.connection.address,
+        assertChainId: true,
+        chainId: chains.mainnet.id,
+        connector: signingSession.connection.connector,
+      });
+    } catch (error) {
+      return {
+        ok: false,
+        failure: {
+          kind: 'transaction-failed',
+          description:
+            error instanceof Error
+              ? error.message
+              : 'The wallet could not prepare this transaction.',
+        },
+      };
+    }
 
     const finalSession = getCurrentEditorSession();
 
@@ -241,8 +259,11 @@ export const submitMetadataUpdate = async ({
       return {
         ok: false,
         failure: {
-          kind: 'transaction-failed',
-          description: result.error.message ?? 'An error occurred.',
+          // The Lens viem adapter can send the transaction and then fail while
+          // waiting for its receipt without returning the issued hash. Do not
+          // classify this as a definitive pre-broadcast failure.
+          kind: 'submission-unknown',
+          error: result.error,
         },
       };
     }

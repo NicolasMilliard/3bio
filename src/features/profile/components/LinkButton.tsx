@@ -1,14 +1,11 @@
-import { getFaviconCandidates, getNextFaviconCandidate } from '@/helpers';
 import { cn } from '@/lib/utils';
 import {
   forwardRef,
-  useState,
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
   type Ref,
 } from 'react';
 
-import { Image } from '@/components/ui';
 import { ExternalLink, Link2 } from 'lucide-react';
 
 type LinkButtonBaseProps = {
@@ -16,7 +13,6 @@ type LinkButtonBaseProps = {
   label: string;
   className?: string;
   interactive?: boolean;
-  loadFavicon?: boolean;
   surface?: 'profile' | 'editor';
 };
 
@@ -41,39 +37,12 @@ export const LinkButton = forwardRef<
     label,
     className = '',
     interactive = true,
-    loadFavicon = true,
     surface = 'profile',
     as = 'link',
     ...elementProps
   },
   ref,
 ) {
-  const faviconCandidates = loadFavicon ? getFaviconCandidates(href) : [];
-  const faviconKey = faviconCandidates.join('|');
-  const primaryFavicon = faviconCandidates[0] ?? null;
-  const [favicon, setFavicon] = useState({
-    key: faviconKey,
-    src: primaryFavicon,
-    loaded: false,
-  });
-  const activeFavicon =
-    favicon.key === faviconKey
-      ? favicon
-      : { key: faviconKey, src: primaryFavicon, loaded: false };
-  const imgSrc = activeFavicon.src;
-
-  const handleImageError = () => {
-    setFavicon({
-      key: faviconKey,
-      src: getNextFaviconCandidate(faviconCandidates, imgSrc),
-      loaded: false,
-    });
-  };
-  const handleImageLoad = () => {
-    if (!imgSrc) return;
-
-    setFavicon({ key: faviconKey, src: imgSrc, loaded: true });
-  };
   const isEditorSurface = surface === 'editor';
   const linkRadiusClassName = 'rounded-lg';
   const iconSurfaceClassName = 'bg-links-icon-background text-links-icon';
@@ -90,22 +59,10 @@ export const LinkButton = forwardRef<
         <span
           className={cn(
             'flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md transition-colors',
-            activeFavicon.loaded ? 'bg-transparent' : iconSurfaceClassName,
+            iconSurfaceClassName,
           )}
         >
-          {imgSrc ? (
-            <Image
-              src={imgSrc}
-              alt=""
-              aria-hidden="true"
-              referrerPolicy="no-referrer"
-              className="size-3.5 rounded-sm"
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-            />
-          ) : (
-            <Link2 aria-hidden="true" className="size-3.5" />
-          )}
+          <Link2 aria-hidden="true" className="size-3.5" />
         </span>
       )}
 

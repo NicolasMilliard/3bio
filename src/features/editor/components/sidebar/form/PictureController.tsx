@@ -5,6 +5,7 @@ import {
   validateImageUpload,
 } from '@/features/editor/schemas/imageUpload.schema';
 import type { MetadataFormValues } from '@/features/editor/schemas/metadataForm.schema';
+import { getTrustedMediaUrl } from '@/lib/trustedMedia';
 import { cn } from '@/lib/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -46,6 +47,9 @@ export const PictureController = ({
   const [isValidating, setIsValidating] = useState(false);
   const [isGuidanceOpen, setIsGuidanceOpen] = useState(false);
   const currentPicture = useWatch({ control, name: formValue })?.preview;
+  const trustedCurrentPicture = getTrustedMediaUrl(currentPicture, {
+    allowBlob: true,
+  });
   const imageError = errors[formValue]?.file ?? errors[formValue]?.preview;
   const normalizedLabel = label.toLowerCase();
   const inputId = `${formValue}-image`;
@@ -204,10 +208,10 @@ export const PictureController = ({
                 previewClassName,
               )}
             >
-              {currentPicture ? (
+              {trustedCurrentPicture ? (
                 <Image
-                  key={currentPicture}
-                  src={currentPicture}
+                  key={trustedCurrentPicture}
+                  src={trustedCurrentPicture}
                   alt=""
                   aria-hidden="true"
                   className={cn('object-cover', previewClassName)}

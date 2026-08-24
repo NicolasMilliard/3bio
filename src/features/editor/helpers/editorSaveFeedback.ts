@@ -61,6 +61,12 @@ export const getMetadataUpdateFailureFeedback = (
         title: 'Transaction failed',
         description: failure.description,
       };
+    case 'submission-unknown':
+      return {
+        title: 'Profile submission interrupted',
+        description:
+          'Your wallet may have submitted the transaction, but 3bio could not verify it. Check your public profile before trying again.',
+      };
     case 'confirmation-failed':
       return getSaveErrorFeedback('confirming-transaction');
   }
@@ -92,6 +98,12 @@ export const getMetadataPreparationFailureFeedback = (
       return {
         title: 'Profile metadata is from a newer version',
         description: 'Update 3bio before saving this profile.',
+      };
+    case 'publication-deleted':
+      return {
+        title: 'Make this profile public before editing',
+        description:
+          'Open Privacy & data on the dashboard and make this profile public before saving new details.',
       };
   }
 };

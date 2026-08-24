@@ -25,6 +25,7 @@ import {
 import type {
   LensLink,
   ThreeBioMetadata,
+  ThreeBioPublicationStatus,
   ThreeBioProfile,
 } from '../schemas/threeBioMetadata.schema';
 
@@ -49,6 +50,9 @@ type MetadataPatch = {
   theme?: ThemePatch;
   settings?: {
     subscription: SubscriptionPatch;
+  };
+  publication?: {
+    status: ThreeBioPublicationStatus;
   };
 };
 
@@ -84,6 +88,11 @@ const supportedLinkTypes = new Set([
 ]);
 const supportedThemes = new Set<string>(THREE_BIO_THEME_NAMES);
 const supportedTombstones = new Set<string>(THREE_BIO_TOMBSTONE_PATHS);
+const supportedPublicationStatuses = new Set<ThreeBioPublicationStatus>([
+  'public',
+  'opted-out',
+  'deleted',
+]);
 
 const hasOwn = (value: object, key: PropertyKey) =>
   Object.prototype.hasOwnProperty.call(value, key);
@@ -416,6 +425,17 @@ const parseSettings = (
     : undefined;
 };
 
+const parsePublication = (
+  value: unknown,
+): MetadataPatch['publication'] => {
+  if (!isRecord(value)) return undefined;
+
+  return typeof value.status === 'string' &&
+    supportedPublicationStatuses.has(value.status as ThreeBioPublicationStatus)
+    ? { status: value.status as ThreeBioPublicationStatus }
+    : undefined;
+};
+
 const parseTombstones = (value: unknown) => {
   const tombstones = new Set<ThreeBioTombstonePath>();
 
@@ -502,7 +522,8 @@ const hasPatchLeaf = (patch: MetadataPatch) =>
   (patch.profile !== undefined && Object.keys(patch.profile).length > 0) ||
   (patch.theme !== undefined && Object.keys(patch.theme).length > 0) ||
   (patch.settings !== undefined &&
-    Object.keys(patch.settings.subscription).length > 0);
+    Object.keys(patch.settings.subscription).length > 0) ||
+  patch.publication !== undefined;
 
 const parseDecodedCandidate = (
   candidate: DecodedCandidate,
@@ -545,10 +566,19 @@ const parseDecodedCandidate = (
     if (settings) patch.settings = settings;
   }
 
+  if (hasOwn(raw, 'publication')) {
+    const publication = parsePublication(raw.publication);
+
+    if (publication) patch.publication = publication;
+  }
+
   if (
     Object.keys(patch).length === 0 &&
     tombstones.size === 0 &&
-    (hasOwn(raw, 'profile') || hasOwn(raw, 'theme') || hasOwn(raw, 'settings'))
+    (hasOwn(raw, 'profile') ||
+      hasOwn(raw, 'theme') ||
+      hasOwn(raw, 'settings') ||
+      hasOwn(raw, 'publication'))
   ) {
     return { unsupported: false };
   }
@@ -738,6 +768,9 @@ const mergeRecords = (
     if (record.patch.settings) {
       applySettings(state, record.patch.settings, tombstones);
     }
+    if (record.patch.publication) {
+      state.publication = record.patch.publication;
+    }
 
     for (const path of record.tombstones) {
       removePath(state, path);
@@ -776,6 +809,7 @@ const mergeRecords = (
           },
         }
       : {}),
+    ...(state.publication ? { publication: state.publication } : {}),
     ...(tombstones.size > 0
       ? {
           tombstones: THREE_BIO_TOMBSTONE_PATHS.filter((path) =>
