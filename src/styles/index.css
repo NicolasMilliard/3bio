@@ -134,6 +134,54 @@
 }
 
 /* =========================================================
+   Dashboard entrance
+========================================================= */
+@keyframes dashboardEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dashboard-enter {
+  animation: dashboardEnter 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dashboard-enter-card-1 {
+  animation-delay: 60ms;
+}
+
+.dashboard-enter-card-2 {
+  animation-delay: 120ms;
+}
+
+.dashboard-enter-privacy {
+  animation-delay: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-enter {
+    animation-name: dashboardFadeIn;
+    animation-duration: 160ms;
+    animation-delay: 0ms;
+    animation-timing-function: ease-out;
+  }
+}
+
+/* =========================================================
    Homepage hero motion
 ========================================================= */
 @keyframes heroVisualEnter {
