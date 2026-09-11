@@ -1,4 +1,3 @@
-import { useId, useState } from 'react';
 import {
   EyeOff,
   FileX2,
@@ -8,6 +7,7 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
+import { useId, useState } from 'react';
 
 import {
   Badge,
@@ -390,7 +390,7 @@ export const PrivacyDataCard = ({
           aria-hidden="true"
         />
         <p className="text-muted-foreground max-w-4xl text-xs leading-relaxed">
-          These controls affect 3bio&apos;s current view and app-managed data.
+          These controls affect 3bio&apos;s current view and Grove upload data.
           Pending uploads and Grove metadata documents are retained. Lens and
           on-chain history, intermediary caches, and third-party copies cannot
           be erased.

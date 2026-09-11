@@ -148,8 +148,13 @@ deployments out of search results. The raw homepage HTML still contains the
 static origin committed in `index.html`.
 
 Cloudflare Pages automatically deploys the root `functions/` directory. This
-project does not require a Wrangler configuration, database, API key, or
-Cloudflare runtime binding for its current feature set.
+project works without a Wrangler configuration, database, API key, or
+Cloudflare runtime binding. To enable optional connected-wallet counts, follow
+[Wallet analytics](./wallet-analytics.md): create a D1 database, apply the SQL
+migration, add the production `WALLET_ANALYTICS_DB` binding, and set the
+production build variable `VITE_WALLET_ANALYTICS_ENABLED=true` before
+redeploying. Keep analytics disabled and the production database unbound in
+Preview deployments.
 
 Moderation is a deploy-time source configuration rather than a backend service.
 Review [Privacy, moderation, and deletion](./privacy-moderation.md) before
@@ -185,6 +190,8 @@ deployment boilerplate:
 - `functions/[[path]].ts` fetches Lens accounts for public handles, injects
   crawler-visible profile metadata, canonicalizes profile URLs, and returns real
   404 or 503 responses when appropriate.
+- `functions/api/analytics/wallet.ts` receives optional wallet-connection
+  submissions at `/api/analytics/wallet` and updates the bound D1 database.
 - `public/_routes.json` sends dynamic routes through the Function while keeping
   the homepage and its explicitly listed static assets on the static path.
 - `public/_headers` applies security headers, long-lived asset caching, and
@@ -210,7 +217,7 @@ image host work.
 
 To hide a profile administratively, add its canonical handle or Lens account
 address to `src/constants/profileModeration.ts`, run the checks, and redeploy.
-The list is static and source-visible; there is no backend or admin UI, so do
+The list is static and source-visible; there is no moderation backend or admin UI, so do
 not put reports or moderation reasons in it. If an older deployment cached a
 profile response, also use the hosting provider's cache purge during urgent
 removal. The complete behavior and deletion limits are documented in
