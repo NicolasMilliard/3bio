@@ -31,6 +31,30 @@ moderation decision. Static assets and generic invalid-route responses retain
 their separate caching policies because they do not contain resolved profile
 data.
 
+## Optional wallet analytics
+
+Operators can enable wallet analytics for the dashboard and editor. A manual
+wallet connection, restored connection on a new visit, or address switch sends
+the connected EVM wallet address to a same-origin endpoint, before Lens login.
+The operator's Cloudflare D1 database holds one row per lowercase address:
+`wallet_address`, `created_at` (first seen), and `updated_at` (latest seen),
+using server-generated UTC timestamps.
+
+This feature does not record public-page viewers, event history, cookies, IP
+addresses, or user agents. It does not send heartbeats or continuously track
+activity. Hosting-provider request logs are separate from this database.
+Submissions are best effort, so a blocked or failed request may be missed.
+
+Wallet addresses are public identifiers that may be linked to on-chain
+activity. The counts describe submitted wallets, not verified people or wallet
+ownership. Records have no automatic expiry and remain until the operator
+removes them. There is no public read endpoint or analytics dashboard.
+
+Hiding or deleting a 3bio profile does not delete its wallet analytics record.
+The operator can delete a specific address in the D1 console; connecting that
+wallet again can recreate it. See [Wallet analytics](./wallet-analytics.md) for
+setup, counts, and the deletion query.
+
 ## Profile-owner controls
 
 Profiles without an explicit publication setting remain public for backward
@@ -145,6 +169,9 @@ eligible Grove objects known to the current browser. They do not erase:
   already received an older response;
 - archives, screenshots, exports, or copies retained by third parties; or
 - request records previously collected by sites a user chose to visit.
+
+These profile controls also leave optional wallet analytics records unchanged;
+the operator must remove those separately from D1.
 
 `no-store` prevents new 3bio profile-page caching; it cannot recall copies made
 before the header was received. For an urgent moderation change after an older

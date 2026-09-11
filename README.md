@@ -37,6 +37,8 @@ settings in a dedicated `3bio` metadata attribute.
   preserving native Lens metadata and unrelated attributes.
 - Search- and share-ready profile titles, canonical URLs, structured metadata,
   and social previews.
+- Optional connected-wallet counts using Cloudflare D1, with first and latest
+  connection timestamps. See [Wallet analytics](./docs/wallet-analytics.md).
 
 ## How it works
 
@@ -62,6 +64,11 @@ limited to trusted origins, and dynamic profile HTML is served with `no-store`
 so conforming caches do not retain a ready page after a later privacy decision.
 See [Privacy, moderation, and deletion](./docs/privacy-moderation.md) for the
 exact behavior and limitations.
+
+When wallet analytics is enabled by the operator, connecting or restoring a
+wallet in the dashboard or editor records its address and first/latest seen
+timestamps. Public-page viewers are not included. Profile deletion does not
+erase this separate record; the operator can remove it from D1.
 
 ## Local development
 
@@ -101,7 +108,8 @@ for details.
 ## Fork and self-host
 
 3bio is designed to be forked and can be deployed through Cloudflare Pages
-without a database or private runtime credentials. A branded fork needs more
+without a database or private runtime credentials. Optional wallet analytics
+adds one D1 database and a runtime binding. A branded fork needs more
 than a single environment-variable change because the crawler-visible homepage
 metadata and public files also contain the production name and origin.
 
